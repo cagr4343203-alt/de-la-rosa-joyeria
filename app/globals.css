@@ -62,7 +62,7 @@ img {
 .site-shell {
   min-height: 100vh;
   opacity: 1;
-  transition: opacity 0.6s ease;
+  transition: opacity 0.32s ease;
 }
 
 .site-shell--loading {
@@ -83,7 +83,7 @@ img {
   justify-content: center;
   opacity: 1;
   position: fixed;
-  transition: opacity 0.65s ease, visibility 0.65s ease;
+  transition: opacity 0.32s ease, visibility 0.32s ease;
   visibility: visible;
   z-index: 2000;
 }
@@ -606,19 +606,19 @@ img {
 }
 
 .reveal--1 {
-  animation-delay: 1.68s;
+  animation-delay: 0.55s;
 }
 
 .reveal--2 {
-  animation-delay: 1.77s;
+  animation-delay: 0.62s;
 }
 
 .reveal--3 {
-  animation-delay: 1.9s;
+  animation-delay: 0.7s;
 }
 
 .reveal--4 {
-  animation-delay: 2.02s;
+  animation-delay: 0.78s;
 }
 
 .promise-strip {
@@ -662,6 +662,8 @@ img {
 }
 
 .catalog-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1800px;
   padding: clamp(80px, 10vw, 145px) clamp(20px, 6vw, 100px);
 }
 
@@ -883,6 +885,8 @@ img {
 
 .story-section {
   background: var(--cream);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
   display: grid;
   gap: clamp(50px, 8vw, 130px);
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 0.82fr);
@@ -936,6 +940,8 @@ img {
 }
 
 .location-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
   background: var(--ink);
   display: grid;
   grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
@@ -1072,6 +1078,8 @@ img {
 }
 
 .closing-banner {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
   align-items: center;
   background:
     linear-gradient(rgba(34, 25, 20, 0.72), rgba(34, 25, 20, 0.78)),
@@ -1558,7 +1566,13 @@ footer > p {
 }
 
 @media (max-width: 820px) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .header {
+    backdrop-filter: none;
+    background: rgba(251, 248, 243, 0.98);
     height: 72px;
     padding: 0 18px;
   }
@@ -1596,6 +1610,22 @@ footer > p {
   .hero__visual {
     margin-top: 62px;
     min-height: 580px;
+  }
+
+  .hero__orb,
+  .hero__image--main,
+  .hero__image--float,
+  .hero__seal {
+    animation: none;
+  }
+
+  .loader__logo {
+    animation-duration: 2.4s;
+    box-shadow: 0 0 34px rgba(199, 165, 103, 0.1);
+  }
+
+  .reveal {
+    animation-duration: 0.55s;
   }
 
   .hero__image--main {

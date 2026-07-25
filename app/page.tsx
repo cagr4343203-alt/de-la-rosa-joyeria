@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 type Product = {
@@ -145,7 +146,14 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setLoading(false), 1650);
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const isMobile = window.matchMedia("(max-width: 820px)").matches;
+    const timer = window.setTimeout(
+      () => setLoading(false),
+      reduceMotion ? 120 : isMobile ? 620 : 1050,
+    );
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -236,10 +244,14 @@ export default function Home() {
         className={`loader ${loading ? "" : "loader--hidden"}`}
         aria-hidden={!loading}
       >
-        <img
+        <Image
           className="loader__logo"
           src="/logo.png"
           alt="De la Rosa Joyería y Relojería"
+          width={255}
+          height={255}
+          priority
+          sizes="(max-width: 820px) 170px, 255px"
         />
         <span className="loader__line" />
         <small>Preparando una experiencia brillante</small>
@@ -272,7 +284,14 @@ export default function Home() {
 
         <header className="header">
           <a className="brand" href="#inicio" aria-label="De la Rosa, inicio">
-            <img className="brand__logo" src="/logo.png" alt="" />
+            <Image
+              className="brand__logo"
+              src="/logo.png"
+              alt=""
+              width={48}
+              height={48}
+              priority
+            />
             <span>
               <strong>DE LA ROSA</strong>
               <small>Joyería · Relojería</small>
@@ -360,15 +379,21 @@ export default function Home() {
             <div className="hero__visual reveal reveal--2">
               <div className="hero__orb" />
               <figure className="hero__image hero__image--main">
-                <img
+                <Image
                   src="/products/06-joya.jpg"
                   alt="Anillos dorados con piedras luminosas"
+                  fill
+                  priority
+                  sizes="(max-width: 820px) 74vw, 31vw"
                 />
               </figure>
               <figure className="hero__image hero__image--float">
-                <img
+                <Image
                   src="/products/05-pulsera.jpg"
                   alt="Pulsera de plata con corazones"
+                  fill
+                  priority
+                  sizes="(max-width: 820px) 50vw, 20vw"
                 />
               </figure>
               <div className="hero__seal" aria-hidden="true">
@@ -452,7 +477,12 @@ export default function Home() {
                   style={{ "--delay": `${(index % 4) * 70}ms` } as React.CSSProperties}
                 >
                   <div className="product-card__image">
-                    <img src={product.image} alt={product.name} />
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 520px) 48vw, (max-width: 820px) 46vw, (max-width: 1120px) 30vw, 22vw"
+                    />
                     {product.badge && <span>{product.badge}</span>}
                     <button
                       type="button"
@@ -501,9 +531,11 @@ export default function Home() {
 
           <section className="story-section" id="nosotros">
             <div className="story__image">
-              <img
+              <Image
                 src="/products/07-destello.jpg"
                 alt="Collares dorados de De la Rosa"
+                fill
+                sizes="(max-width: 820px) 100vw, 46vw"
               />
               <span>Desde Encarnación</span>
             </div>
@@ -576,7 +608,7 @@ export default function Home() {
               <span className="map__road map__road--two" />
               <span className="map__road map__road--three" />
               <div className="map__pin">
-                <img src="/logo.png" alt="" />
+                <Image src="/logo.png" alt="" width={74} height={74} />
                 <span>DE LA ROSA</span>
                 <small>Joyería · Relojería</small>
               </div>
@@ -606,7 +638,13 @@ export default function Home() {
 
         <footer>
           <div className="footer__brand">
-            <img className="brand__logo" src="/logo.png" alt="" />
+            <Image
+              className="brand__logo"
+              src="/logo.png"
+              alt=""
+              width={48}
+              height={48}
+            />
             <div>
               <strong>DE LA ROSA</strong>
               <small>Joyería · Relojería</small>
@@ -682,7 +720,13 @@ export default function Home() {
             ) : (
               cart.map((item) => (
                 <article className="cart-line" key={item.id}>
-                  <img src={item.image} alt="" />
+                  <Image
+                    src={item.image}
+                    alt=""
+                    width={92}
+                    height={116}
+                    sizes="92px"
+                  />
                   <div className="cart-line__info">
                     <p>{item.material}</p>
                     <h3>{item.name}</h3>
@@ -755,7 +799,13 @@ export default function Home() {
         >
           <div className="mobile-menu__top">
             <a className="brand" href="#inicio" onClick={() => setMenuOpen(false)}>
-              <img className="brand__logo" src="/logo.png" alt="" />
+              <Image
+                className="brand__logo"
+                src="/logo.png"
+                alt=""
+                width={48}
+                height={48}
+              />
               <span>
                 <strong>DE LA ROSA</strong>
                 <small>Joyería · Relojería</small>
