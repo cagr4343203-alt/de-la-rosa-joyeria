@@ -1,0 +1,11 @@
+.openai
+build
+db
+dist
+drizzle
+examples
+outputs
+worker
+.wrangler
+drizzle.config.ts
+vite.config.ts
