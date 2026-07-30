@@ -36,7 +36,8 @@ body {
 
 body.no-scroll,
 body.menu-open,
-body.cart-open {
+body.cart-open,
+body.page-loading {
   overflow: hidden;
 }
 
@@ -89,6 +90,7 @@ img {
   position: fixed;
   transition: opacity 0.28s ease, visibility 0.28s ease;
   visibility: visible;
+  will-change: opacity;
   z-index: 1000;
 }
 

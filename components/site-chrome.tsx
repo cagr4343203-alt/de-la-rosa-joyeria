@@ -54,6 +54,10 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const drawerScrollRef = useRef<HTMLDivElement>(null);
+  const previousPathnameRef = useRef(pathname);
+  const navigationPendingRef = useRef(false);
+  const navigationHideTimerRef = useRef<number | undefined>(undefined);
+  const navigationFallbackTimerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const reduced = window.matchMedia(
@@ -77,6 +81,117 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     return () => {
       window.clearTimeout(timer);
       if (readyTimer !== undefined) window.clearTimeout(readyTimer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (previousPathnameRef.current === pathname) return;
+
+    previousPathnameRef.current = pathname;
+    if (!navigationPendingRef.current) return;
+
+    navigationPendingRef.current = false;
+    window.clearTimeout(navigationFallbackTimerRef.current);
+
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const mobile = window.matchMedia("(max-width: 760px)").matches;
+
+    navigationHideTimerRef.current = window.setTimeout(
+      () => {
+        setLoading(false);
+        document.body.classList.remove("page-loading");
+        document.documentElement.dataset.siteReady = "true";
+        window.dispatchEvent(new Event("dela:site-ready"));
+      },
+      reduced ? 20 : mobile ? 260 : 380,
+    );
+  }, [pathname]);
+
+  useEffect(() => {
+    const finishFallback = () => {
+      navigationPendingRef.current = false;
+      setLoading(false);
+      document.body.classList.remove("page-loading");
+      document.documentElement.dataset.siteReady = "true";
+      window.dispatchEvent(new Event("dela:site-ready"));
+    };
+
+    const beginNavigation = (nextUrl?: URL) => {
+      window.clearTimeout(navigationHideTimerRef.current);
+      window.clearTimeout(navigationFallbackTimerRef.current);
+
+      navigationPendingRef.current = true;
+      document.documentElement.dataset.siteReady = "false";
+      document.body.classList.add("page-loading");
+      setMenuOpen(false);
+      setLoading(true);
+
+      const samePage =
+        nextUrl &&
+        nextUrl.pathname === window.location.pathname;
+      navigationFallbackTimerRef.current = window.setTimeout(
+        finishFallback,
+        samePage ? 480 : 2500,
+      );
+    };
+
+    const handleInternalLink = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const anchor = target.closest<HTMLAnchorElement>("a[href]");
+      if (
+        !anchor ||
+        anchor.target === "_blank" ||
+        anchor.hasAttribute("download")
+      ) {
+        return;
+      }
+
+      const nextUrl = new URL(anchor.href, window.location.href);
+      if (nextUrl.origin !== window.location.origin) return;
+
+      const currentUrl = new URL(window.location.href);
+      const isNavigationPanelLink = Boolean(
+        anchor.closest(
+          ".desktop-nav, .mobile-drawer nav, .mobile-bottom-nav",
+        ),
+      );
+      const isCurrentUrl =
+        nextUrl.pathname === currentUrl.pathname &&
+        nextUrl.search === currentUrl.search;
+
+      if (isCurrentUrl && !isNavigationPanelLink) {
+        return;
+      }
+
+      beginNavigation(nextUrl);
+    };
+
+    const handleHistoryNavigation = () => beginNavigation();
+
+    document.addEventListener("click", handleInternalLink, true);
+    window.addEventListener("popstate", handleHistoryNavigation);
+
+    return () => {
+      document.removeEventListener("click", handleInternalLink, true);
+      window.removeEventListener("popstate", handleHistoryNavigation);
+      window.clearTimeout(navigationHideTimerRef.current);
+      window.clearTimeout(navigationFallbackTimerRef.current);
+      document.body.classList.remove("page-loading");
     };
   }, []);
 
@@ -144,6 +259,8 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       <div
         className={`site-loader ${loading ? "" : "is-hidden"}`}
         aria-hidden={!loading}
+        aria-live="polite"
+        role="status"
       >
         <Image
           src="/logo-delarosa-negro.jpg"
