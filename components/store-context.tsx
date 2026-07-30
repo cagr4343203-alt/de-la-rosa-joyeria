@@ -163,6 +163,7 @@ export function CartDrawer() {
         className={`cart-drawer ${cartOpen ? "is-open" : ""}`}
         aria-hidden={!cartOpen}
         aria-label="Carrito de compras"
+        inert={!cartOpen}
       >
         <div className="drawer-head">
           <div>

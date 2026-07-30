@@ -27,8 +27,7 @@ const categoryCards = [
   {
     title: "Bombillas",
     eyebrow: "Detalles para regalar",
-    image: "/products/12-regalos-bombilla-boligrafo.png",
-    position: "left center",
+    image: "/products/13-bombilla-category.png",
   },
   {
     title: "Pulseras",
@@ -150,7 +149,6 @@ export default async function Home() {
                 loading="eager"
                 quality={70}
                 sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw"
-                style={{ objectPosition: card.position }}
               />
               <span>{card.eyebrow}</span>
               <h3>{card.title}</h3>

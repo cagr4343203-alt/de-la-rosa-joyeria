@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   ArrowUpRight,
   CalendarDays,
@@ -68,6 +69,25 @@ export default function ReservationsPage() {
               <Sparkles size={19} />
               Atención personalizada
             </span>
+          </div>
+          <div className="reservation-reference">
+            <figure>
+              <Image
+                src="/products/piercing-reference-client.png"
+                alt="Ejemplo de perforaciones y aros para inspiración"
+                fill
+                priority
+                sizes="(max-width: 900px) 34vw, 190px"
+              />
+            </figure>
+            <div>
+              <span>Imagen de referencia</span>
+              <strong>Inspiración para elegir tu estilo</strong>
+              <p>
+                El equipo te orientará sobre las opciones disponibles durante
+                la confirmación de tu reserva.
+              </p>
+            </div>
           </div>
         </div>
 

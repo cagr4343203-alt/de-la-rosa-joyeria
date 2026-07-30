@@ -11,6 +11,7 @@ import {
   Menu,
   PackageSearch,
   ShoppingBag,
+  UsersRound,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -34,6 +35,7 @@ const mobileItems = [
   { href: "/", label: "Inicio", Icon: Home },
   { href: "/productos", label: "Productos", Icon: PackageSearch },
   { href: "/reservas", label: "Reservar", Icon: CalendarDays, primary: true },
+  { href: "/nosotros", label: "Nosotros", Icon: UsersRound },
   { href: "/combos", label: "Combos", Icon: Gift },
   { href: "/ubicacion", label: "Ubicación", Icon: MapPin },
 ];
@@ -86,7 +88,11 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         <small>Preparando detalles exclusivos</small>
       </div>
 
-      <div className="announcement" aria-label="Información destacada">
+      <div
+        className="announcement"
+        role="region"
+        aria-label="Información destacada"
+      >
         <div>
           <span>Desde 2003 formando parte de tus momentos</span>
           <i>✦</i>
@@ -266,7 +272,11 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         </p>
       </footer>
 
-      <div className="social-dock" aria-label="Contacto rápido">
+      <div
+        className="social-dock"
+        role="group"
+        aria-label="Contacto rápido"
+      >
         <a
           className="social-pill whatsapp"
           href={whatsappHref("Hola DELAROSA, quiero hacer una consulta.")}
@@ -294,6 +304,11 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           <Link
             key={href}
             href={href}
+            onClick={() => {
+              if (href === "/" && pathname === "/") {
+                window.scrollTo({ top: 0, behavior: "auto" });
+              }
+            }}
             className={`${primary ? "is-primary" : ""} ${
               isActive(pathname, href) ? "is-active" : ""
             }`}
