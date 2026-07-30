@@ -14,17 +14,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      default: "DELAROSA | El detalle exclusivo",
-      template: "%s · DELAROSA",
+      default: "Dela Rosa | El detalle exclusivo",
+      template: "%s · Dela Rosa",
     },
     description:
-      "Joyas, relojes y regalos para momentos especiales. Comprá por catálogo o reservá tu perforación de oreja en DELAROSA, Encarnación.",
+      "Joyas, relojes y regalos para momentos especiales. Comprá por catálogo o reservá tu perforación de oreja en Dela Rosa, Encarnación.",
     icons: {
       icon: "/logo-delarosa-negro.jpg",
       shortcut: "/logo-delarosa-negro.jpg",
     },
     openGraph: {
-      title: "DELAROSA | El detalle exclusivo para ese momento especial",
+      title: "Dela Rosa | El detalle exclusivo para ese momento especial",
       description:
         "Joyas, relojes, regalos y reserva de perforación en Encarnación.",
       type: "website",
@@ -34,13 +34,13 @@ export async function generateMetadata(): Promise<Metadata> {
           url: `${baseUrl}/og.png`,
           width: 1734,
           height: 907,
-          alt: "DELAROSA — El detalle exclusivo para ese momento especial",
+          alt: "Dela Rosa — El detalle exclusivo para ese momento especial",
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: "DELAROSA | El detalle exclusivo",
+      title: "Dela Rosa | El detalle exclusivo",
       description:
         "Joyas, relojes, regalos y reserva de perforación en Encarnación.",
       images: [`${baseUrl}/og.png`],

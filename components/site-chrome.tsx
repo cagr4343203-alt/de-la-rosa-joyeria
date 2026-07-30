@@ -75,7 +75,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       >
         <Image
           src="/logo-delarosa-negro.jpg"
-          alt="DELAROSA Joyería y Relojería"
+          alt="Dela Rosa Joyería y Relojería"
           width={220}
           height={220}
           priority
@@ -105,7 +105,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       </div>
 
       <header className="site-header">
-        <Link className="header-brand" href="/" aria-label="DELAROSA, inicio">
+        <Link className="header-brand" href="/" aria-label="Dela Rosa, inicio">
           <Image
             src="/logo-delarosa-negro.jpg"
             alt=""
@@ -114,7 +114,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             priority
           />
           <span>
-            <strong>DELAROSA</strong>
+            <strong>DELA ROSA</strong>
             <small>Joyería · Relojería</small>
           </span>
         </Link>
@@ -141,18 +141,18 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               href={INSTAGRAM_URL}
               target="_blank"
               rel="noreferrer"
-              aria-label="Instagram de DELAROSA"
+              aria-label="Instagram de Dela Rosa"
             >
               <Image src="/instagram.svg" alt="" width={18} height={18} />
             </a>
             <a
               className="brand-bubble whatsapp"
               href={whatsappHref(
-                "Hola DELAROSA, quiero consultar sobre sus productos.",
+                "Hola Dela Rosa, quiero consultar sobre sus productos.",
               )}
               target="_blank"
               rel="noreferrer"
-              aria-label="WhatsApp de DELAROSA"
+              aria-label="WhatsApp de Dela Rosa"
             >
               <Image src="/whatsapp.svg" alt="" width={18} height={18} />
             </a>
@@ -196,7 +196,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               height={58}
             />
             <span>
-              <strong>DELAROSA</strong>
+              <strong>DELA ROSA</strong>
               <small>Joyería · Relojería</small>
             </span>
           </Link>
@@ -236,12 +236,12 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         <div className="footer-brand">
           <Image
             src="/logo-delarosa-negro.jpg"
-            alt="DELAROSA Joyería y Relojería"
+            alt="Dela Rosa Joyería y Relojería"
             width={94}
             height={94}
           />
           <div>
-            <strong>DELAROSA</strong>
+            <strong>DELA ROSA</strong>
             <p>El detalle exclusivo para ese momento especial.</p>
           </div>
         </div>
@@ -261,7 +261,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             @dela_rosajoyeria
           </a>
           <a
-            href={whatsappHref("Hola DELAROSA, quiero hacer una consulta.")}
+            href={whatsappHref("Hola Dela Rosa, quiero hacer una consulta.")}
             target="_blank"
             rel="noreferrer"
           >
@@ -269,7 +269,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           </a>
         </div>
         <p className="footer-copy">
-          © {new Date().getFullYear()} DELAROSA · Encarnación, Paraguay
+          © {new Date().getFullYear()} Dela Rosa · Encarnación, Paraguay
         </p>
       </footer>
 
@@ -280,7 +280,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       >
         <a
           className="social-pill whatsapp"
-          href={whatsappHref("Hola DELAROSA, quiero hacer una consulta.")}
+          href={whatsappHref("Hola Dela Rosa, quiero hacer una consulta.")}
           target="_blank"
           rel="noreferrer"
           aria-label="Consultar por WhatsApp"
@@ -316,7 +316,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             aria-current={isActive(pathname, href) ? "page" : undefined}
           >
             <span>
-              <Icon size={primary ? 24 : 20} />
+              <Icon size={20} />
             </span>
             <small>{label}</small>
           </Link>

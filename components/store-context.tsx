@@ -134,7 +134,7 @@ export function CartDrawer() {
     : money(total);
 
   const orderMessage = [
-    "Hola DELAROSA ✨ Quiero consultar por este pedido:",
+    "Hola Dela Rosa ✨ Quiero consultar por este pedido:",
     "",
     ...cart.map(
       (item) =>

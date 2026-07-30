@@ -28,7 +28,7 @@ await client
     image: {
       _type: "image",
       asset: { _type: "reference", _ref: asset._id },
-      alt: "Argollas Trenzadas de DELAROSA",
+      alt: "Argollas Trenzadas de Dela Rosa",
     },
     referentialImage: false,
   })

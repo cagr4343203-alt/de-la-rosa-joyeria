@@ -58,7 +58,7 @@ export function ProductCard({
         </button>
         <a
           href={whatsappHref(
-            `Hola DELAROSA, quiero consultar por ${product.name}.`,
+            `Hola Dela Rosa, quiero consultar por ${product.name}.`,
           )}
           target="_blank"
           rel="noreferrer"

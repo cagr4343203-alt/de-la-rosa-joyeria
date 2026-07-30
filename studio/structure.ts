@@ -6,7 +6,7 @@ const apiVersion = "2026-07-29";
 
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title("Catálogo DELAROSA")
+    .title("Catálogo Dela Rosa")
     .items([
       S.listItem()
         .title("Productos")

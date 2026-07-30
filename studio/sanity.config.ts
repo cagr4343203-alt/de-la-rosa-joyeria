@@ -6,7 +6,7 @@ import { structure } from "./structure";
 
 export default defineConfig({
   name: "default",
-  title: "DELAROSA · Catálogo",
+  title: "Dela Rosa · Catálogo",
   projectId: "224225np",
   dataset: "production",
   plugins: [structureTool({ structure }), visionTool()],
@@ -17,7 +17,7 @@ export default defineConfig({
       {
         id: "combo-product",
         title: "Combo",
-        description: "Agregar un combo al catálogo de DELAROSA",
+        description: "Agregar un combo al catálogo de Dela Rosa",
         schemaType: "product",
         value: {
           category: "Combos",

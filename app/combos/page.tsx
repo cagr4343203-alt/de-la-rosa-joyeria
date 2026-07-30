@@ -4,7 +4,7 @@ import { getProducts } from "@/sanity/lib/products";
 export const metadata = {
   title: "Combos",
   description:
-    "Combos de regalos DELAROSA, administrados desde nuestro catálogo.",
+    "Combos de regalos Dela Rosa, administrados desde nuestro catálogo.",
 };
 
 export default async function CombosPage() {

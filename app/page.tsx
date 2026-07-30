@@ -78,7 +78,7 @@ export default async function Home() {
           <figure className="hero-photo hero-photo-main">
             <Image
               src="/products/06-joya.jpg"
-              alt="Anillos de DELAROSA"
+              alt="Anillos de Dela Rosa"
               fill
               priority
               sizes="(max-width: 900px) 76vw, 36vw"
@@ -87,7 +87,7 @@ export default async function Home() {
           <figure className="hero-photo hero-photo-small">
             <Image
               src="/products/05-pulsera.jpg"
-              alt="Pulsera de DELAROSA"
+              alt="Pulsera de Dela Rosa"
               fill
               priority
               sizes="(max-width: 900px) 45vw, 20vw"
@@ -163,7 +163,7 @@ export default async function Home() {
       <section className="home-section featured-section">
         <div className="section-heading">
           <div>
-            <span className="kicker">Selección DELAROSA</span>
+            <span className="kicker">Selección Dela Rosa</span>
             <h2>Productos destacados</h2>
           </div>
           <p>
@@ -220,7 +220,7 @@ export default async function Home() {
         <div className="history-logo">
           <Image
             src="/logo-delarosa-blanco.jpg"
-            alt="Logo de DELAROSA"
+            alt="Logo de Dela Rosa"
             fill
             loading="eager"
             quality={70}
@@ -235,7 +235,7 @@ export default async function Home() {
             recuerdos que duran para siempre.
           </p>
           <Link className="text-link" href="/nosotros">
-            Conocé DELAROSA <ArrowUpRight size={16} />
+            Conocé Dela Rosa <ArrowUpRight size={16} />
           </Link>
         </div>
       </section>
@@ -257,7 +257,7 @@ export default async function Home() {
         <a
           className="button button-gold"
           href={whatsappHref(
-            "Hola DELAROSA, quiero consultar el horario del local.",
+            "Hola Dela Rosa, quiero consultar el horario del local.",
           )}
           target="_blank"
           rel="noreferrer"

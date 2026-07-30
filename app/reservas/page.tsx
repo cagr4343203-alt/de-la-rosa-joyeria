@@ -25,7 +25,7 @@ export default function ReservationsPage() {
     () =>
       whatsappHref(
         [
-          "Hola DELAROSA ✨ Quiero solicitar una reserva para perforación de oreja.",
+          "Hola Dela Rosa ✨ Quiero solicitar una reserva para perforación de oreja.",
           "",
           `Nombre: ${name || "A completar"}`,
           `Servicio: ${service}`,
@@ -54,7 +54,7 @@ export default function ReservationsPage() {
           </h1>
           <p>
             Completá tus preferencias y enviaremos la solicitud por WhatsApp.
-            La reserva queda confirmada cuando el equipo de DELAROSA te responde.
+            La reserva queda confirmada cuando el equipo de Dela Rosa te responde.
           </p>
           <div className="reservation-benefits">
             <span>
@@ -187,7 +187,7 @@ export default function ReservationsPage() {
           <article>
             <span>03</span>
             <Sparkles size={25} />
-            <h3>Vení a DELAROSA</h3>
+            <h3>Vení a Dela Rosa</h3>
             <p>Recibí orientación e indicaciones para tu visita.</p>
           </article>
         </div>

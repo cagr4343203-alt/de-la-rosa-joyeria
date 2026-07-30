@@ -22,13 +22,13 @@ async function render() {
   );
 }
 
-test("renders the DELAROSA storefront", async () => {
+test("renders the Dela Rosa storefront", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /DELAROSA/);
+  assert.match(html, /Dela Rosa|DELA ROSA/);
   assert.match(html, /El detalle exclusivo/);
   assert.match(html, /Reservar perforaci/);
   assert.match(html, /Productos destacados/);

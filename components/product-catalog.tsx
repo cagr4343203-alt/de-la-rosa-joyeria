@@ -67,7 +67,7 @@ export function ProductCatalog({
   return (
     <>
       <section className="catalog-hero">
-        <span className="kicker">Catálogo DELAROSA</span>
+        <span className="kicker">Catálogo Dela Rosa</span>
         <h1>{title}</h1>
         <p>
           Joyas, relojes y regalos especiales. La disponibilidad y los precios
