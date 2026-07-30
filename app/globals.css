@@ -2581,17 +2581,17 @@ img {
   }
 
   .mobile-bottom-nav a.is-primary {
-    color: var(--ink);
+    color: var(--gold-light);
   }
 
   .mobile-bottom-nav a.is-primary > span {
-    background: var(--gold);
+    background: transparent;
     border: 0;
-    border-radius: 50%;
+    border-radius: 0;
     box-shadow: none;
     height: 32px;
     margin-top: 0;
-    width: 32px;
+    width: 36px;
   }
 
   .mobile-bottom-nav a.is-primary small {
