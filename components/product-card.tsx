@@ -4,6 +4,7 @@ import Image from "next/image";
 import { MessageCircle, Plus, ShoppingBag } from "lucide-react";
 import { type CSSProperties, useEffect, useRef } from "react";
 import { type Product, money, whatsappHref } from "@/lib/store";
+import { observeMotionElement } from "./motion-reveal";
 import { useStore } from "./store-context";
 
 export function ProductCard({
@@ -27,32 +28,20 @@ export function ProductCard({
 
     card.classList.add("is-motion-ready");
 
-    if (
-      !("IntersectionObserver" in window) ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      card.classList.add("is-visible");
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        card.classList.add("is-visible");
-        observer.disconnect();
-      },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
-    );
-
-    observer.observe(card);
-    return () => observer.disconnect();
+    return observeMotionElement(card, (isInView) => {
+      if (isInView) {
+        card.classList.add("is-visible", "is-in-view");
+      } else {
+        card.classList.remove("is-in-view");
+      }
+    });
   }, [motionIndex]);
 
   const motionStyle =
     motionIndex === undefined
       ? undefined
       : ({
-          "--product-delay": `${motionIndex * 90}ms`,
+          "--product-delay": `${motionIndex * 60}ms`,
           "--product-drift-delay": `${motionIndex * -1.15}s`,
         } as CSSProperties);
 

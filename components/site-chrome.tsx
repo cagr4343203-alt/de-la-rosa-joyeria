@@ -60,11 +60,24 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       "(prefers-reduced-motion: reduce)",
     ).matches;
     const mobile = window.matchMedia("(max-width: 760px)").matches;
+    let readyTimer: number | undefined;
     const timer = window.setTimeout(
-      () => setLoading(false),
+      () => {
+        setLoading(false);
+        readyTimer = window.setTimeout(
+          () => {
+            document.documentElement.dataset.siteReady = "true";
+            window.dispatchEvent(new Event("dela:site-ready"));
+          },
+          reduced ? 20 : 300,
+        );
+      },
       reduced ? 50 : mobile ? 320 : 620,
     );
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      if (readyTimer !== undefined) window.clearTimeout(readyTimer);
+    };
   }, []);
 
   useEffect(() => {

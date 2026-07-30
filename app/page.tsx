@@ -9,6 +9,7 @@ import {
   MapPin,
   ShieldCheck,
 } from "lucide-react";
+import { MotionReveal } from "@/components/motion-reveal";
 import { ProductCard } from "@/components/product-card";
 import { MAPS_URL, STORE_ADDRESS, whatsappHref } from "@/lib/store";
 import { getProducts } from "@/sanity/lib/products";
@@ -42,7 +43,12 @@ export default async function Home() {
 
   return (
     <>
-      <section className="home-hero">
+      <MotionReveal
+        as="section"
+        className="home-hero"
+        direction="none"
+        observeOnly
+      >
         <div className="hero-copy">
           <span className="kicker kicker-light">Encarnación · Desde 2003</span>
           <h1>
@@ -99,9 +105,14 @@ export default async function Home() {
             <ArrowUpRight size={18} />
           </Link>
         </div>
-      </section>
+      </MotionReveal>
 
-      <section className="service-band" aria-label="Servicios destacados">
+      <MotionReveal
+        as="section"
+        className="service-band"
+        aria-label="Servicios destacados"
+        distance={22}
+      >
         <article>
           <Gem size={24} />
           <div>
@@ -123,10 +134,10 @@ export default async function Home() {
             <span>Bombillas, bolígrafos y más detalles</span>
           </div>
         </article>
-      </section>
+      </MotionReveal>
 
       <section className="home-section category-section">
-        <div className="section-heading">
+        <MotionReveal className="section-heading" distance={24}>
           <div>
             <span className="kicker">Comprar por categoría</span>
             <h2>Encontrá ese detalle especial</h2>
@@ -134,34 +145,40 @@ export default async function Home() {
           <Link className="text-link" href="/productos">
             Ver todo el catálogo <ArrowUpRight size={16} />
           </Link>
-        </div>
+        </MotionReveal>
         <div className="category-grid">
-          {categoryCards.map((card) => (
-            <Link
+          {categoryCards.map((card, index) => (
+            <MotionReveal
               key={card.title}
-              className="category-card"
-              href={`/productos?categoria=${encodeURIComponent(card.title)}`}
+              className="category-card-motion"
+              delay={index * 60}
+              distance={26}
             >
-              <Image
-                src={card.image}
-                alt=""
-                fill
-                loading="eager"
-                quality={70}
-                sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw"
-              />
-              <span>{card.eyebrow}</span>
-              <h3>{card.title}</h3>
-              <i>
-                <ArrowUpRight size={18} />
-              </i>
-            </Link>
+              <Link
+                className="category-card"
+                href={`/productos?categoria=${encodeURIComponent(card.title)}`}
+              >
+                <Image
+                  src={card.image}
+                  alt=""
+                  fill
+                  loading="lazy"
+                  quality={70}
+                  sizes="(max-width: 700px) 50vw, (max-width: 1100px) 50vw, 25vw"
+                />
+                <span>{card.eyebrow}</span>
+                <h3>{card.title}</h3>
+                <i>
+                  <ArrowUpRight size={18} />
+                </i>
+              </Link>
+            </MotionReveal>
           ))}
         </div>
       </section>
 
       <section className="home-section featured-section">
-        <div className="section-heading">
+        <MotionReveal className="section-heading" distance={24}>
           <div>
             <span className="kicker">Selección Dela Rosa</span>
             <h2>Productos destacados</h2>
@@ -170,13 +187,12 @@ export default async function Home() {
             Agregá tus favoritos al carrito o consultá la disponibilidad
             directamente por WhatsApp.
           </p>
-        </div>
+        </MotionReveal>
         <div className="featured-grid">
           {featured.map((product, index) => (
             <ProductCard
               key={product.id}
               product={product}
-              eager
               motionIndex={index}
             />
           ))}
@@ -184,7 +200,11 @@ export default async function Home() {
       </section>
 
       <section className="piercing-cta">
-        <div className="piercing-copy">
+        <MotionReveal
+          className="piercing-copy"
+          direction="left"
+          distance={34}
+        >
           <span className="kicker kicker-light">Reserva de perforación</span>
           <h2>Tu nuevo brillo, con atención personalizada.</h2>
           <p>
@@ -202,8 +222,14 @@ export default async function Home() {
           <Link className="button button-gold" href="/reservas">
             Reservar ahora <ArrowUpRight size={17} />
           </Link>
-        </div>
-        <figure className="piercing-showcase">
+        </MotionReveal>
+        <MotionReveal
+          as="figure"
+          className="piercing-showcase"
+          direction="scale"
+          delay={120}
+          distance={20}
+        >
           <Image
             src="/products/piercing-reference-client.png"
             alt="Perforación de oreja realizada con aros plateados"
@@ -214,21 +240,30 @@ export default async function Home() {
             <span>Servicio con reserva</span>
             <strong>Inspiración para tu próximo estilo</strong>
           </figcaption>
-        </figure>
+        </MotionReveal>
       </section>
 
       <section className="history-teaser">
-        <div className="history-logo">
+        <MotionReveal
+          className="history-logo"
+          direction="left"
+          distance={34}
+        >
           <Image
             src="/logo-delarosa-blanco.jpg"
             alt="Logo de Dela Rosa"
             fill
-            loading="eager"
+            loading="lazy"
             quality={70}
             sizes="(max-width: 800px) 88vw, 42vw"
           />
-        </div>
-        <div className="history-copy">
+        </MotionReveal>
+        <MotionReveal
+          className="history-copy"
+          direction="right"
+          delay={100}
+          distance={34}
+        >
           <span className="kicker">Nuestra historia</span>
           <h2>Desde el 2003 formando parte de tus momentos.</h2>
           <p>
@@ -238,10 +273,14 @@ export default async function Home() {
           <Link className="text-link" href="/nosotros">
             Conocé Dela Rosa <ArrowUpRight size={16} />
           </Link>
-        </div>
+        </MotionReveal>
       </section>
 
-      <section className="location-teaser">
+      <MotionReveal
+        as="section"
+        className="location-teaser"
+        distance={24}
+      >
         <div>
           <span className="kicker kicker-light">Nuestra casa</span>
           <h2>Te esperamos en Encarnación.</h2>
@@ -265,7 +304,7 @@ export default async function Home() {
         >
           Consultar horario <ArrowUpRight size={17} />
         </a>
-      </section>
+      </MotionReveal>
     </>
   );
 }
