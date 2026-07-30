@@ -40,3 +40,8 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# Sanity Studio build artifacts
+/studio/.sanity/
+/studio/dist/
+/studio/node_modules/

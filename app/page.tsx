@@ -1,854 +1,264 @@
-"use client";
-
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import {
+  ArrowUpRight,
+  CalendarDays,
+  Clock3,
+  Gem,
+  Gift,
+  MapPin,
+  ShieldCheck,
+} from "lucide-react";
+import { ProductCard } from "@/components/product-card";
+import { MAPS_URL, whatsappHref } from "@/lib/store";
+import { getProducts } from "@/sanity/lib/products";
 
-type Product = {
-  id: number;
-  name: string;
-  category: string;
-  material: string;
-  price: number;
-  image: string;
-  badge?: string;
-  description: string;
-};
-
-type CartLine = Product & { quantity: number };
-
-const WHATSAPP_NUMBER = "595985720031";
-const INSTAGRAM_URL = "https://www.instagram.com/dela_rosajoyeria/";
-const MAPS_URL =
-  "https://www.google.com/maps/search/?api=1&query=Calle+Estigarribia+y+Constitucion+Encarnacion+Paraguay";
-
-const products: Product[] = [
+const categoryCards = [
   {
-    id: 1,
-    name: "Cadena Espíritu Santo",
-    category: "Cadenas",
-    material: "Oro 18K",
-    price: 1350000,
-    image: "/products/01-cadena-angel.jpg",
-    badge: "Nueva",
-    description: "Cadena delicada con dije simbólico y terminación luminosa.",
-  },
-  {
-    id: 2,
-    name: "Argollas Trenzadas",
-    category: "Aros",
-    material: "Oro 18K",
-    price: 980000,
-    image: "/products/03-anillos.jpg",
-    badge: "Favorita",
-    description: "Argollas livianas con detalle trenzado para todos los días.",
-  },
-  {
-    id: 3,
-    name: "Solitario Lumière",
-    category: "Anillos",
-    material: "Plata Gold",
-    price: 425000,
+    title: "Anillos",
+    eyebrow: "Momentos únicos",
     image: "/products/06-joya.jpg",
-    badge: "Destacado",
-    description: "Anillo de brillo central, clásico y delicado.",
   },
   {
-    id: 4,
-    name: "Pulsera Cœurs",
-    category: "Pulseras",
-    material: "Plata 925",
-    price: 350000,
-    image: "/products/05-pulsera.jpg",
-    description: "Corazones engastados y destellos que acompañan cada gesto.",
-  },
-  {
-    id: 5,
-    name: "Collar Éclat",
-    category: "Cadenas",
-    material: "Enchapado",
-    price: 380000,
-    image: "/products/07-destello.jpg",
-    badge: "Edición especial",
-    description: "Collar protagonista de discos dorados con textura satinada.",
-  },
-  {
-    id: 6,
-    name: "Collar Mariposa",
-    category: "Cadenas",
-    material: "Plata Gold",
-    price: 295000,
-    image: "/products/08-coleccion.jpg",
-    description: "Mariposa de nácar con cadena regulable y doble detalle.",
-  },
-  {
-    id: 7,
-    name: "Huggies Clásicos",
-    category: "Aros",
-    material: "Oro 18K",
-    price: 720000,
+    title: "Aros",
+    eyebrow: "Brillo cotidiano",
     image: "/products/04-aros.jpg",
-    description: "Aros compactos, cómodos y versátiles para combinar.",
   },
   {
-    id: 8,
-    name: "Set Serena",
-    category: "Sets",
-    material: "Plata 925",
-    price: 470000,
-    image: "/products/09-plata.jpg",
-    badge: "Para regalar",
-    description: "Un set armónico pensado para regalar o regalarte.",
+    title: "Bombillas",
+    eyebrow: "Detalles para regalar",
+    image: "/products/12-regalos-bombilla-boligrafo.png",
+    position: "left center",
   },
   {
-    id: 9,
-    name: "Reloj Signature",
-    category: "Relojes",
-    material: "Acero",
-    price: 890000,
-    image: "/products/10-reloj.jpg",
-    description: "Diseño elegante con caja de acero y lectura limpia.",
-  },
-  {
-    id: 10,
-    name: "Dije Destello",
-    category: "Dijes",
-    material: "Oro 18K",
-    price: 1100000,
-    image: "/products/11-oro.jpg",
-    description: "Una pieza de oro con brillo sutil para llevar siempre.",
+    title: "Pulseras",
+    eyebrow: "Plata 925 bañada en oro",
+    image: "/products/client/pulsera-tennis-gold.jpeg",
   },
 ];
 
-const categories = [
-  "Todo",
-  "Anillos",
-  "Aros",
-  "Cadenas",
-  "Pulseras",
-  "Sets",
-  "Relojes",
-];
-
-function money(value: number) {
-  return `Gs. ${new Intl.NumberFormat("es-PY").format(value)}`;
-}
-
-function whatsappHref(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-}
-
-export default function Home() {
-  const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState("Todo");
-  const [query, setQuery] = useState("");
-  const [cart, setCart] = useState<CartLine[]>([]);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const isMobile = window.matchMedia("(max-width: 820px)").matches;
-    const timer = window.setTimeout(
-      () => setLoading(false),
-      reduceMotion ? 120 : isMobile ? 620 : 1050,
-    );
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem("delarosa-cart");
-    if (!saved) return;
-    try {
-      setCart(JSON.parse(saved) as CartLine[]);
-    } catch {
-      window.localStorage.removeItem("delarosa-cart");
-    }
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem("delarosa-cart", JSON.stringify(cart));
-  }, [cart]);
-
-  useEffect(() => {
-    document.body.classList.toggle("no-scroll", cartOpen || menuOpen);
-    return () => document.body.classList.remove("no-scroll");
-  }, [cartOpen, menuOpen]);
-
-  const filteredProducts = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return products.filter((product) => {
-      const categoryMatches =
-        activeCategory === "Todo" || product.category === activeCategory;
-      const queryMatches =
-        !normalized ||
-        `${product.name} ${product.category} ${product.material}`
-          .toLowerCase()
-          .includes(normalized);
-      return categoryMatches && queryMatches;
-    });
-  }, [activeCategory, query]);
-
-  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-
-  function addToCart(product: Product) {
-    setCart((current) => {
-      const existing = current.find((item) => item.id === product.id);
-      if (existing) {
-        return current.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        );
-      }
-      return [...current, { ...product, quantity: 1 }];
-    });
-    setCartOpen(true);
-  }
-
-  function changeQuantity(id: number, difference: number) {
-    setCart((current) =>
-      current
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: item.quantity + difference }
-            : item,
-        )
-        .filter((item) => item.quantity > 0),
-    );
-  }
-
-  const orderMessage = [
-    "Hola De la Rosa ✨ Quiero consultar por este pedido:",
-    "",
-    ...cart.map(
-      (item) =>
-        `• ${item.quantity} × ${item.name} (${item.material}) — ${money(
-          item.price * item.quantity,
-        )}`,
-    ),
-    "",
-    `Total referencial: ${money(total)}`,
-    "",
-    "¿Me confirman disponibilidad y precio final, por favor?",
-  ].join("\n");
+export default async function Home() {
+  const products = await getProducts();
+  const featured = products.slice(0, 4);
 
   return (
     <>
-      <div
-        className={`loader ${loading ? "" : "loader--hidden"}`}
-        aria-hidden={!loading}
-      >
-        <Image
-          className="loader__logo"
-          src="/logo.png"
-          alt="De la Rosa Joyería y Relojería"
-          width={255}
-          height={255}
-          priority
-          sizes="(max-width: 820px) 170px, 255px"
-        />
-        <span className="loader__line" />
-        <small>Preparando una experiencia brillante</small>
-      </div>
-
-      <div className={`site-shell ${loading ? "site-shell--loading" : ""}`}>
-        <div className="marquee" aria-label="Información destacada">
-          <div className="marquee__track">
-            <span>Oro 18K</span>
-            <i>✦</i>
-            <span>Plata 925</span>
-            <i>✦</i>
-            <span>Relojería</span>
-            <i>✦</i>
-            <span>Atención personalizada</span>
-            <i>✦</i>
-            <span>Envíos a todo el país</span>
-            <i>✦</i>
-            <span>Oro 18K</span>
-            <i>✦</i>
-            <span>Plata 925</span>
-            <i>✦</i>
-            <span>Relojería</span>
-            <i>✦</i>
-            <span>Atención personalizada</span>
-            <i>✦</i>
-            <span>Envíos a todo el país</span>
+      <section className="home-hero">
+        <div className="hero-copy">
+          <span className="kicker kicker-light">Encarnación · Desde 2003</span>
+          <h1>
+            El detalle exclusivo
+            <em>para ese momento especial.</em>
+          </h1>
+          <p>
+            Joyas, relojes y regalos seleccionados para acompañar historias que
+            merecen ser recordadas.
+          </p>
+          <div className="hero-actions">
+            <Link className="button button-gold" href="/productos">
+              Ver productos <ArrowUpRight size={17} />
+            </Link>
+            <Link className="button button-outline-light" href="/reservas">
+              <CalendarDays size={17} /> Reservar perforación
+            </Link>
+          </div>
+          <div className="hero-trust">
+            <span>
+              <Gem size={17} />
+              Oro, plata y relojería
+            </span>
+            <span>
+              <ShieldCheck size={17} />
+              Atención personalizada
+            </span>
           </div>
         </div>
 
-        <header className="header">
-          <a className="brand" href="#inicio" aria-label="De la Rosa, inicio">
+        <div className="hero-gallery">
+          <div className="hero-halo" />
+          <figure className="hero-photo hero-photo-main">
             <Image
-              className="brand__logo"
-              src="/logo.png"
-              alt=""
-              width={48}
-              height={48}
+              src="/products/06-joya.jpg"
+              alt="Anillos de DELAROSA"
+              fill
               priority
+              sizes="(max-width: 900px) 76vw, 36vw"
             />
-            <span>
-              <strong>DE LA ROSA</strong>
-              <small>Joyería · Relojería</small>
-            </span>
-          </a>
-
-          <nav className="desktop-nav" aria-label="Navegación principal">
-            <a href="#coleccion">Colección</a>
-            <a href="#materiales">Materiales</a>
-            <a href="#nosotros">Nosotros</a>
-            <a href="#ubicacion">Ubicación</a>
-          </nav>
-
-          <div className="header__actions">
-            <a
-              className="icon-button desktop-only"
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Ver Instagram de De la Rosa"
-            >
-              ◎
-            </a>
-            <button
-              className="cart-button"
-              type="button"
-              onClick={() => setCartOpen(true)}
-              aria-label={`Abrir carrito, ${itemCount} productos`}
-            >
-              <span>Carrito</span>
-              <b>{itemCount}</b>
-            </button>
-            <button
-              className="menu-button"
-              type="button"
-              onClick={() => setMenuOpen(true)}
-              aria-label="Abrir menú"
-            >
-              <span />
-              <span />
-            </button>
-          </div>
-        </header>
-
-        <main>
-          <section className="hero" id="inicio">
-            <div className="hero__copy">
-              <p className="eyebrow reveal reveal--1">Encarnación · Paraguay</p>
-              <h1 className="reveal reveal--2">
-                Joyas que
-                <em> hablan de vos.</em>
-              </h1>
-              <p className="hero__lead reveal reveal--3">
-                Piezas para celebrar historias, instantes y personas. Descubrí
-                nuestra selección de oro, plata y relojería.
-              </p>
-              <div className="hero__buttons reveal reveal--4">
-                <a className="button button--gold" href="#coleccion">
-                  Ver colección <span>↗</span>
-                </a>
-                <a
-                  className="text-link"
-                  href={whatsappHref(
-                    "Hola De la Rosa, quiero recibir asesoramiento para elegir una joya.",
-                  )}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Asesoría personalizada →
-                </a>
-              </div>
-              <div className="hero__proof reveal reveal--4">
-                <div className="proof__avatars" aria-hidden="true">
-                  <span>DR</span>
-                  <span>✦</span>
-                  <span>18K</span>
-                </div>
-                <p>
-                  <strong>21,6 mil</strong>
-                  personas siguen nuestras novedades
-                </p>
-              </div>
-            </div>
-
-            <div className="hero__visual reveal reveal--2">
-              <div className="hero__orb" />
-              <figure className="hero__image hero__image--main">
-                <Image
-                  src="/products/06-joya.jpg"
-                  alt="Anillos dorados con piedras luminosas"
-                  fill
-                  priority
-                  sizes="(max-width: 820px) 74vw, 31vw"
-                />
-              </figure>
-              <figure className="hero__image hero__image--float">
-                <Image
-                  src="/products/05-pulsera.jpg"
-                  alt="Pulsera de plata con corazones"
-                  fill
-                  priority
-                  sizes="(max-width: 820px) 50vw, 20vw"
-                />
-              </figure>
-              <div className="hero__seal" aria-hidden="true">
-                <span>PIEZAS CON HISTORIA · DESDE ENCARNACIÓN ·</span>
-                <b>◇</b>
-              </div>
-            </div>
-
-            <a className="scroll-cue" href="#coleccion" aria-label="Ir al catálogo">
-              <span>Explorar</span>
-              <i>↓</i>
-            </a>
-          </section>
-
-          <section className="promise-strip" id="materiales">
-            <article>
-              <span>01</span>
-              <div>
-                <strong>Materiales seleccionados</strong>
-                <p>Oro, plata, acero quirúrgico y enchapados.</p>
-              </div>
-            </article>
-            <article>
-              <span>02</span>
-              <div>
-                <strong>Atención cercana</strong>
-                <p>Te ayudamos a encontrar la pieza indicada.</p>
-              </div>
-            </article>
-            <article>
-              <span>03</span>
-              <div>
-                <strong>Compra simple</strong>
-                <p>Armá tu pedido y confirmalo por WhatsApp.</p>
-              </div>
-            </article>
-          </section>
-
-          <section className="catalog-section" id="coleccion">
-            <div className="section-heading">
-              <div>
-                <p className="eyebrow eyebrow--dark">Nuestra selección</p>
-                <h2>Encontrá tu próxima joya</h2>
-              </div>
-              <p>
-                Una curaduría inspirada en las piezas reales de De la Rosa.
-                Precios referenciales sujetos a confirmación.
-              </p>
-            </div>
-
-            <div className="catalog-tools">
-              <div className="filters" aria-label="Filtrar por categoría">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    className={activeCategory === category ? "active" : ""}
-                    onClick={() => setActiveCategory(category)}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-              <label className="search-field">
-                <span aria-hidden="true">⌕</span>
-                <input
-                  type="search"
-                  placeholder="Buscar una pieza..."
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  aria-label="Buscar en el catálogo"
-                />
-              </label>
-            </div>
-
-            <div className="product-grid">
-              {filteredProducts.map((product, index) => (
-                <article
-                  className="product-card"
-                  key={product.id}
-                  style={{ "--delay": `${(index % 4) * 70}ms` } as React.CSSProperties}
-                >
-                  <div className="product-card__image">
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      sizes="(max-width: 520px) 48vw, (max-width: 820px) 46vw, (max-width: 1120px) 30vw, 22vw"
-                    />
-                    {product.badge && <span>{product.badge}</span>}
-                    <button
-                      type="button"
-                      className="quick-add"
-                      onClick={() => addToCart(product)}
-                    >
-                      Agregar al carrito
-                    </button>
-                  </div>
-                  <div className="product-card__body">
-                    <div>
-                      <p>{product.material}</p>
-                      <h3>{product.name}</h3>
-                    </div>
-                    <strong>{money(product.price)}</strong>
-                  </div>
-                  <p className="product-card__description">
-                    {product.description}
-                  </p>
-                  <div className="product-card__mobile-actions">
-                    <button type="button" onClick={() => addToCart(product)}>
-                      Agregar
-                    </button>
-                    <a
-                      href={whatsappHref(
-                        `Hola De la Rosa, quiero consultar por ${product.name}.`,
-                      )}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Consultar
-                    </a>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            {filteredProducts.length === 0 && (
-              <div className="empty-results">
-                <span>◇</span>
-                <h3>No encontramos esa pieza</h3>
-                <p>Probá otra búsqueda o escribinos por WhatsApp.</p>
-              </div>
-            )}
-          </section>
-
-          <section className="story-section" id="nosotros">
-            <div className="story__image">
-              <Image
-                src="/products/07-destello.jpg"
-                alt="Collares dorados de De la Rosa"
-                fill
-                sizes="(max-width: 820px) 100vw, 46vw"
-              />
-              <span>Desde Encarnación</span>
-            </div>
-            <div className="story__copy">
-              <p className="eyebrow eyebrow--dark">De la Rosa</p>
-              <h2>El detalle que transforma un momento.</h2>
-              <p>
-                Somos una joyería y relojería de Encarnación dedicada a
-                acompañarte en tus momentos especiales con piezas que podés
-                llevar toda la vida.
-              </p>
-              <p>
-                Trabajamos con oro, plata, acero quirúrgico y enchapados, además
-                de una selección de relojes y regalos.
-              </p>
-              <a
-                className="text-link text-link--dark"
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Conocé nuestras novedades en Instagram →
-              </a>
-            </div>
-          </section>
-
-          <section className="location-section" id="ubicacion">
-            <div className="location__card">
-              <p className="eyebrow">Nuestra casa</p>
-              <h2>Vení a conocernos</h2>
-              <p className="location__address">
-                Calle Estigarribia y Constitución
-                <br />
-                Encarnación, Paraguay
-              </p>
-              <div className="location__hours">
-                <span>Atención personalizada</span>
-                <span>Consultá el horario del día por WhatsApp</span>
-              </div>
-              <div className="location__actions">
-                <a
-                  className="button button--gold"
-                  href={MAPS_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Cómo llegar <span>↗</span>
-                </a>
-                <a
-                  className="text-link"
-                  href={whatsappHref(
-                    "Hola De la Rosa, quiero consultar el horario para visitar el local.",
-                  )}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Consultar horario →
-                </a>
-              </div>
-            </div>
-            <a
-              className="location__map"
-              href={MAPS_URL}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Abrir la ubicación en Google Maps"
-            >
-              <div className="map__grid" aria-hidden="true" />
-              <span className="map__road map__road--one" />
-              <span className="map__road map__road--two" />
-              <span className="map__road map__road--three" />
-              <div className="map__pin">
-                <Image src="/logo.png" alt="" width={74} height={74} />
-                <span>DE LA ROSA</span>
-                <small>Joyería · Relojería</small>
-              </div>
-              <p>Estigarribia y Constitución · Abrir mapa ↗</p>
-            </a>
-          </section>
-
-          <section className="closing-banner">
-            <p className="eyebrow">Una pieza para cada historia</p>
-            <h2>
-              Elegí lo que te enamora.
-              <br />
-              <em>Nosotros te ayudamos.</em>
-            </h2>
-            <a
-              className="button button--light"
-              href={whatsappHref(
-                "Hola De la Rosa, quiero ayuda para elegir una joya.",
-              )}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Hablar con una asesora <span>↗</span>
-            </a>
-          </section>
-        </main>
-
-        <footer>
-          <div className="footer__brand">
+          </figure>
+          <figure className="hero-photo hero-photo-small">
             <Image
-              className="brand__logo"
-              src="/logo.png"
-              alt=""
-              width={48}
-              height={48}
+              src="/products/05-pulsera.jpg"
+              alt="Pulsera de DELAROSA"
+              fill
+              priority
+              sizes="(max-width: 900px) 45vw, 20vw"
             />
-            <div>
-              <strong>DE LA ROSA</strong>
-              <small>Joyería · Relojería</small>
-            </div>
+          </figure>
+          <Link className="hero-reserve-card" href="/reservas">
+            <span>Agenda disponible</span>
+            <strong>Reservá tu perforación</strong>
+            <ArrowUpRight size={18} />
+          </Link>
+        </div>
+      </section>
+
+      <section className="service-band" aria-label="Servicios destacados">
+        <article>
+          <Gem size={24} />
+          <div>
+            <strong>Joyas seleccionadas</strong>
+            <span>Oro 18K, plata y enchapados</span>
           </div>
-          <div className="footer__links">
-            <a href="#coleccion">Colección</a>
-            <a href="#nosotros">Nosotros</a>
-            <a href="#ubicacion">Ubicación</a>
-            <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
-              Instagram
-            </a>
+        </article>
+        <article>
+          <CalendarDays size={24} />
+          <div>
+            <strong>Perforación de oreja</strong>
+            <span>Reservá fecha y horario por WhatsApp</span>
+          </div>
+        </article>
+        <article>
+          <Gift size={24} />
+          <div>
+            <strong>Regalos especiales</strong>
+            <span>Bombillas, bolígrafos y más detalles</span>
+          </div>
+        </article>
+      </section>
+
+      <section className="home-section category-section">
+        <div className="section-heading">
+          <div>
+            <span className="kicker">Comprar por categoría</span>
+            <h2>Encontrá ese detalle especial</h2>
+          </div>
+          <Link className="text-link" href="/productos">
+            Ver todo el catálogo <ArrowUpRight size={16} />
+          </Link>
+        </div>
+        <div className="category-grid">
+          {categoryCards.map((card) => (
+            <Link
+              key={card.title}
+              className="category-card"
+              href={`/productos?categoria=${encodeURIComponent(card.title)}`}
+            >
+              <Image
+                src={card.image}
+                alt=""
+                fill
+                loading="eager"
+                quality={70}
+                sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw"
+                style={{ objectPosition: card.position }}
+              />
+              <span>{card.eyebrow}</span>
+              <h3>{card.title}</h3>
+              <i>
+                <ArrowUpRight size={18} />
+              </i>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="home-section featured-section">
+        <div className="section-heading">
+          <div>
+            <span className="kicker">Selección DELAROSA</span>
+            <h2>Productos destacados</h2>
           </div>
           <p>
-            © {new Date().getFullYear()} De la Rosa · Encarnación, Paraguay
+            Agregá tus favoritos al carrito o consultá la disponibilidad
+            directamente por WhatsApp.
           </p>
-        </footer>
+        </div>
+        <div className="featured-grid">
+          {featured.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              eager
+            />
+          ))}
+        </div>
+      </section>
 
+      <section className="piercing-cta">
+        <div className="piercing-copy">
+          <span className="kicker kicker-light">Reserva de perforación</span>
+          <h2>Tu nuevo brillo, con atención personalizada.</h2>
+          <p>
+            Elegí fecha, horario y cantidad de perforaciones. Preparamos tu
+            solicitud y la confirmamos contigo por WhatsApp.
+          </p>
+          <div className="piercing-points">
+            <span>
+              <Clock3 size={18} /> Reserva rápida
+            </span>
+            <span>
+              <ShieldCheck size={18} /> Cuidado y orientación
+            </span>
+          </div>
+          <Link className="button button-gold" href="/reservas">
+            Reservar ahora <ArrowUpRight size={17} />
+          </Link>
+        </div>
+        <div className="piercing-number" aria-hidden="true">
+          <span>01</span>
+          <strong>PERFORACIÓN</strong>
+        </div>
+      </section>
+
+      <section className="history-teaser">
+        <div className="history-logo">
+          <Image
+            src="/logo-delarosa-blanco.jpg"
+            alt="Logo de DELAROSA"
+            fill
+            loading="eager"
+            quality={70}
+            sizes="(max-width: 800px) 88vw, 42vw"
+          />
+        </div>
+        <div className="history-copy">
+          <span className="kicker">Nuestra historia</span>
+          <h2>Desde el 2003 formando parte de tus momentos.</h2>
+          <p>
+            Gracias por elegirnos para celebrar aniversarios, logros, regalos y
+            recuerdos que duran para siempre.
+          </p>
+          <Link className="text-link" href="/nosotros">
+            Conocé DELAROSA <ArrowUpRight size={16} />
+          </Link>
+        </div>
+      </section>
+
+      <section className="location-teaser">
+        <div>
+          <span className="kicker kicker-light">Nuestra casa</span>
+          <h2>Te esperamos en Encarnación.</h2>
+          <p>Calle Estigarribia y Constitución, Encarnación, Paraguay.</p>
+        </div>
         <a
-          className="whatsapp-float"
+          className="button button-outline-light"
+          href={MAPS_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <MapPin size={17} /> Cómo llegar
+        </a>
+        <a
+          className="button button-gold"
           href={whatsappHref(
-            "Hola De la Rosa, quiero consultar sobre sus joyas.",
+            "Hola DELAROSA, quiero consultar el horario del local.",
           )}
           target="_blank"
           rel="noreferrer"
-          aria-label="Contactar por WhatsApp"
         >
-          <span>◔</span>
-          <small>WhatsApp</small>
+          Consultar horario <ArrowUpRight size={17} />
         </a>
-
-        <div
-          className={`overlay ${cartOpen || menuOpen ? "overlay--visible" : ""}`}
-          onClick={() => {
-            setCartOpen(false);
-            setMenuOpen(false);
-          }}
-          aria-hidden="true"
-        />
-
-        <aside
-          className={`cart-drawer ${cartOpen ? "cart-drawer--open" : ""}`}
-          aria-hidden={!cartOpen}
-          aria-label="Carrito de compras"
-        >
-          <div className="drawer__header">
-            <div>
-              <p className="eyebrow eyebrow--dark">Tu selección</p>
-              <h2>Carrito</h2>
-            </div>
-            <button
-              type="button"
-              onClick={() => setCartOpen(false)}
-              aria-label="Cerrar carrito"
-            >
-              ×
-            </button>
-          </div>
-
-          <div className="cart__content">
-            {cart.length === 0 ? (
-              <div className="cart__empty">
-                <span>◇</span>
-                <h3>Tu carrito está esperando</h3>
-                <p>Agregá las piezas que te gusten para armar tu consulta.</p>
-                <button
-                  type="button"
-                  onClick={() => setCartOpen(false)}
-                >
-                  Explorar colección
-                </button>
-              </div>
-            ) : (
-              cart.map((item) => (
-                <article className="cart-line" key={item.id}>
-                  <Image
-                    src={item.image}
-                    alt=""
-                    width={92}
-                    height={116}
-                    sizes="92px"
-                  />
-                  <div className="cart-line__info">
-                    <p>{item.material}</p>
-                    <h3>{item.name}</h3>
-                    <strong>{money(item.price)}</strong>
-                    <div className="quantity">
-                      <button
-                        type="button"
-                        onClick={() => changeQuantity(item.id, -1)}
-                        aria-label={`Quitar una unidad de ${item.name}`}
-                      >
-                        −
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button
-                        type="button"
-                        onClick={() => changeQuantity(item.id, 1)}
-                        aria-label={`Agregar una unidad de ${item.name}`}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    className="cart-line__remove"
-                    onClick={() =>
-                      setCart((current) =>
-                        current.filter((product) => product.id !== item.id),
-                      )
-                    }
-                    aria-label={`Eliminar ${item.name}`}
-                  >
-                    ×
-                  </button>
-                </article>
-              ))
-            )}
-          </div>
-
-          <div className="cart__footer">
-            <div className="cart__total">
-              <span>Total referencial</span>
-              <strong>{money(total)}</strong>
-            </div>
-            <p>Disponibilidad y precio final se confirman por WhatsApp.</p>
-            <a
-              className={`checkout-button ${cart.length === 0 ? "disabled" : ""}`}
-              href={cart.length ? whatsappHref(orderMessage) : undefined}
-              target="_blank"
-              rel="noreferrer"
-              aria-disabled={cart.length === 0}
-            >
-              Enviar pedido por WhatsApp <span>↗</span>
-            </a>
-            {cart.length > 0 && (
-              <button
-                className="clear-cart"
-                type="button"
-                onClick={() => setCart([])}
-              >
-                Vaciar carrito
-              </button>
-            )}
-          </div>
-        </aside>
-
-        <aside
-          className={`mobile-menu ${menuOpen ? "mobile-menu--open" : ""}`}
-          aria-hidden={!menuOpen}
-        >
-          <div className="mobile-menu__top">
-            <a className="brand" href="#inicio" onClick={() => setMenuOpen(false)}>
-              <Image
-                className="brand__logo"
-                src="/logo.png"
-                alt=""
-                width={48}
-                height={48}
-              />
-              <span>
-                <strong>DE LA ROSA</strong>
-                <small>Joyería · Relojería</small>
-              </span>
-            </a>
-            <button
-              type="button"
-              onClick={() => setMenuOpen(false)}
-              aria-label="Cerrar menú"
-            >
-              ×
-            </button>
-          </div>
-          <nav>
-            {[
-              ["Colección", "#coleccion"],
-              ["Materiales", "#materiales"],
-              ["Nosotros", "#nosotros"],
-              ["Ubicación", "#ubicacion"],
-            ].map(([label, href], index) => (
-              <a href={href} key={href} onClick={() => setMenuOpen(false)}>
-                <span>0{index + 1}</span>
-                {label}
-                <i>↗</i>
-              </a>
-            ))}
-          </nav>
-          <div className="mobile-menu__footer">
-            <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
-              Instagram
-            </a>
-            <a
-              href={whatsappHref(
-                "Hola De la Rosa, quiero consultar sobre sus joyas.",
-              )}
-              target="_blank"
-              rel="noreferrer"
-            >
-              WhatsApp
-            </a>
-          </div>
-        </aside>
-      </div>
+      </section>
     </>
   );
 }

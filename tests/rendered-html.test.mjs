@@ -22,15 +22,15 @@ async function render() {
   );
 }
 
-test("renders the De la Rosa storefront", async () => {
+test("renders the DELAROSA storefront", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /De la Rosa/);
-  assert.match(html, /Joyas que/);
-  assert.match(html, /Encontrá tu próxima joya/);
-  assert.match(html, /Calle Estigarribia y Constitución/);
+  assert.match(html, /DELAROSA/);
+  assert.match(html, /El detalle exclusivo/);
+  assert.match(html, /Reservar perforaci/);
+  assert.match(html, /Productos destacados/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
