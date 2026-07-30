@@ -101,6 +101,7 @@ img {
 .site-loader img {
   animation: loaderPulse 1.7s ease-in-out infinite;
   border: 1px solid rgba(234, 212, 168, 0.24);
+  border-radius: 50%;
   box-shadow: 0 0 58px rgba(207, 172, 104, 0.14);
   height: clamp(160px, 28vw, 220px);
   object-fit: cover;
@@ -184,6 +185,8 @@ img {
 
 .header-brand img {
   border: 1px solid rgba(207, 172, 104, 0.32);
+  border-radius: 50%;
+  box-shadow: 0 5px 18px rgba(23, 18, 15, 0.1);
   height: 58px;
   object-fit: cover;
   width: 58px;
@@ -1401,7 +1404,11 @@ img {
 
 .history-logo {
   aspect-ratio: 1;
+  border: 1px solid rgba(118, 80, 31, 0.18);
+  border-radius: 50%;
+  box-shadow: 0 24px 65px rgba(39, 28, 20, 0.13);
   min-height: 400px;
+  overflow: hidden;
   position: relative;
 }
 
@@ -1951,6 +1958,7 @@ img {
 
 .about-logo-frame {
   background: #050505;
+  border-radius: 50%;
   box-shadow: 0 26px 70px rgba(39, 28, 20, 0.18);
   inset: clamp(20px, 3vw, 42px);
   overflow: hidden;
@@ -1960,6 +1968,7 @@ img {
 
 .about-logo-frame::after {
   border: 1px solid rgba(234, 212, 168, 0.3);
+  border-radius: 50%;
   content: "";
   inset: 13px;
   pointer-events: none;
@@ -2516,6 +2525,8 @@ img {
 }
 
 .footer-brand img {
+  border: 1px solid rgba(234, 212, 168, 0.26);
+  border-radius: 50%;
   flex: 0 0 auto;
   height: 94px;
   object-fit: cover;
