@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  ArrowUpRight,
   CalendarDays,
   Gift,
   Home,
@@ -14,7 +15,7 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   INSTAGRAM_URL,
   MAPS_URL,
@@ -23,12 +24,12 @@ import {
 import { CartDrawer, useStore } from "./store-context";
 
 const navItems = [
-  { href: "/", label: "Inicio" },
-  { href: "/productos", label: "Productos" },
-  { href: "/combos", label: "Combos" },
-  { href: "/nosotros", label: "Nosotros" },
-  { href: "/reservas", label: "Reserva" },
-  { href: "/ubicacion", label: "Ubicación" },
+  { href: "/", label: "Inicio", hint: "Descubrí Dela Rosa" },
+  { href: "/productos", label: "Productos", hint: "Joyas, relojes y regalos" },
+  { href: "/combos", label: "Combos", hint: "Detalles listos para regalar" },
+  { href: "/nosotros", label: "Nosotros", hint: "Nuestra historia desde 2003" },
+  { href: "/reservas", label: "Reserva", hint: "Agendá tu perforación" },
+  { href: "/ubicacion", label: "Ubicación", hint: "Cómo llegar y horarios" },
 ];
 
 const mobileItems = [
@@ -49,6 +50,10 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   const { itemCount, setCartOpen } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const drawerScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reduced = window.matchMedia(
@@ -63,9 +68,63 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    document.body.classList.toggle("no-scroll", menuOpen);
-    return () => document.body.classList.remove("no-scroll");
+    document.body.classList.toggle("menu-open", menuOpen);
+    return () => document.body.classList.remove("menu-open");
   }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    drawerScrollRef.current?.scrollTo({ top: 0 });
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      closeButtonRef.current?.focus();
+    });
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const drawer = drawerRef.current;
+      if (!drawer) return;
+
+      const focusable = Array.from(
+        drawer.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last ||
+          !drawer.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+  };
 
   return (
     <>
@@ -175,20 +234,33 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             className="menu-toggle"
             type="button"
             onClick={() => setMenuOpen(true)}
+            ref={menuButtonRef}
             aria-label="Abrir menú"
+            aria-controls="mobile-navigation"
+            aria-expanded={menuOpen}
           >
             <Menu size={22} />
           </button>
         </div>
       </header>
 
-      <aside
+      <div
+        id="mobile-navigation"
+        ref={drawerRef}
         className={`mobile-drawer ${menuOpen ? "is-open" : ""}`}
         aria-hidden={!menuOpen}
+        aria-label="Menú de navegación"
+        aria-modal="true"
         inert={!menuOpen}
+        role="dialog"
       >
         <div className="mobile-drawer-head">
-          <Link className="header-brand" href="/">
+          <Link
+            className="header-brand"
+            href="/"
+            aria-label="Dela Rosa, inicio"
+            onClick={() => setMenuOpen(false)}
+          >
             <Image
               src="/logo-delarosa-negro.jpg"
               alt=""
@@ -202,32 +274,83 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           </Link>
           <button
             type="button"
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMenu}
+            ref={closeButtonRef}
             aria-label="Cerrar menú"
           >
             <X size={20} />
           </button>
         </div>
-        <nav>
-          {navItems.map((item, index) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMenuOpen(false)}
-            >
-              <span>0{index + 1}</span>
-              {item.label}
-              <i>↗</i>
-            </Link>
-          ))}
-        </nav>
-      </aside>
+        <div className="mobile-drawer-scroll" ref={drawerScrollRef}>
+          <div className="mobile-drawer-intro">
+            <span>Menú principal</span>
+            <p>El detalle exclusivo para ese momento especial.</p>
+          </div>
+
+          <nav aria-label="Navegación móvil">
+            {navItems.map((item, index) => {
+              const active = isActive(pathname, item.href);
+              const reserve = item.href === "/reservas";
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${active ? "is-active" : ""} ${
+                    reserve ? "is-reserve" : ""
+                  }`}
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span className="mobile-drawer-index">0{index + 1}</span>
+                  <span className="mobile-drawer-link-copy">
+                    <strong>{item.label}</strong>
+                    <small>{item.hint}</small>
+                  </span>
+                  <span className="mobile-drawer-arrow" aria-hidden="true">
+                    <ArrowUpRight size={16} strokeWidth={1.7} />
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="mobile-drawer-footer">
+            <p>
+              <strong>¿Necesitás ayuda?</strong>
+              Te asesoramos de forma personalizada.
+            </p>
+            <div>
+              <a
+                className="mobile-drawer-contact is-whatsapp"
+                href={whatsappHref(
+                  "Hola Dela Rosa, quiero consultar sobre sus productos.",
+                )}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Image src="/whatsapp.svg" alt="" width={17} height={17} />
+                WhatsApp
+              </a>
+              <a
+                className="mobile-drawer-contact is-instagram"
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Image src="/instagram.svg" alt="" width={17} height={17} />
+                Instagram
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
       <button
         className={`menu-overlay ${menuOpen ? "is-visible" : ""}`}
         type="button"
-        aria-label="Cerrar menú"
-        onClick={() => setMenuOpen(false)}
-        tabIndex={menuOpen ? 0 : -1}
+        aria-hidden="true"
+        onClick={closeMenu}
+        tabIndex={-1}
       />
 
       <main className="site-main">{children}</main>

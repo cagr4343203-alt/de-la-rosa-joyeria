@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Gem, Heart, Sparkles } from "lucide-react";
-import { INSTAGRAM_URL } from "@/lib/store";
+import { FACEBOOK_URL, INSTAGRAM_URL, TIKTOK_URL } from "@/lib/store";
 
 export const metadata = {
   title: "Nuestra historia",
@@ -60,16 +60,51 @@ export default function AboutPage() {
       <section className="social-story">
         <span className="kicker kicker-light">Seguinos</span>
         <h2>Descubrí novedades y piezas recién llegadas.</h2>
-        <div>
-          <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
-            @dela_rosajoyeria <ArrowUpRight size={17} />
-          </a>
+        <div className="social-story-grid">
           <a
-            href="https://www.instagram.com/delarosa.joyeria/"
+            className="social-story-card is-instagram"
+            href={INSTAGRAM_URL}
             target="_blank"
             rel="noreferrer"
           >
-            @delarosa.joyeria <ArrowUpRight size={17} />
+            <span className="social-story-icon">
+              <Image src="/instagram.svg" alt="" width={28} height={28} />
+            </span>
+            <span className="social-story-copy">
+              <small>Instagram</small>
+              <strong>@dela_rosajoyeria</strong>
+            </span>
+            <ArrowUpRight size={18} aria-hidden="true" />
+          </a>
+          <a
+            className="social-story-card is-tiktok"
+            href={TIKTOK_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="social-story-icon">
+              <Image src="/tiktok.svg" alt="" width={28} height={28} />
+            </span>
+            <span className="social-story-copy">
+              <small>TikTok</small>
+              <strong>@delarosa.joyeria</strong>
+            </span>
+            <ArrowUpRight size={18} aria-hidden="true" />
+          </a>
+          <a
+            className="social-story-card is-facebook"
+            href={FACEBOOK_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="social-story-icon">
+              <Image src="/facebook.svg" alt="" width={30} height={30} />
+            </span>
+            <span className="social-story-copy">
+              <small>Facebook</small>
+              <strong>Dela Rosa Joyería</strong>
+            </span>
+            <ArrowUpRight size={18} aria-hidden="true" />
           </a>
         </div>
       </section>

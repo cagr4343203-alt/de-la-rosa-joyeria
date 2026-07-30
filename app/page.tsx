@@ -172,11 +172,12 @@ export default async function Home() {
           </p>
         </div>
         <div className="featured-grid">
-          {featured.map((product) => (
+          {featured.map((product, index) => (
             <ProductCard
               key={product.id}
               product={product}
               eager
+              motionIndex={index}
             />
           ))}
         </div>

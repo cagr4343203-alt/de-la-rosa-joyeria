@@ -2,21 +2,68 @@
 
 import Image from "next/image";
 import { MessageCircle, Plus, ShoppingBag } from "lucide-react";
+import { type CSSProperties, useEffect, useRef } from "react";
 import { type Product, money, whatsappHref } from "@/lib/store";
 import { useStore } from "./store-context";
 
 export function ProductCard({
   product,
   eager = false,
+  motionIndex,
 }: {
   product: Product;
   eager?: boolean;
+  motionIndex?: number;
 }) {
   const { addToCart } = useStore();
   const outOfStock = product.status === "outOfStock";
+  const cardRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (motionIndex === undefined) return;
+
+    const card = cardRef.current;
+    if (!card) return;
+
+    card.classList.add("is-motion-ready");
+
+    if (
+      !("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      card.classList.add("is-visible");
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        card.classList.add("is-visible");
+        observer.disconnect();
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
+    );
+
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, [motionIndex]);
+
+  const motionStyle =
+    motionIndex === undefined
+      ? undefined
+      : ({
+          "--product-delay": `${motionIndex * 90}ms`,
+          "--product-drift-delay": `${motionIndex * -1.15}s`,
+        } as CSSProperties);
 
   return (
-    <article className="product-card">
+    <article
+      ref={cardRef}
+      className={`product-card ${
+        motionIndex === undefined ? "" : "is-featured-motion"
+      }`}
+      style={motionStyle}
+    >
       <div className="product-media">
         <Image
           src={product.image}

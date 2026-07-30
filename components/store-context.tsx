@@ -52,8 +52,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [cart, cartReady]);
 
   useEffect(() => {
-    document.body.classList.toggle("no-scroll", cartOpen);
-    return () => document.body.classList.remove("no-scroll");
+    document.body.classList.toggle("cart-open", cartOpen);
+    return () => document.body.classList.remove("cart-open");
   }, [cartOpen]);
 
   const value = useMemo<StoreContextValue>(() => {

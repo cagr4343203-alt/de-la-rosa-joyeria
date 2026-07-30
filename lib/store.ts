@@ -16,6 +16,8 @@ export type CartLine = Product & { quantity: number };
 
 export const WHATSAPP_NUMBER = "595985720031";
 export const INSTAGRAM_URL = "https://www.instagram.com/dela_rosajoyeria/";
+export const TIKTOK_URL = "https://www.tiktok.com/@delarosa.joyeria";
+export const FACEBOOK_URL = "https://www.facebook.com/delarosa.joyeria";
 export const MAPS_URL = "https://maps.app.goo.gl/vzreQDfWqbHvAty1A";
 export const STORE_ADDRESS =
   "Mariscal José Félix Estigarribia, Encarnación, Paraguay";
