@@ -1,10 +1,14 @@
 import { ArrowUpRight, Clock3, MapPin, MessageCircle } from "lucide-react";
-import { MAPS_URL, whatsappHref } from "@/lib/store";
+import {
+  MAPS_URL,
+  STORE_ADDRESS,
+  STORE_HOURS,
+  whatsappHref,
+} from "@/lib/store";
 
 export const metadata = {
   title: "Ubicación",
-  description:
-    "Visitá DELAROSA en Calle Estigarribia y Constitución, Encarnación.",
+  description: `Visitá DELAROSA en ${STORE_ADDRESS}.`,
 };
 
 export default function LocationPage() {
@@ -13,11 +17,7 @@ export default function LocationPage() {
       <div className="location-details">
         <span className="kicker kicker-light">El local</span>
         <h1>Vení a conocernos</h1>
-        <p>
-          Calle Estigarribia y Constitución
-          <br />
-          Encarnación, Paraguay
-        </p>
+        <p>{STORE_ADDRESS}</p>
         <div className="location-data">
           <span>
             <MapPin size={18} />
@@ -25,8 +25,21 @@ export default function LocationPage() {
           </span>
           <span>
             <Clock3 size={18} />
-            Consultá el horario del día
+            Horarios actualizados
           </span>
+        </div>
+        <div className="location-hours">
+          <strong>Horario de atención</strong>
+          {STORE_HOURS.map((schedule) => (
+            <div key={schedule.days}>
+              <span>{schedule.days}</span>
+              <p>
+                {schedule.times.map((time) => (
+                  <time key={time}>{time}</time>
+                ))}
+              </p>
+            </div>
+          ))}
         </div>
         <div className="location-buttons">
           <a
@@ -63,7 +76,7 @@ export default function LocationPage() {
         <div className="map-marker">
           <MapPin size={30} />
           <strong>DELAROSA</strong>
-          <small>Estigarribia y Constitución</small>
+          <small>Mariscal José Félix Estigarribia</small>
         </div>
         <p>
           Abrir ubicación <ArrowUpRight size={16} />

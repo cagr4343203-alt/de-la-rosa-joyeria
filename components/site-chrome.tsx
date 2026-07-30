@@ -35,8 +35,8 @@ const mobileItems = [
   { href: "/", label: "Inicio", Icon: Home },
   { href: "/productos", label: "Productos", Icon: PackageSearch },
   { href: "/reservas", label: "Reservar", Icon: CalendarDays, primary: true },
-  { href: "/nosotros", label: "Nosotros", Icon: UsersRound },
   { href: "/combos", label: "Combos", Icon: Gift },
+  { href: "/nosotros", label: "Nosotros", Icon: UsersRound },
   { href: "/ubicacion", label: "Ubicación", Icon: MapPin },
 ];
 
@@ -61,10 +61,6 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     );
     return () => window.clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     document.body.classList.toggle("no-scroll", menuOpen);
@@ -189,6 +185,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       <aside
         className={`mobile-drawer ${menuOpen ? "is-open" : ""}`}
         aria-hidden={!menuOpen}
+        inert={!menuOpen}
       >
         <div className="mobile-drawer-head">
           <Link className="header-brand" href="/">
@@ -213,7 +210,11 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         </div>
         <nav>
           {navItems.map((item, index) => (
-            <Link key={item.href} href={item.href}>
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setMenuOpen(false)}
+            >
               <span>0{index + 1}</span>
               {item.label}
               <i>↗</i>
@@ -254,7 +255,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         <div className="footer-links">
           <strong>Contacto</strong>
           <a href={MAPS_URL} target="_blank" rel="noreferrer">
-            Estigarribia y Constitución
+            Mariscal José Félix Estigarribia
           </a>
           <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
             @dela_rosajoyeria

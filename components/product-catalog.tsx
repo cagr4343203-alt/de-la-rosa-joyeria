@@ -197,8 +197,12 @@ export function ProductCatalog({
 
           {filtered.length ? (
             <div className="catalog-grid">
-              {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {filtered.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  eager={index < 4}
+                />
               ))}
             </div>
           ) : (

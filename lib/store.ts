@@ -16,8 +16,23 @@ export type CartLine = Product & { quantity: number };
 
 export const WHATSAPP_NUMBER = "595985720031";
 export const INSTAGRAM_URL = "https://www.instagram.com/dela_rosajoyeria/";
-export const MAPS_URL =
-  "https://www.google.com/maps/search/?api=1&query=Calle+Estigarribia+y+Constitucion+Encarnacion+Paraguay";
+export const MAPS_URL = "https://maps.app.goo.gl/vzreQDfWqbHvAty1A";
+export const STORE_ADDRESS =
+  "Mariscal José Félix Estigarribia, Encarnación, Paraguay";
+export const STORE_HOURS = [
+  {
+    days: "Lunes a viernes",
+    times: ["08:00 - 12:30", "15:00 - 19:00"],
+  },
+  {
+    days: "Sábado",
+    times: ["08:00 - 13:00", "15:00 - 19:00"],
+  },
+  {
+    days: "Domingo",
+    times: ["Cerrado"],
+  },
+] as const;
 
 export const products: Product[] = [
   {

@@ -10,7 +10,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
-import { MAPS_URL, whatsappHref } from "@/lib/store";
+import { MAPS_URL, STORE_ADDRESS, whatsappHref } from "@/lib/store";
 import { getProducts } from "@/sanity/lib/products";
 
 const categoryCards = [
@@ -202,10 +202,18 @@ export default async function Home() {
             Reservar ahora <ArrowUpRight size={17} />
           </Link>
         </div>
-        <div className="piercing-number" aria-hidden="true">
-          <span>01</span>
-          <strong>PERFORACIÓN</strong>
-        </div>
+        <figure className="piercing-showcase">
+          <Image
+            src="/products/piercing-reference-client.png"
+            alt="Perforación de oreja realizada con aros plateados"
+            fill
+            sizes="(max-width: 900px) 82vw, 32vw"
+          />
+          <figcaption>
+            <span>Servicio con reserva</span>
+            <strong>Inspiración para tu próximo estilo</strong>
+          </figcaption>
+        </figure>
       </section>
 
       <section className="history-teaser">
@@ -236,7 +244,7 @@ export default async function Home() {
         <div>
           <span className="kicker kicker-light">Nuestra casa</span>
           <h2>Te esperamos en Encarnación.</h2>
-          <p>Calle Estigarribia y Constitución, Encarnación, Paraguay.</p>
+          <p>{STORE_ADDRESS}.</p>
         </div>
         <a
           className="button button-outline-light"
