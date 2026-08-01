@@ -8,6 +8,7 @@ import {
   Gift,
   MapPin,
   ShieldCheck,
+  Watch,
 } from "lucide-react";
 import { MotionReveal } from "@/components/motion-reveal";
 import { ProductCard } from "@/components/product-card";
@@ -113,29 +114,37 @@ export default async function Home() {
         aria-label="Servicios destacados"
         distance={22}
       >
-       <article>
-  <Gem size={24} />
-  <div>
-    <strong>Joyas seleccionadas</strong>
-    <span>Oro 18K, plata y enchapados</span>
-  </div>
-</article>
+        <article>
+          <Gem size={24} />
+          <div>
+            <strong>Joyas seleccionadas</strong>
+            <span>Oro 18K, plata y enchapados</span>
+          </div>
+        </article>
 
-<article>
-  <Gift size={24} />
-  <div>
-    <strong>Regalos especiales</strong>
-    <span>Bombillas, bolígrafos y más detalles</span>
-  </div>
-</article>
+        <article>
+          <Watch size={24} />
+          <div>
+            <strong>Relojes</strong>
+            <span>Modelos clásicos y contemporáneos</span>
+          </div>
+        </article>
 
-<article>
-  <CalendarDays size={24} />
-  <div>
-    <strong>Perforación de oreja</strong>
-    <span>Reservá fecha y horario por WhatsApp</span>
-  </div>
-</article>
+        <article>
+          <Gift size={24} />
+          <div>
+            <strong>Regalos especiales</strong>
+            <span>Bombillas, bolígrafos y más detalles</span>
+          </div>
+        </article>
+
+        <article>
+          <CalendarDays size={24} />
+          <div>
+            <strong>Perforación de oreja</strong>
+            <span>Reservá fecha y horario por WhatsApp</span>
+          </div>
+        </article>
       </MotionReveal>
 
       <section className="home-section category-section">

@@ -937,7 +937,7 @@ img {
   background: var(--cream);
   border-bottom: 1px solid var(--line);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   padding: 0 clamp(22px, 5vw, 80px);
 }
 
@@ -969,6 +969,10 @@ img {
 
 .service-band.is-in-view article:nth-child(3) svg {
   animation-delay: -3s;
+}
+
+.service-band.is-in-view article:nth-child(4) svg {
+  animation-delay: -4.5s;
 }
 
 .service-band div {
