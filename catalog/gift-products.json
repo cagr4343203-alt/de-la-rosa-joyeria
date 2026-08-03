@@ -1,0 +1,11 @@
+[
+  { "file": "bombilla-01.jpg", "sourceKey": "bombilla-signature", "name": "Bombilla de plata con detalles", "category": "Bombillas", "material": "Plata" },
+  { "file": "bombilla-02.jpg", "sourceKey": "whatsapp-bombilla-02", "name": "Bombilla de plata diseño clásico", "category": "Bombillas", "material": "Plata" },
+  { "file": "bombilla-03.jpg", "sourceKey": "whatsapp-bombilla-03", "name": "Bombilla de plata labrada", "category": "Bombillas", "material": "Plata" },
+  { "file": "bombilla-04.jpg", "sourceKey": "whatsapp-bombilla-04", "name": "Bombilla de plata con guardas", "category": "Bombillas", "material": "Plata" },
+  { "file": "bombilla-05.jpg", "sourceKey": "whatsapp-bombilla-05", "name": "Bombilla de plata diseño artesanal", "category": "Bombillas", "material": "Plata" },
+  { "file": "bombilla-06.jpg", "sourceKey": "whatsapp-bombilla-06", "name": "Bombilla de plata torneada", "category": "Bombillas", "material": "Plata" },
+  { "file": "bombilla-07.jpg", "sourceKey": "whatsapp-bombilla-07", "name": "Bombilla de plata pico curvo", "category": "Bombillas", "material": "Plata" },
+  { "file": "bombilla-08.jpg", "sourceKey": "whatsapp-bombilla-08", "name": "Bombilla de plata espiral", "category": "Bombillas", "material": "Plata" },
+  { "file": "boligrafo-01.jpg", "sourceKey": "boligrafo-ejecutivo", "name": "Bolígrafo dorado ejecutivo", "category": "Bolígrafos", "material": "Metal dorado" }
+]

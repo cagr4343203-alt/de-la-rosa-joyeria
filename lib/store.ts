@@ -1,3 +1,4 @@
+import { giftProducts } from "./gift-products";
 import { watchProducts } from "./watch-products";
 
 export type Product = {
@@ -134,30 +135,7 @@ export const products: Product[] = [
     image: "/products/11-oro.jpg",
     description: "Una pieza de oro con brillo sutil para llevar siempre.",
   },
-  {
-    id: 11,
-    name: "Bombilla Signature",
-    category: "Bombillas",
-    material: "Acero inoxidable",
-    price: 145000,
-    image: "/products/12-regalos-bombilla-boligrafo.png",
-    imagePosition: "left center",
-    referentialImage: true,
-    badge: "Nuevo",
-    description: "Bombilla de acero con terminación pulida para un regalo especial.",
-  },
-  {
-    id: 12,
-    name: "Bolígrafo Ejecutivo",
-    category: "Bolígrafos",
-    material: "Laca y metal",
-    price: 185000,
-    image: "/products/12-regalos-bombilla-boligrafo.png",
-    imagePosition: "right center",
-    referentialImage: true,
-    badge: "Nuevo",
-    description: "Bolígrafo elegante en negro y dorado, ideal para obsequiar.",
-  },
+  ...giftProducts,
   ...watchProducts,
 ];
 
