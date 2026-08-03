@@ -1,3 +1,5 @@
+import { watchProducts } from "./watch-products";
+
 export type Product = {
   id: string | number;
   name: string;
@@ -156,6 +158,7 @@ export const products: Product[] = [
     badge: "Nuevo",
     description: "Bolígrafo elegante en negro y dorado, ideal para obsequiar.",
   },
+  ...watchProducts,
 ];
 
 export const categories = [
@@ -166,6 +169,9 @@ export const categories = [
   "Pulseras",
   "Sets",
   "Relojes",
+  "Reloj dama",
+  "Reloj caballero",
+  "Reloj infantil",
   "Bombillas",
   "Bolígrafos",
   "Combos",

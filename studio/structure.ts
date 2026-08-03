@@ -37,9 +37,27 @@ const productCategories = [
   },
   {
     id: "relojes",
-    title: "Relojes",
+    title: "Relojes generales",
     value: "Relojes",
     templateId: "product-relojes",
+  },
+  {
+    id: "reloj-dama",
+    title: "Reloj dama",
+    value: "Reloj dama",
+    templateId: "product-reloj-dama",
+  },
+  {
+    id: "reloj-caballero",
+    title: "Reloj caballero",
+    value: "Reloj caballero",
+    templateId: "product-reloj-caballero",
+  },
+  {
+    id: "reloj-infantil",
+    title: "Reloj infantil",
+    value: "Reloj infantil",
+    templateId: "product-reloj-infantil",
   },
   {
     id: "dijes",

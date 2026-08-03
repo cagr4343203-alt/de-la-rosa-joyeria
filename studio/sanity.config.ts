@@ -36,6 +36,21 @@ const productCategoryTemplates = [
     category: "Relojes",
   },
   {
+    id: "product-reloj-dama",
+    title: "Nuevo reloj dama",
+    category: "Reloj dama",
+  },
+  {
+    id: "product-reloj-caballero",
+    title: "Nuevo reloj caballero",
+    category: "Reloj caballero",
+  },
+  {
+    id: "product-reloj-infantil",
+    title: "Nuevo reloj infantil",
+    category: "Reloj infantil",
+  },
+  {
     id: "product-dijes",
     title: "Nuevo dije",
     category: "Dijes",

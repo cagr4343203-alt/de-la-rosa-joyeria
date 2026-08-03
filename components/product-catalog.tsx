@@ -7,6 +7,21 @@ import { ProductCard } from "./product-card";
 
 type SortMode = "featured" | "price-asc" | "price-desc" | "name";
 
+const watchCategories = new Set([
+  "Relojes",
+  "Reloj dama",
+  "Reloj caballero",
+  "Reloj infantil",
+]);
+
+function matchesCategory(productCategory: string, selectedCategory: string) {
+  if (selectedCategory === "Todo") return true;
+  if (selectedCategory === "Relojes") {
+    return watchCategories.has(productCategory);
+  }
+  return productCategory === selectedCategory;
+}
+
 const ignoredSearchWords = new Set([
   "de",
   "del",
@@ -154,8 +169,7 @@ export function ProductCatalog({
     const result = products.filter((product) => {
       const categoryMatch =
         searchIsActive ||
-        category === "Todo" ||
-        product.category === category;
+        matchesCategory(product.category, category);
 
       const normalizedProductMaterial = normalizeSearchText(product.material);
       const normalizedSelectedMaterial = normalizeSearchText(material);
@@ -291,7 +305,9 @@ export function ProductCatalog({
               const count =
                 item === "Todo"
                   ? products.length
-                  : products.filter((product) => product.category === item)
+                  : products.filter((product) =>
+                      matchesCategory(product.category, item),
+                    )
                       .length;
 
               if (item !== "Todo" && count === 0) {
