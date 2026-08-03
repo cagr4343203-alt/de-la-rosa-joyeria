@@ -1,5 +1,32 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "buildCommand": "npx next build"
+  "buildCommand": "npx next build",
+  "redirects": [
+    {
+      "source": "/productos%E2%81%A0",
+      "destination": "/productos",
+      "permanent": false
+    },
+    {
+      "source": "/combos%E2%81%A0",
+      "destination": "/combos",
+      "permanent": false
+    },
+    {
+      "source": "/nosotros%E2%81%A0",
+      "destination": "/nosotros",
+      "permanent": false
+    },
+    {
+      "source": "/reservas%E2%81%A0",
+      "destination": "/reservas",
+      "permanent": false
+    },
+    {
+      "source": "/ubicacion%E2%81%A0",
+      "destination": "/ubicacion",
+      "permanent": false
+    }
+  ]
 }
