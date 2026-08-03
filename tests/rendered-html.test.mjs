@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-async function render() {
+async function render(pathname = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("http://localhost/", {
+    new Request(new URL(pathname, "http://localhost/"), {
       headers: { accept: "text/html" },
     }),
     {
@@ -33,4 +33,14 @@ test("renders the Dela Rosa storefront", async () => {
   assert.match(html, /Reservar perforaci/);
   assert.match(html, /Productos destacados/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
+});
+
+test("recovers product links containing invisible characters", async () => {
+  const response = await render("/productos%E2%81%A0");
+
+  assert.ok([307, 308].includes(response.status));
+  assert.equal(
+    new URL(response.headers.get("location"), "http://localhost/").pathname,
+    "/productos",
+  );
 });
