@@ -11,13 +11,14 @@ type GiftCatalogEntry = {
 
 const giftCatalog = giftCatalogData as GiftCatalogEntry[];
 
-export const giftProducts: Product[] = giftCatalog.map((gift, index) => ({
+export const giftProducts: Product[] = giftCatalog.map((gift) => ({
   id: gift.sourceKey,
   name: gift.name,
   category: gift.category,
   material: gift.material,
   price: 0,
   image: `/products/gifts/${gift.file}`,
+  imageFit: "contain",
   badge: "Nuevo",
   description:
     "Foto real de Dela Rosa. Consultá disponibilidad y precio por WhatsApp.",

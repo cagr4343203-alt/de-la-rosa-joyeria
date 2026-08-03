@@ -97,6 +97,22 @@ export const product = defineType({
       initialValue: false,
     }),
     defineField({
+      name: "imageFit",
+      title: "Encuadre de la foto",
+      description:
+        "Usá Mostrar completa para fotos verticales. Llenar tarjeta puede recortar los bordes.",
+      type: "string",
+      initialValue: "contain",
+      options: {
+        list: [
+          { title: "Mostrar completa y centrada", value: "contain" },
+          { title: "Llenar la tarjeta", value: "cover" },
+        ],
+        layout: "radio",
+      },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
   name: "description",
   title: "Descripción",
   description: "Opcional. Podés dejar este campo vacío.",

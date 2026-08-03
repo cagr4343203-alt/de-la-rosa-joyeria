@@ -19,6 +19,7 @@ const PRODUCTS_QUERY = defineQuery(`
     badge,
     description,
     referentialImage,
+    imageFit,
     status
   }
 `);
@@ -33,6 +34,7 @@ type SanityProduct = {
   badge?: string;
   description: string;
   referentialImage?: boolean;
+  imageFit?: "cover" | "contain";
   status?: "available" | "outOfStock" | "hidden";
 };
 
@@ -48,25 +50,28 @@ export async function getProducts(): Promise<Product[]> {
 
     return entries
       .filter((entry) => entry.image)
-      .map((entry) => ({
-        id: entry._id,
-        name: entry.name,
-        category: entry.category,
-        material: entry.material,
-        price: entry.price,
-        image: builder
-          .image(entry.image!)
-          .width(1200)
-          .height(1500)
-          .fit("crop")
-          .auto("format")
-          .url(),
-        badge: entry.badge,
-        description: entry.description,
-        referentialImage: entry.referentialImage,
-        status:
-          entry.status === "outOfStock" ? "outOfStock" : "available",
-      }));
+      .map((entry) => {
+        const imageFit = entry.imageFit === "cover" ? "cover" : "contain";
+        const imageBuilder = builder.image(entry.image!).width(1200);
+
+        return {
+          id: entry._id,
+          name: entry.name,
+          category: entry.category,
+          material: entry.material,
+          price: entry.price,
+          image:
+            imageFit === "cover"
+              ? imageBuilder.height(1500).fit("crop").auto("format").url()
+              : imageBuilder.auto("format").url(),
+          imageFit,
+          badge: entry.badge,
+          description: entry.description,
+          referentialImage: entry.referentialImage,
+          status:
+            entry.status === "outOfStock" ? "outOfStock" : "available",
+        };
+      });
   } catch {
     return fallbackProducts;
   }

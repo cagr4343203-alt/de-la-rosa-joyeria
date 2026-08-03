@@ -30,6 +30,7 @@ export function ProductCard({
   const { addToCart } = useStore();
 
   const outOfStock = product.status === "outOfStock";
+  const imageFit = product.imageFit ?? "contain";
 
   const cardRef = useRef<HTMLElement>(null);
 
@@ -100,7 +101,7 @@ export function ProductCard({
         ref={cardRef}
         className={`product-card ${
           motionIndex === undefined ? "" : "is-featured-motion"
-        }`}
+        } ${imageFit === "contain" ? "has-contained-image" : ""}`}
         style={motionStyle}
       >
         <div className="product-media">
@@ -118,8 +119,8 @@ export function ProductCard({
               loading={eager ? "eager" : "lazy"}
               sizes="(max-width: 560px) 48vw, (max-width: 900px) 46vw, (max-width: 1200px) 30vw, 22vw"
               style={{
-                objectFit: "cover",
-                objectPosition: product.imagePosition,
+                objectFit: imageFit,
+                objectPosition: product.imagePosition ?? "center",
               }}
             />
           </button>

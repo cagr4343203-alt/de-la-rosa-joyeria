@@ -10,6 +10,7 @@ export type Product = {
   image: string;
   badge?: string;
   description: string;
+  imageFit?: "cover" | "contain";
   imagePosition?: string;
   referentialImage?: boolean;
   status?: "available" | "outOfStock";

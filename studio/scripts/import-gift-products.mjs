@@ -22,9 +22,14 @@ for (let index = 0; index < giftCatalog.length; index += 1) {
     "gifts",
     gift.file,
   );
-  const asset = await client.assets.upload("image", createReadStream(filepath), {
-    filename: gift.file,
-  });
+  let assetRef = existing?.image?.asset?._ref;
+
+  if (!assetRef) {
+    const asset = await client.assets.upload("image", createReadStream(filepath), {
+      filename: gift.file,
+    });
+    assetRef = asset._id;
+  }
 
   const document = {
     _type: "product",
@@ -36,9 +41,10 @@ for (let index = 0; index < giftCatalog.length; index += 1) {
     price: 0,
     image: {
       _type: "image",
-      asset: { _type: "reference", _ref: asset._id },
+      asset: { _type: "reference", _ref: assetRef },
       alt: gift.name,
     },
+    imageFit: "contain",
     referentialImage: false,
     description:
       "Foto real de Dela Rosa. Consultá disponibilidad y precio por WhatsApp.",

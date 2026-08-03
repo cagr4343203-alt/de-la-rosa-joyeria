@@ -29,7 +29,7 @@ const categoryCards = [
   {
     title: "Bombillas",
     eyebrow: "Detalles para regalar",
-    image: "/products/13-bombilla-category.png",
+    image: "/products/gifts/bombilla-04.jpg",
   },
   {
     title: "Pulseras",

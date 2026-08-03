@@ -45,6 +45,7 @@ for (let index = 0; index < watchCatalog.length; index += 1) {
       asset: { _type: "reference", _ref: assetRef },
       alt: watch.name,
     },
+    imageFit: "contain",
     referentialImage: false,
     description:
       "Foto real de Dela Rosa. Consultá disponibilidad y precio por WhatsApp.",

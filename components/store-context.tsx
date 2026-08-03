@@ -36,14 +36,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = window.localStorage.getItem("delarosa-cart");
+    let restoredCart: CartLine[] = [];
+
     if (saved) {
       try {
-        setCart(JSON.parse(saved) as CartLine[]);
+        restoredCart = JSON.parse(saved) as CartLine[];
       } catch {
         window.localStorage.removeItem("delarosa-cart");
       }
     }
-    setCartReady(true);
+
+    const frame = window.requestAnimationFrame(() => {
+      setCart(restoredCart);
+      setCartReady(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -199,7 +207,10 @@ export function CartDrawer() {
                     alt=""
                     fill
                     sizes="92px"
-                    style={{ objectPosition: item.imagePosition }}
+                    style={{
+                      objectFit: item.imageFit ?? "contain",
+                      objectPosition: item.imagePosition ?? "center",
+                    }}
                   />
                 </div>
                 <div className="cart-line-info">

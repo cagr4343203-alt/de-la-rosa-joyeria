@@ -78,6 +78,39 @@ const searchAliases: Record<string, string> = {
 
   // Relojes
   relojes: "reloj",
+  damas: "dama",
+  mujer: "dama",
+  mujeres: "dama",
+  senora: "dama",
+  senoras: "dama",
+  femenino: "dama",
+  femenina: "dama",
+  femeninos: "dama",
+  femeninas: "dama",
+  caballeros: "caballero",
+  hombre: "caballero",
+  hombres: "caballero",
+  varon: "caballero",
+  varones: "caballero",
+  senor: "caballero",
+  senores: "caballero",
+  masculino: "caballero",
+  masculina: "caballero",
+  masculinos: "caballero",
+  masculinas: "caballero",
+  nino: "infantil",
+  ninos: "infantil",
+  nina: "infantil",
+  ninas: "infantil",
+  nena: "infantil",
+  nenas: "infantil",
+  nene: "infantil",
+  nenes: "infantil",
+  chico: "infantil",
+  chicos: "infantil",
+  chica: "infantil",
+  chicas: "infantil",
+  kids: "infantil",
 
   // Dijes
   dijes: "dije",
@@ -86,11 +119,21 @@ const searchAliases: Record<string, string> = {
 
   // Bombillas
   bombillas: "bombilla",
+  mate: "bombilla",
 
   // Bolígrafos
   boligrafos: "boligrafo",
   lapicera: "boligrafo",
   lapiceras: "boligrafo",
+  birome: "boligrafo",
+  biromes: "boligrafo",
+  pluma: "boligrafo",
+  plumas: "boligrafo",
+
+  // Materiales y formas habituales de pedirlos
+  gold: "oro",
+  golden: "oro",
+  silver: "plata",
 
   // Sets
   sets: "set",
