@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "Reserva de perforación",
   description:
     "Reservá tu turno para perforación de oreja en Dela Rosa Joyería y Relojería.",
+  alternates: {
+    canonical: "/reservas",
+  },
 };
 
 export default function ReservationLayout({

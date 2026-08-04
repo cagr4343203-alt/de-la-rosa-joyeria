@@ -32,7 +32,24 @@ test("renders the Dela Rosa storefront", async () => {
   assert.match(html, /El detalle exclusivo/);
   assert.match(html, /Reservar perforaci/);
   assert.match(html, /Productos destacados/);
+  assert.match(html, /application\/ld\+json/);
+  assert.match(html, /https:\/\/delarosajoyeria\.com/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
+});
+
+test("publishes SEO discovery files for the canonical domain", async () => {
+  const [robotsResponse, sitemapResponse] = await Promise.all([
+    render("/robots.txt"),
+    render("/sitemap.xml"),
+  ]);
+
+  assert.equal(robotsResponse.status, 200);
+  assert.match(await robotsResponse.text(), /delarosajoyeria\.com\/sitemap\.xml/);
+
+  assert.equal(sitemapResponse.status, 200);
+  const sitemap = await sitemapResponse.text();
+  assert.match(sitemap, /https:\/\/delarosajoyeria\.com\/productos/);
+  assert.match(sitemap, /https:\/\/delarosajoyeria\.com\/reservas/);
 });
 
 test("recovers product links containing invisible characters", async () => {

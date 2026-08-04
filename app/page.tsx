@@ -13,6 +13,7 @@ import {
 import { MotionReveal } from "@/components/motion-reveal";
 import { ProductCard } from "@/components/product-card";
 import { MAPS_URL, STORE_ADDRESS, whatsappHref } from "@/lib/store";
+import { LOCAL_BUSINESS_JSON_LD } from "@/lib/seo";
 import { getProducts } from "@/sanity/lib/products";
 
 const categoryCards = [
@@ -44,6 +45,12 @@ export default async function Home() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(LOCAL_BUSINESS_JSON_LD).replace(/</g, "\\u003c"),
+        }}
+      />
       <MotionReveal
         as="section"
         className="home-hero"

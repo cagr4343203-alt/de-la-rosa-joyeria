@@ -1,18 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
 import { SiteChrome } from "@/components/site-chrome";
 import { StoreProvider } from "@/components/store-context";
+import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get("host") ?? "localhost";
-  const protocol =
-    requestHeaders.get("x-forwarded-proto") ??
-    (host.startsWith("localhost") ? "http" : "https");
-  const baseUrl = `${protocol}://${host}`;
-
-  return {
+export const metadata: Metadata = {
+    metadataBase: new URL(SITE_URL),
     title: {
       default: "Dela Rosa | El detalle exclusivo",
       template: "%s · Dela Rosa",
@@ -23,15 +16,31 @@ export async function generateMetadata(): Promise<Metadata> {
       icon: "/logo-delarosa-negro.jpg",
       shortcut: "/logo-delarosa-negro.jpg",
     },
+    alternates: {
+      canonical: "/",
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    },
     openGraph: {
       title: "Dela Rosa | El detalle exclusivo para ese momento especial",
       description:
         "Joyas, relojes, regalos y reserva de perforación en Encarnación.",
+      url: SITE_URL,
+      siteName: "Dela Rosa Joyería",
       type: "website",
       locale: "es_PY",
       images: [
         {
-          url: `${baseUrl}/og.png`,
+          url: "/og.png",
           width: 1734,
           height: 907,
           alt: "Dela Rosa — El detalle exclusivo para ese momento especial",
@@ -43,10 +52,9 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "Dela Rosa | El detalle exclusivo",
       description:
         "Joyas, relojes, regalos y reserva de perforación en Encarnación.",
-      images: [`${baseUrl}/og.png`],
+      images: ["/og.png"],
     },
   };
-}
 
 export const viewport: Viewport = {
   themeColor: "#17120f",
@@ -60,7 +68,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" data-scroll-behavior="smooth">
+    <html lang="es-PY" data-scroll-behavior="smooth">
       <body>
         <StoreProvider>
           <SiteChrome>{children}</SiteChrome>

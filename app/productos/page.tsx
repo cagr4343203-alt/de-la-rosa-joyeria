@@ -4,7 +4,10 @@ import { getProducts } from "@/sanity/lib/products";
 export const metadata = {
   title: "Productos",
   description:
-    "Catálogo de joyas, relojes y regalos de Dela Rosa en Encarnación.",
+    "Catálogo de joyas, relojes, pulseras, aros, bombillas y regalos de Dela Rosa en Encarnación, Paraguay.",
+  alternates: {
+    canonical: "/productos",
+  },
 };
 
 export default async function ProductsPage({

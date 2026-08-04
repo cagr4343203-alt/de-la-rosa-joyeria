@@ -8,7 +8,10 @@ import {
 
 export const metadata = {
   title: "Ubicación",
-  description: `Visitá Dela Rosa en ${STORE_ADDRESS}.`,
+  description: `Visitá Dela Rosa Joyería en ${STORE_ADDRESS}. Consultá horarios, ubicación y contacto.`,
+  alternates: {
+    canonical: "/ubicacion",
+  },
 };
 
 export default function LocationPage() {

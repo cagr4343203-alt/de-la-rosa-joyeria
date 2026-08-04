@@ -19,6 +19,7 @@ export type Product = {
 export type CartLine = Product & { quantity: number };
 
 export const WHATSAPP_NUMBER = "595985720031";
+export const STORE_PHONE = "+59571205132";
 export const INSTAGRAM_URL = "https://www.instagram.com/dela_rosajoyeria/";
 export const TIKTOK_URL = "https://www.tiktok.com/@delarosa.joyeria";
 export const FACEBOOK_URL = "https://www.facebook.com/delarosa.joyeria";

@@ -8,6 +8,9 @@ export const metadata = {
   title: "Nuestra historia",
   description:
     "Desde 2003, Dela Rosa acompaña los momentos especiales de Encarnación.",
+  alternates: {
+    canonical: "/nosotros",
+  },
 };
 
 export default function AboutPage() {

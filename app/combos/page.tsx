@@ -4,7 +4,10 @@ import { getProducts } from "@/sanity/lib/products";
 export const metadata = {
   title: "Combos",
   description:
-    "Combos de regalos Dela Rosa, administrados desde nuestro catálogo.",
+    "Combos de joyas, relojes y regalos para momentos especiales en Dela Rosa, Encarnación.",
+  alternates: {
+    canonical: "/combos",
+  },
 };
 
 export default async function CombosPage() {
