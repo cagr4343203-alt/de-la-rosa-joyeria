@@ -58,7 +58,9 @@ export default async function Home() {
         observeOnly
       >
         <div className="hero-copy">
-          <span className="kicker kicker-light">Encarnación · Desde 2003</span>
+          <span className="kicker kicker-light">
+            Dela Rosa Joyería · Encarnación · Desde 2003
+          </span>
           <h1>
             El detalle exclusivo
             <em>para ese momento especial.</em>

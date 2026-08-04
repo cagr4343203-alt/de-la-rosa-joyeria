@@ -7,11 +7,11 @@ import "./globals.css";
 export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: "Dela Rosa | El detalle exclusivo",
-      template: "%s · Dela Rosa",
+      default: "Dela Rosa Joyería y Relojería | Encarnación",
+      template: "%s · Dela Rosa Joyería",
     },
     description:
-      "Joyas, relojes y regalos para momentos especiales. Comprá por catálogo o reservá tu perforación de oreja en Dela Rosa, Encarnación.",
+      "Dela Rosa Joyería y Relojería en Encarnación, Paraguay. Joyas de oro y plata, relojes, regalos, bombillas, bolígrafos y perforación de oreja desde 2003.",
     icons: {
       icon: "/logo-delarosa-negro.jpg",
       shortcut: "/logo-delarosa-negro.jpg",
@@ -31,9 +31,9 @@ export const metadata: Metadata = {
       },
     },
     openGraph: {
-      title: "Dela Rosa | El detalle exclusivo para ese momento especial",
+      title: "Dela Rosa Joyería y Relojería en Encarnación",
       description:
-        "Joyas, relojes, regalos y reserva de perforación en Encarnación.",
+        "Joyas, relojes, regalos y perforación de oreja en Encarnación, Paraguay. Desde 2003 formando parte de tus momentos.",
       url: SITE_URL,
       siteName: "Dela Rosa Joyería",
       type: "website",
@@ -49,9 +49,9 @@ export const metadata: Metadata = {
     },
     twitter: {
       card: "summary_large_image",
-      title: "Dela Rosa | El detalle exclusivo",
+      title: "Dela Rosa Joyería y Relojería en Encarnación",
       description:
-        "Joyas, relojes, regalos y reserva de perforación en Encarnación.",
+        "Joyas, relojes, regalos y perforación de oreja en Encarnación, Paraguay.",
       images: ["/og.png"],
     },
   };
