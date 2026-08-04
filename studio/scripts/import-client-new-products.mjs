@@ -13,12 +13,31 @@ const client = process.env.SANITY_AUTH_TOKEN
     })
   : getCliClient({ apiVersion: "2026-08-04" });
 const projectRoot = resolve(import.meta.dirname, "../..");
-const products = JSON.parse(
-  readFileSync(
-    resolve(projectRoot, "catalog", "client-new-products.json"),
-    "utf8",
+const catalogFiles = [
+  "client-new-products.json",
+  "client-products-august.json",
+];
+const products = catalogFiles.flatMap((filename) =>
+  JSON.parse(
+    readFileSync(resolve(projectRoot, "catalog", filename), "utf8"),
   ),
 );
+
+function productDescription(product) {
+  if (product.category === "Anillos") {
+    return "Anillo de compromiso de oro 18K. Consultá disponibilidad y detalles por WhatsApp.";
+  }
+
+  if (product.category === "Reloj infantil") {
+    return "Reloj infantil. Consultá disponibilidad, características y precio por WhatsApp.";
+  }
+
+  if (product.sourceKey.startsWith("argolla-plata-")) {
+    return "Argolla de plata 925. Consultá disponibilidad y detalles por WhatsApp.";
+  }
+
+  return "Aros de plata 925. Consultá disponibilidad y detalles por WhatsApp.";
+}
 
 for (let index = 0; index < products.length; index += 1) {
   const product = products[index];
@@ -42,7 +61,6 @@ for (let index = 0; index < products.length; index += 1) {
     assetRef = asset._id;
   }
 
-  const isRing = product.category === "Anillos";
   const document = {
     _type: "product",
     name: product.name,
@@ -58,9 +76,7 @@ for (let index = 0; index < products.length; index += 1) {
     },
     imageFit: "contain",
     referentialImage: false,
-    description: isRing
-      ? "Anillo de compromiso de oro 18K. Consultá disponibilidad y detalles por WhatsApp."
-      : "Argolla de plata 925. Consultá disponibilidad y detalles por WhatsApp.",
+    description: productDescription(product),
     badge: "Nuevo",
     featured: index < 4,
     order: 50 + index,
