@@ -1,5 +1,6 @@
 import { giftProducts } from "./gift-products";
 import { watchProducts } from "./watch-products";
+import { clientNewProducts } from "./client-new-products";
 
 export type Product = {
   id: string | number;
@@ -47,7 +48,7 @@ export const products: Product[] = [
     name: "Cadena Espíritu Santo",
     category: "Cadenas",
     material: "Oro 18K",
-    price: 1350000,
+    price: 0,
     image: "/products/01-cadena-angel.jpg",
     badge: "Nueva",
     description: "Cadena delicada con dije simbólico y terminación luminosa.",
@@ -57,7 +58,7 @@ export const products: Product[] = [
     name: "Argollas Trenzadas",
     category: "Aros",
     material: "Oro 18K",
-    price: 980000,
+    price: 0,
     image: "/products/02-argollas.jpg",
     badge: "Favorita",
     description: "Argollas livianas con detalle trenzado para todos los días.",
@@ -67,7 +68,7 @@ export const products: Product[] = [
     name: "Solitario Lumière",
     category: "Anillos",
     material: "Plata Gold",
-    price: 425000,
+    price: 0,
     image: "/products/06-joya.jpg",
     badge: "Destacado",
     description: "Anillo de brillo central, clásico y delicado.",
@@ -77,7 +78,7 @@ export const products: Product[] = [
     name: "Pulsera Cœurs",
     category: "Pulseras",
     material: "Plata 925",
-    price: 350000,
+    price: 0,
     image: "/products/05-pulsera.jpg",
     description: "Corazones engastados y destellos que acompañan cada gesto.",
   },
@@ -86,7 +87,7 @@ export const products: Product[] = [
     name: "Collar Éclat",
     category: "Cadenas",
     material: "Enchapado",
-    price: 380000,
+    price: 0,
     image: "/products/07-destello.jpg",
     badge: "Edición especial",
     description: "Collar protagonista de discos dorados con textura satinada.",
@@ -96,7 +97,7 @@ export const products: Product[] = [
     name: "Collar Mariposa",
     category: "Cadenas",
     material: "Plata Gold",
-    price: 295000,
+    price: 0,
     image: "/products/08-coleccion.jpg",
     description: "Mariposa de nácar con cadena regulable y doble detalle.",
   },
@@ -105,7 +106,7 @@ export const products: Product[] = [
     name: "Huggies Clásicos",
     category: "Aros",
     material: "Oro 18K",
-    price: 720000,
+    price: 0,
     image: "/products/04-aros.jpg",
     description: "Aros compactos, cómodos y versátiles para combinar.",
   },
@@ -114,7 +115,7 @@ export const products: Product[] = [
     name: "Set Serena",
     category: "Sets",
     material: "Plata 925",
-    price: 470000,
+    price: 0,
     image: "/products/09-plata.jpg",
     badge: "Para regalar",
     description: "Un set armónico pensado para regalar o regalarte.",
@@ -124,7 +125,7 @@ export const products: Product[] = [
     name: "Reloj Signature",
     category: "Relojes",
     material: "Acero",
-    price: 890000,
+    price: 0,
     image: "/products/10-reloj.jpg",
     description: "Diseño elegante con caja de acero y lectura limpia.",
   },
@@ -133,12 +134,13 @@ export const products: Product[] = [
     name: "Dije Destello",
     category: "Dijes",
     material: "Oro 18K",
-    price: 1100000,
+    price: 0,
     image: "/products/11-oro.jpg",
     description: "Una pieza de oro con brillo sutil para llevar siempre.",
   },
   ...giftProducts,
   ...watchProducts,
+  ...clientNewProducts,
 ];
 
 export const categories = [
