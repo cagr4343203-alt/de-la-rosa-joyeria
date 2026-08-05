@@ -13,9 +13,9 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "es-PY",
     icons: [
       {
-        src: "/logo-delarosa-negro.jpg",
-        sizes: "500x500",
-        type: "image/jpeg",
+        src: "/favicon.png",
+        sizes: "512x512",
+        type: "image/png",
       },
     ],
   };

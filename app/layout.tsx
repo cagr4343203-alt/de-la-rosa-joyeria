@@ -13,8 +13,9 @@ export const metadata: Metadata = {
     description:
       "Dela Rosa Joyería y Relojería en Encarnación, Paraguay. Joyas de oro y plata, relojes, regalos, bombillas, bolígrafos y perforación de oreja desde 2003.",
     icons: {
-      icon: "/logo-delarosa-negro.jpg",
-      shortcut: "/logo-delarosa-negro.jpg",
+      icon: [{ url: "/favicon.png", type: "image/png", sizes: "512x512" }],
+      shortcut: "/favicon.png",
+      apple: [{ url: "/favicon.png", type: "image/png", sizes: "512x512" }],
     },
     alternates: {
       canonical: "/",
