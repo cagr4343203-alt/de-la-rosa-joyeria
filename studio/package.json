@@ -10,6 +10,7 @@
     "import:watches": "sanity exec scripts/import-watch-products.mjs --with-user-token",
     "import:gifts": "sanity exec scripts/import-gift-products.mjs --with-user-token",
     "import:client-new": "sanity exec scripts/import-client-new-products.mjs --with-user-token",
+    "import:client-evening": "sanity exec scripts/import-2026-08-05-evening.mjs --with-user-token",
     "prices:consult": "sanity exec scripts/set-consult-price.mjs --with-user-token",
     "normalize:catalog": "sanity exec scripts/normalize-product-catalog.mjs --with-user-token"
   },

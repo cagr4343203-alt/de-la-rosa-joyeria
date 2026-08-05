@@ -7,53 +7,28 @@ const client = process.env.SANITY_AUTH_TOKEN
   ? createClient({
       projectId: "224225np",
       dataset: "production",
-      apiVersion: "2026-08-04",
+      apiVersion: "2026-08-05",
       useCdn: false,
       token: process.env.SANITY_AUTH_TOKEN,
     })
-  : getCliClient({ apiVersion: "2026-08-04" });
+  : getCliClient({ apiVersion: "2026-08-05" });
+
 const projectRoot = resolve(import.meta.dirname, "../..");
-const catalogFiles = [
-  "client-new-products.json",
-  "client-products-august.json",
-  "client-products-2026-08-05.json",
-  "client-products-2026-08-05-evening.json",
-];
-const products = catalogFiles.flatMap((filename) =>
-  JSON.parse(
-    readFileSync(resolve(projectRoot, "catalog", filename), "utf8"),
+const products = JSON.parse(
+  readFileSync(
+    resolve(projectRoot, "catalog", "client-products-2026-08-05-evening.json"),
+    "utf8",
   ),
 );
 
-function productDescription(product) {
-  if (product.description) {
-    return product.description;
-  }
-
-  if (product.category === "Anillos") {
-    return "Anillo de compromiso de oro 18K. Consultá disponibilidad y detalles por WhatsApp.";
-  }
-
-  if (product.category === "Reloj infantil") {
-    return "Reloj infantil. Consultá disponibilidad, características y precio por WhatsApp.";
-  }
-
-  if (product.sourceKey.startsWith("argolla-plata-")) {
-    return "Argolla de plata 925. Consultá disponibilidad y detalles por WhatsApp.";
-  }
-
-  return "Aros de plata 925. Consultá disponibilidad y detalles por WhatsApp.";
-}
-
-for (let index = 0; index < products.length; index += 1) {
-  const product = products[index];
+async function importProduct(product, index) {
   const existing = await client.fetch(
     `*[_type == "product" && sourceKey == $sourceKey][0]{_id, image}`,
     { sourceKey: product.sourceKey },
   );
 
   let assetRef = existing?.image?.asset?._ref;
-  if (!assetRef || product.forceImage) {
+  if (!assetRef) {
     const filepath = resolve(
       projectRoot,
       "public",
@@ -82,10 +57,10 @@ for (let index = 0; index < products.length; index += 1) {
     },
     imageFit: "contain",
     referentialImage: false,
-    description: productDescription(product),
+    description: product.description,
     badge: "Nuevo",
-    featured: index < 4,
-    order: 50 + index,
+    featured: false,
+    order: 60 + index,
     sourceKey: product.sourceKey,
   };
 
@@ -100,4 +75,40 @@ for (let index = 0; index < products.length; index += 1) {
   console.log(`✓ ${product.name}`);
 }
 
-console.log(`Colección nueva lista: ${products.length} productos.`);
+let cursor = 0;
+async function worker() {
+  while (cursor < products.length) {
+    const index = cursor;
+    cursor += 1;
+    await importProduct(products[index], index);
+  }
+}
+
+await Promise.all(Array.from({ length: 4 }, () => worker()));
+
+const sourceKeys = products.map((product) => product.sourceKey);
+const importedDocuments = await client.fetch(
+  `*[_type == "product" && sourceKey in $sourceKeys]
+    | order(sourceKey asc, _createdAt asc){_id, sourceKey}`,
+  { sourceKeys },
+);
+const documentsBySourceKey = Map.groupBy(
+  importedDocuments,
+  (document) => document.sourceKey,
+);
+
+for (const [sourceKey, documents] of documentsBySourceKey) {
+  for (const duplicate of documents.slice(1)) {
+    await client
+      .patch(duplicate._id)
+      .set({
+        status: "hidden",
+        featured: false,
+        sourceKey: `${sourceKey}-duplicate-hidden-${duplicate._id.slice(-6)}`,
+      })
+      .commit();
+    console.log(`↳ Duplicado oculto: ${sourceKey}`);
+  }
+}
+
+console.log(`Lote nocturno listo: ${products.length} productos.`);

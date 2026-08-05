@@ -1,12 +1,14 @@
 import clientNewCatalog from "@/catalog/client-new-products.json";
 import clientAugustCatalog from "@/catalog/client-products-august.json";
 import clientAugustFifthCatalog from "@/catalog/client-products-2026-08-05.json";
+import clientAugustFifthEveningCatalog from "@/catalog/client-products-2026-08-05-evening.json";
 import type { Product } from "./store";
 
 const clientCatalog = [
   ...clientNewCatalog,
   ...clientAugustCatalog,
   ...clientAugustFifthCatalog,
+  ...clientAugustFifthEveningCatalog,
 ];
 
 function productDescription(product: (typeof clientCatalog)[number]) {

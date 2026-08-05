@@ -55,7 +55,10 @@ function expectedCategory(product) {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
-  if (product.sourceKey?.startsWith("argolla-plata-")) {
+  if (
+    product.sourceKey?.startsWith("argolla-plata-") ||
+    (normalized.startsWith("argolla") && product.material === "Plata 925")
+  ) {
     return "Argollas de plata";
   }
 
