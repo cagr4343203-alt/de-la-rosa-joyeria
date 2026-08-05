@@ -4,6 +4,7 @@ const apiVersion = "2026-08-03";
 const allowedCategories = new Set([
   "Anillos",
   "Aros",
+  "Argollas de plata",
   "Cadenas",
   "Pulseras",
   "Sets",
@@ -19,13 +20,18 @@ const allowedCategories = new Set([
 ]);
 
 const query = `
-  *[_type == "product"] | order(category asc, name asc) {
+  *[
+    _type == "product" &&
+    !(_id in path("drafts.**")) &&
+    status != "hidden"
+  ] | order(category asc, name asc) {
     _id,
     name,
     category,
     material,
     sourceKey,
-    "hasImage": defined(image.asset)
+    "hasImage": defined(image.asset),
+    "imageRef": image.asset._ref
   }
 `;
 const url = new URL(
@@ -41,12 +47,17 @@ if (!response.ok) {
 const { result: products } = await response.json();
 const issues = [];
 const sourceKeys = new Set();
+const imageRefs = new Map();
 
-function expectedCategory(name) {
-  const normalized = name
+function expectedCategory(product) {
+  const normalized = product.name
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
+
+  if (product.sourceKey?.startsWith("argolla-plata-")) {
+    return "Argollas de plata";
+  }
 
   if (normalized.startsWith("reloj dama")) return "Reloj dama";
   if (normalized.startsWith("reloj caballero")) return "Reloj caballero";
@@ -67,13 +78,25 @@ for (const product of products) {
     issues.push(`${product.name}: categoría desconocida "${product.category}".`);
   }
 
-  const expected = expectedCategory(product.name);
+  const expected = expectedCategory(product);
   if (expected && product.category !== expected && product.category !== "Combos") {
     issues.push(`${product.name}: está en ${product.category}; se esperaba ${expected}.`);
   }
 
   if (!product.hasImage) {
     issues.push(`${product.name}: no tiene foto.`);
+  }
+
+  if (product.imageRef) {
+    const previousImage = imageRefs.get(product.imageRef);
+
+    if (previousImage && previousImage.category !== product.category) {
+      issues.push(
+        `${product.name}: comparte la misma foto con ${previousImage.name} de la categoría ${previousImage.category}.`,
+      );
+    } else if (!previousImage) {
+      imageRefs.set(product.imageRef, product);
+    }
   }
 
   if (!product.material || product.material === "1") {

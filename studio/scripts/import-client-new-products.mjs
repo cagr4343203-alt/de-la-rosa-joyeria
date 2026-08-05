@@ -16,6 +16,7 @@ const projectRoot = resolve(import.meta.dirname, "../..");
 const catalogFiles = [
   "client-new-products.json",
   "client-products-august.json",
+  "client-products-2026-08-05.json",
 ];
 const products = catalogFiles.flatMap((filename) =>
   JSON.parse(
@@ -24,6 +25,10 @@ const products = catalogFiles.flatMap((filename) =>
 );
 
 function productDescription(product) {
+  if (product.description) {
+    return product.description;
+  }
+
   if (product.category === "Anillos") {
     return "Anillo de compromiso de oro 18K. Consultá disponibilidad y detalles por WhatsApp.";
   }
@@ -47,7 +52,7 @@ for (let index = 0; index < products.length; index += 1) {
   );
 
   let assetRef = existing?.image?.asset?._ref;
-  if (!assetRef) {
+  if (!assetRef || product.forceImage) {
     const filepath = resolve(
       projectRoot,
       "public",

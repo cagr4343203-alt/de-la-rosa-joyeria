@@ -210,15 +210,12 @@ export function ProductCatalog({
     const searchIsActive = queryWords.length > 0;
 
     const result = products.filter((product) => {
-      const categoryMatch =
-        searchIsActive ||
-        matchesCategory(product.category, category);
+      const categoryMatch = matchesCategory(product.category, category);
 
       const normalizedProductMaterial = normalizeSearchText(product.material);
       const normalizedSelectedMaterial = normalizeSearchText(material);
 
       const materialMatch =
-        searchIsActive ||
         material === "Todos" ||
         normalizedProductMaterial.includes(normalizedSelectedMaterial);
 
@@ -264,11 +261,6 @@ export function ProductCatalog({
 
   function handleSearchChange(value: string) {
     setQuery(value);
-
-    if (value.trim()) {
-      setCategory("Todo");
-      setMaterial("Todos");
-    }
   }
 
   function clearFilters() {

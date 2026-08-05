@@ -155,6 +155,7 @@ export const categories = [
   "Reloj dama",
   "Reloj caballero",
   "Reloj infantil",
+  "Dijes",
   "Bombillas",
   "Bolígrafos",
   "Combos",
