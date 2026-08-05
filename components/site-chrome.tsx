@@ -522,7 +522,17 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           </a>
         </div>
         <p className="footer-copy">
-          © {new Date().getFullYear()} Dela Rosa · Encarnación, Paraguay
+          <span>© {new Date().getFullYear()} Dela Rosa · Encarnación, Paraguay</span>
+          <span className="footer-credit">
+            Desarrollado por{" "}
+            <a
+              href="https://www.growthagency.space/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Growth Agency
+            </a>
+          </span>
         </p>
       </footer>
 
