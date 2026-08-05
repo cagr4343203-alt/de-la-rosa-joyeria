@@ -16,6 +16,11 @@ const productCategoryTemplates = [
     category: "Aros",
   },
   {
+    id: "product-argollas-plata",
+    title: "Nueva argolla de plata",
+    category: "Argollas de plata",
+  },
+  {
     id: "product-cadenas",
     title: "Nueva cadena",
     category: "Cadenas",

@@ -18,6 +18,12 @@ const productCategories = [
     templateId: "product-aros",
   },
   {
+    id: "argollas-plata",
+    title: "Argollas de plata",
+    value: "Argollas de plata",
+    templateId: "product-argollas-plata",
+  },
+  {
     id: "cadenas",
     title: "Cadenas",
     value: "Cadenas",

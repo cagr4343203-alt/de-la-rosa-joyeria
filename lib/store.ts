@@ -147,6 +147,7 @@ export const categories = [
   "Todo",
   "Anillos",
   "Aros",
+  "Argollas de plata",
   "Cadenas",
   "Pulseras",
   "Sets",
