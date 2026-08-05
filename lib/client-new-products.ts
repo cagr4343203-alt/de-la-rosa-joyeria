@@ -10,7 +10,11 @@ const clientCatalog = [
 ];
 
 function productDescription(product: (typeof clientCatalog)[number]) {
-  if ("description" in product && product.description) {
+  if (
+    "description" in product &&
+    typeof product.description === "string" &&
+    product.description
+  ) {
     return product.description;
   }
 
