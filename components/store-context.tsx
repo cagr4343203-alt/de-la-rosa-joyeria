@@ -24,20 +24,32 @@ type StoreContextValue = {
   itemCount: number;
   total: number;
   addToCart: (product: Product) => void;
-  changeQuantity: (id: Product["id"], difference: number) => void;
+  changeQuantity: (
+    id: Product["id"],
+    difference: number,
+  ) => void;
   clearCart: () => void;
   removeFromCart: (id: Product["id"]) => void;
   setCartOpen: (open: boolean) => void;
 };
 
-const StoreContext = createContext<StoreContextValue | null>(null);
+const StoreContext =
+  createContext<StoreContextValue | null>(null);
 
-function getAbsoluteImageUrl(image: string) {
-  try {
-    return new URL(image, SITE_URL).toString();
-  } catch {
-    return image;
-  }
+function createOrderSummaryUrl(cart: CartLine[]) {
+  const selectedItems = cart.map((item) => ({
+    id: String(item.id),
+    quantity: item.quantity,
+  }));
+
+  const orderUrl = new URL("/pedido", SITE_URL);
+
+  orderUrl.searchParams.set(
+    "items",
+    JSON.stringify(selectedItems),
+  );
+
+  return orderUrl.toString();
 }
 
 export function StoreProvider({
@@ -50,23 +62,29 @@ export function StoreProvider({
   const [cartReady, setCartReady] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("delarosa-cart");
+    const saved =
+      window.localStorage.getItem("delarosa-cart");
+
     let restoredCart: CartLine[] = [];
 
     if (saved) {
       try {
         restoredCart = JSON.parse(saved) as CartLine[];
       } catch {
-        window.localStorage.removeItem("delarosa-cart");
+        window.localStorage.removeItem(
+          "delarosa-cart",
+        );
       }
     }
 
-    const frame = window.requestAnimationFrame(() => {
-      setCart(restoredCart);
-      setCartReady(true);
-    });
+    const frame =
+      window.requestAnimationFrame(() => {
+        setCart(restoredCart);
+        setCartReady(true);
+      });
 
-    return () => window.cancelAnimationFrame(frame);
+    return () =>
+      window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -79,11 +97,15 @@ export function StoreProvider({
   }, [cart, cartReady]);
 
   useEffect(() => {
-    document.body.classList.toggle("cart-open", cartOpen);
+    document.body.classList.toggle(
+      "cart-open",
+      cartOpen,
+    );
 
-    return () => {
-      document.body.classList.remove("cart-open");
-    };
+    return () =>
+      document.body.classList.remove(
+        "cart-open",
+      );
   }, [cartOpen]);
 
   const value = useMemo<StoreContextValue>(() => {
@@ -93,7 +115,8 @@ export function StoreProvider({
     );
 
     const total = cart.reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) =>
+        sum + item.price * item.quantity,
       0,
     );
 
@@ -115,7 +138,8 @@ export function StoreProvider({
               item.id === product.id
                 ? {
                     ...item,
-                    quantity: item.quantity + 1,
+                    quantity:
+                      item.quantity + 1,
                   }
                 : item,
             );
@@ -140,17 +164,23 @@ export function StoreProvider({
               item.id === id
                 ? {
                     ...item,
-                    quantity: item.quantity + difference,
+                    quantity:
+                      item.quantity +
+                      difference,
                   }
                 : item,
             )
-            .filter((item) => item.quantity > 0),
+            .filter(
+              (item) => item.quantity > 0,
+            ),
         );
       },
 
       removeFromCart(id) {
         setCart((current) =>
-          current.filter((item) => item.id !== id),
+          current.filter(
+            (item) => item.id !== id,
+          ),
         );
       },
 
@@ -200,30 +230,31 @@ export function CartDrawer() {
       : "A confirmar"
     : money(total);
 
-  const productLines = cart.flatMap((item, index) => {
-    const imageUrl = getAbsoluteImageUrl(item.image);
-
-    return [
-      `*${index + 1}. ${item.quantity} × ${item.name}*`,
-      `Categoría: ${item.category}`,
-      `Material: ${item.material}`,
-      `Precio: ${
-        item.price > 0
-          ? money(item.price * item.quantity)
-          : "A confirmar"
-      }`,
-      "Foto del producto:",
-      imageUrl,
-      "",
-    ];
-  });
+  const orderSummaryUrl =
+    cart.length > 0
+      ? createOrderSummaryUrl(cart)
+      : "";
 
   const orderMessage = [
     "Hola Dela Rosa ✨",
     "Quiero consultar por este pedido:",
     "",
-    ...productLines,
-    `*Total referencial: ${totalLabel}*`,
+    ...cart.map(
+      (item) =>
+        `• ${item.quantity} × ${item.name} (${item.material}) — ${
+          item.price > 0
+            ? money(
+                item.price *
+                  item.quantity,
+              )
+            : "Precio a confirmar"
+        }`,
+    ),
+    "",
+    `Total referencial: ${totalLabel}`,
+    "",
+    "Ver pedido completo con todas las fotos:",
+    orderSummaryUrl,
     "",
     "¿Me confirman disponibilidad y precio final, por favor?",
   ].join("\n");
@@ -250,14 +281,19 @@ export function CartDrawer() {
       >
         <div className="drawer-head">
           <div>
-            <span className="kicker">Tu selección</span>
+            <span className="kicker">
+              Tu selección
+            </span>
+
             <h2>Carrito</h2>
           </div>
 
           <button
             className="round-close"
             type="button"
-            onClick={() => setCartOpen(false)}
+            onClick={() =>
+              setCartOpen(false)
+            }
             aria-label="Cerrar carrito"
           >
             ×
@@ -269,16 +305,21 @@ export function CartDrawer() {
             <div className="cart-empty">
               <span>◇</span>
 
-              <h3>Tu carrito está esperando</h3>
+              <h3>
+                Tu carrito está esperando
+              </h3>
 
               <p>
-                Agregá las piezas que te gusten para preparar tu
+                Agregá las piezas que te
+                gusten para preparar tu
                 consulta.
               </p>
 
               <button
                 type="button"
-                onClick={() => setCartOpen(false)}
+                onClick={() =>
+                  setCartOpen(false)
+                }
               >
                 Seguir explorando
               </button>
@@ -296,9 +337,12 @@ export function CartDrawer() {
                     fill
                     sizes="92px"
                     style={{
-                      objectFit: item.imageFit ?? "contain",
+                      objectFit:
+                        item.imageFit ??
+                        "contain",
                       objectPosition:
-                        item.imagePosition ?? "center",
+                        item.imagePosition ??
+                        "center",
                     }}
                   />
                 </div>
@@ -318,19 +362,27 @@ export function CartDrawer() {
                     <button
                       type="button"
                       onClick={() =>
-                        changeQuantity(item.id, -1)
+                        changeQuantity(
+                          item.id,
+                          -1,
+                        )
                       }
                       aria-label={`Quitar una unidad de ${item.name}`}
                     >
                       −
                     </button>
 
-                    <span>{item.quantity}</span>
+                    <span>
+                      {item.quantity}
+                    </span>
 
                     <button
                       type="button"
                       onClick={() =>
-                        changeQuantity(item.id, 1)
+                        changeQuantity(
+                          item.id,
+                          1,
+                        )
                       }
                       aria-label={`Agregar una unidad de ${item.name}`}
                     >
@@ -359,27 +411,33 @@ export function CartDrawer() {
             <span>Total referencial</span>
 
             <strong>
-              {cart.length ? totalLabel : money(0)}
+              {cart.length
+                ? totalLabel
+                : money(0)}
             </strong>
           </div>
 
           <p>
-            Disponibilidad y precio final se confirman por
-            WhatsApp.
+            Disponibilidad y precio final se
+            confirman por WhatsApp.
           </p>
 
           <a
             className={`checkout-button ${
-              cart.length === 0 ? "is-disabled" : ""
+              cart.length === 0
+                ? "is-disabled"
+                : ""
             }`}
             href={
-              cart.length
+              cart.length > 0
                 ? whatsappHref(orderMessage)
                 : undefined
             }
             target="_blank"
             rel="noreferrer"
-            aria-disabled={cart.length === 0}
+            aria-disabled={
+              cart.length === 0
+            }
           >
             Enviar pedido por WhatsApp
             <span>↗</span>

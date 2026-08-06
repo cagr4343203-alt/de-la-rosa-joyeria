@@ -1,0 +1,252 @@
+.page {
+  margin: 0 auto;
+  max-width: 1120px;
+  min-height: 70vh;
+  padding: clamp(48px, 7vw, 90px)
+    clamp(16px, 5vw, 60px) 110px;
+}
+
+.heading {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 32px;
+  padding-bottom: 28px;
+}
+
+.heading > span {
+  color: var(--gold-deep);
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.heading h1 {
+  font-family: var(--serif);
+  font-size: clamp(2.8rem, 6vw, 5.8rem);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  line-height: 0.94;
+  margin: 0;
+}
+
+.heading p {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.65;
+  margin: 20px 0 0;
+  max-width: 560px;
+}
+
+.products {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.product {
+  background: white;
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 190px minmax(0, 1fr);
+  padding: 14px;
+}
+
+.image {
+  aspect-ratio: 1;
+  background: var(--cream);
+  overflow: hidden;
+  position: relative;
+}
+
+.information {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 10px 16px 10px 0;
+}
+
+.information > span {
+  color: var(--gold-deep);
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.information h2 {
+  font-family: var(--serif);
+  font-size: clamp(1.45rem, 2.6vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.08;
+  margin: 8px 0 0;
+}
+
+.information > p {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.55;
+  margin: 12px 0 0;
+}
+
+.details {
+  align-items: flex-end;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 15px;
+}
+
+.details small {
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.details > strong {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 400;
+  text-align: right;
+}
+
+.summary {
+  background: var(--ink);
+  color: white;
+  margin-top: 24px;
+  padding: 25px 28px;
+}
+
+.summary > div {
+  align-items: center;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.summary span {
+  color: var(--gold-light);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.summary strong {
+  font-family: var(--serif);
+  font-size: clamp(1.35rem, 3vw, 2.2rem);
+  font-weight: 400;
+  text-align: right;
+}
+
+.summary p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.62rem;
+  margin: 9px 0 0;
+  text-align: right;
+}
+
+.empty {
+  border: 1px solid var(--line);
+  padding: 70px 20px;
+  text-align: center;
+}
+
+.empty > span {
+  color: var(--gold-deep);
+  font-family: var(--serif);
+  font-size: 3rem;
+}
+
+.empty h2 {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin: 14px 0 8px;
+}
+
+.empty p {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.6;
+}
+
+.empty a,
+.back {
+  border-bottom: 1px solid currentColor;
+  display: inline-flex;
+  font-size: 0.64rem;
+  font-weight: 800;
+  margin-top: 18px;
+  padding: 7px 0;
+  text-transform: uppercase;
+}
+
+.back {
+  margin-top: 30px;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-left: 13px;
+    padding-right: 13px;
+    padding-top: 35px;
+  }
+
+  .heading {
+    margin-bottom: 20px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .product {
+    gap: 13px;
+    grid-template-columns:
+      110px minmax(0, 1fr);
+    padding: 9px;
+  }
+
+  .information {
+    padding: 4px 2px 4px 0;
+  }
+
+  .information h2 {
+    font-size: 1.05rem;
+  }
+
+  .information > p {
+    display: none;
+  }
+
+  .details {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 12px;
+    padding-top: 10px;
+  }
+
+  .details > strong {
+    font-size: 0.82rem;
+    text-align: left;
+  }
+
+  .summary {
+    padding: 20px;
+  }
+
+  .summary > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .summary strong,
+  .summary p {
+    text-align: left;
+  }
+}
