@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { GoogleAnalytics } from "@/components/google-analytics";
 import { SiteChrome } from "@/components/site-chrome";
 import { StoreProvider } from "@/components/store-context";
 import { SITE_URL } from "@/lib/seo";
@@ -74,6 +75,7 @@ export default function RootLayout({
         <StoreProvider>
           <SiteChrome>{children}</SiteChrome>
         </StoreProvider>
+        <GoogleAnalytics />
       </body>
     </html>
   );
