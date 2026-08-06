@@ -3672,18 +3672,25 @@ img {
   }
 
   .product-actions {
-    grid-template-columns: 1fr;
-  }
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 1fr;
+}
 
-  .product-actions a {
-    display: none;
-  }
+.product-actions button,
+.product-actions a {
+  display: flex;
+  font-size: 0.52rem;
+  min-height: 38px;
+  padding: 0 6px;
+  width: 100%;
+}
 
-  .product-actions button {
-    font-size: 0.54rem;
-    min-height: 37px;
-    padding: 0 7px;
-  }
+.product-actions a {
+  background: transparent;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+}
 
   .piercing-cta {
     padding-left: 20px;
