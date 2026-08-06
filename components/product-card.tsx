@@ -25,6 +25,8 @@ import { type Product, money, whatsappHref } from "@/lib/store";
 import { observeMotionElement } from "./motion-reveal";
 import { useStore } from "./store-context";
 
+const SITE_URL = "https://delarosajoyeria.com";
+
 export function ProductCard({
   product,
   eager = false,
@@ -44,6 +46,30 @@ export function ProductCard({
 
   const [imageOpen, setImageOpen] = useState(false);
   const [imageZoomed, setImageZoomed] = useState(false);
+
+  const productImageUrl = new URL(
+    product.image,
+    SITE_URL,
+  ).toString();
+
+  const consultationMessage = [
+    "Hola Dela Rosa, quiero consultar por este producto:",
+    "",
+    `*${product.name}*`,
+    `Categoría: ${product.category}`,
+    `Material: ${product.material}`,
+    product.price > 0
+      ? `Precio: ${money(product.price)}`
+      : "Precio: Consultar",
+    product.description
+      ? `Detalle: ${product.description}`
+      : "",
+    "",
+    "Foto del producto:",
+    productImageUrl,
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   useEffect(() => {
     if (motionIndex === undefined) return;
@@ -213,9 +239,9 @@ export function ProductCard({
         </div>
 
         <div
-  className="product-actions"
-  style={{ display: "grid" }}
->
+          className="product-actions"
+          style={{ display: "grid" }}
+        >
           <button
             type="button"
             onClick={handleAddToCart}
@@ -226,12 +252,11 @@ export function ProductCard({
           </button>
 
           <a
-            href={whatsappHref(
-              `Hola Dela Rosa, quiero consultar por ${product.name}.`,
-            )}
+            href={whatsappHref(consultationMessage)}
             target="_blank"
             rel="noreferrer"
             onClick={handleProductConsultation}
+            aria-label={`Consultar por WhatsApp sobre ${product.name}`}
           >
             <MessageCircle size={15} />
             Consultar
@@ -270,7 +295,9 @@ export function ProductCard({
                 className="product-lightbox-image"
                 type="button"
                 onClick={() =>
-                  setImageZoomed((currentValue) => !currentValue)
+                  setImageZoomed(
+                    (currentValue) => !currentValue,
+                  )
                 }
                 aria-label={
                   imageZoomed
