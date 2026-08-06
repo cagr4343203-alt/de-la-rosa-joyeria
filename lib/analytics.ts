@@ -1,3 +1,5 @@
+import type { CartLine } from "@/lib/store";
+
 export type AnalyticsParameters = Record<string, unknown>;
 
 declare global {
@@ -88,7 +90,10 @@ export function trackProductConsultation(product: {
   });
 }
 
-export function trackSearch(searchTerm: string, resultsCount: number) {
+export function trackSearch(
+  searchTerm: string,
+  resultsCount: number,
+) {
   trackEvent("busqueda_producto", {
     search_term: searchTerm,
     results_count: resultsCount,
@@ -107,10 +112,86 @@ export function trackSocialClick(
   location: string,
 ) {
   trackEvent(
-    socialNetwork === "instagram" ? "clic_instagram" : "clic_whatsapp",
+    socialNetwork === "instagram"
+      ? "clic_instagram"
+      : "clic_whatsapp",
     {
       social_network: socialNetwork,
       link_location: location,
     },
   );
+}
+
+/**
+ * Registra el momento en que el cliente presiona
+ * "Enviar pedido por WhatsApp" desde el carrito.
+ *
+ * Envía:
+ * - productos seleccionados;
+ * - cantidades;
+ * - categorías;
+ * - materiales;
+ * - total conocido;
+ * - si hay productos sin precio.
+ */
+export function trackCartWhatsAppCheckout(
+  cart: CartLine[],
+  orderSummaryUrl?: string,
+) {
+  if (cart.length === 0) {
+    return;
+  }
+
+  const itemCount = cart.reduce(
+    (sum, item) => sum + item.quantity,
+    0,
+  );
+
+  const pricedTotal = cart.reduce(
+    (sum, item) =>
+      sum +
+      (item.price > 0
+        ? item.price * item.quantity
+        : 0),
+    0,
+  );
+
+  const hasUnpricedProducts = cart.some(
+    (item) => item.price <= 0,
+  );
+
+  const items = cart.map((item) => ({
+    item_id: String(item.id),
+    item_name: item.name,
+    item_category: item.category,
+    item_variant: item.material,
+    price: item.price,
+    quantity: item.quantity,
+  }));
+
+  const parameters: AnalyticsParameters = {
+    currency: "PYG",
+    value: pricedTotal,
+    item_count: itemCount,
+    distinct_products: cart.length,
+    has_unpriced_products: hasUnpricedProducts
+      ? "yes"
+      : "no",
+    contact_method: "whatsapp",
+    order_summary_url: orderSummaryUrl ?? "",
+    items,
+  };
+
+  /*
+   * Evento estándar de comercio electrónico.
+   * Permite analizar qué productos llegaron al proceso
+   * de consulta o pedido.
+   */
+  trackEvent("begin_checkout", parameters);
+
+  /*
+   * Evento personalizado con un nombre fácil de entender.
+   * Este es el que luego marcaremos como evento clave.
+   */
+  trackEvent("pedido_carrito_whatsapp", parameters);
 }
