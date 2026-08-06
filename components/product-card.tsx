@@ -14,7 +14,14 @@ import {
   useRef,
   useState,
 } from "react";
+
+import {
+  trackAddToCart,
+  trackProductConsultation,
+  trackProductView,
+} from "@/lib/analytics";
 import { type Product, money, whatsappHref } from "@/lib/store";
+
 import { observeMotionElement } from "./motion-reveal";
 import { useStore } from "./store-context";
 
@@ -33,6 +40,7 @@ export function ProductCard({
   const imageFit = product.imageFit ?? "contain";
 
   const cardRef = useRef<HTMLElement>(null);
+  const hasTrackedView = useRef(false);
 
   const [imageOpen, setImageOpen] = useState(false);
   const [imageZoomed, setImageZoomed] = useState(false);
@@ -88,11 +96,45 @@ export function ProductCard({
   function openImage() {
     setImageZoomed(false);
     setImageOpen(true);
+
+    if (!hasTrackedView.current) {
+      trackProductView({
+        id: String(product.id),
+        name: product.name,
+        category: product.category,
+        material: product.material,
+        price: product.price,
+      });
+
+      hasTrackedView.current = true;
+    }
   }
 
   function closeImage() {
     setImageOpen(false);
     setImageZoomed(false);
+  }
+
+  function handleAddToCart() {
+    if (outOfStock) return;
+
+    addToCart(product);
+
+    trackAddToCart({
+      id: String(product.id),
+      name: product.name,
+      category: product.category,
+      material: product.material,
+      price: product.price,
+    });
+  }
+
+  function handleProductConsultation() {
+    trackProductConsultation({
+      id: String(product.id),
+      name: product.name,
+      category: product.category,
+    });
   }
 
   return (
@@ -140,7 +182,7 @@ export function ProductCard({
           <button
             className="quick-add"
             type="button"
-            onClick={() => addToCart(product)}
+            onClick={handleAddToCart}
             disabled={outOfStock}
           >
             <ShoppingBag size={16} />
@@ -155,7 +197,9 @@ export function ProductCard({
 
           <h3>{product.name}</h3>
 
-          <span>{product.description}</span>
+          {product.description && (
+            <span>{product.description}</span>
+          )}
 
           {product.referentialImage && (
             <small>Imagen referencial</small>
@@ -171,7 +215,7 @@ export function ProductCard({
         <div className="product-actions">
           <button
             type="button"
-            onClick={() => addToCart(product)}
+            onClick={handleAddToCart}
             disabled={outOfStock}
           >
             <Plus size={15} />
@@ -184,6 +228,7 @@ export function ProductCard({
             )}
             target="_blank"
             rel="noreferrer"
+            onClick={handleProductConsultation}
           >
             <MessageCircle size={15} />
             Consultar
@@ -238,7 +283,8 @@ export function ProductCard({
                   sizes="95vw"
                   style={{
                     objectFit: "contain",
-                    objectPosition: product.imagePosition,
+                    objectPosition:
+                      product.imagePosition ?? "center",
                   }}
                 />
               </button>
