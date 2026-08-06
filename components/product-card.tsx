@@ -212,7 +212,10 @@ export function ProductCard({
           </strong>
         </div>
 
-        <div className="product-actions">
+        <div
+  className="product-actions"
+  style={{ display: "grid" }}
+>
           <button
             type="button"
             onClick={handleAddToCart}
