@@ -30,7 +30,7 @@ export function trackEvent(
 }
 
 export function trackProductView(product: {
-  id: string;
+  id: string | number;
   name: string;
   category: string;
   material: string;
@@ -41,7 +41,7 @@ export function trackProductView(product: {
     value: product.price,
     items: [
       {
-        item_id: product.id,
+        item_id: String(product.id),
         item_name: product.name,
         item_category: product.category,
         item_variant: product.material,
@@ -53,7 +53,7 @@ export function trackProductView(product: {
 }
 
 export function trackAddToCart(product: {
-  id: string;
+  id: string | number;
   name: string;
   category: string;
   material: string;
@@ -64,7 +64,7 @@ export function trackAddToCart(product: {
     value: product.price,
     items: [
       {
-        item_id: product.id,
+        item_id: String(product.id),
         item_name: product.name,
         item_category: product.category,
         item_variant: product.material,
@@ -76,31 +76,29 @@ export function trackAddToCart(product: {
 }
 
 export function trackProductConsultation(product: {
-  id: string;
+  id: string | number;
   name: string;
   category: string;
 }) {
-  trackEvent("generate_lead", {
-    lead_source: "whatsapp",
-    lead_type: "consulta_producto",
-    item_id: product.id,
+  trackEvent("consulta_producto_whatsapp", {
+    item_id: String(product.id),
     item_name: product.name,
     item_category: product.category,
+    contact_method: "whatsapp",
   });
 }
 
 export function trackSearch(searchTerm: string, resultsCount: number) {
-  trackEvent("view_search_results", {
+  trackEvent("busqueda_producto", {
     search_term: searchTerm,
     results_count: resultsCount,
   });
 }
 
 export function trackReservationClick(location: string) {
-  trackEvent("generate_lead", {
-    lead_source: "whatsapp",
-    lead_type: "reserva_perforacion",
+  trackEvent("reserva_perforacion_whatsapp", {
     link_location: location,
+    contact_method: "whatsapp",
   });
 }
 
@@ -108,8 +106,11 @@ export function trackSocialClick(
   socialNetwork: "instagram" | "whatsapp",
   location: string,
 ) {
-  trackEvent("social_click", {
-    social_network: socialNetwork,
-    link_location: location,
-  });
+  trackEvent(
+    socialNetwork === "instagram" ? "clic_instagram" : "clic_whatsapp",
+    {
+      social_network: socialNetwork,
+      link_location: location,
+    },
+  );
 }
