@@ -16,6 +16,7 @@ const PRODUCTS_QUERY = defineQuery(`
     material,
     price,
     image,
+    gallery[]{_key, asset, crop, hotspot, alt},
     badge,
     description,
     referentialImage,
@@ -31,6 +32,12 @@ type SanityProduct = {
   material: string;
   price: number;
   image?: SanityImageSource;
+  gallery?: Array<
+    SanityImageSource & {
+      _key: string;
+      alt?: string;
+    }
+  >;
   badge?: string;
   description: string;
   referentialImage?: boolean;
@@ -52,7 +59,19 @@ export async function getProducts(): Promise<Product[]> {
       .filter((entry) => entry.image)
       .map((entry) => {
         const imageFit = entry.imageFit === "cover" ? "cover" : "contain";
-        const imageBuilder = builder.image(entry.image!).width(1200);
+        const imageUrl = (source: SanityImageSource) => {
+          const imageBuilder = builder.image(source).width(1200);
+
+          return imageFit === "cover"
+            ? imageBuilder.height(1500).fit("crop").auto("format").url()
+            : imageBuilder.auto("format").url();
+        };
+
+        const primaryImage = imageUrl(entry.image!);
+        const galleryImages = (entry.gallery ?? []).map((image, index) => ({
+          src: imageUrl(image),
+          alt: image.alt?.trim() || `${entry.name}, vista ${index + 2}`,
+        }));
 
         return {
           id: entry._id,
@@ -60,10 +79,11 @@ export async function getProducts(): Promise<Product[]> {
           category: entry.category,
           material: entry.material,
           price: entry.price,
-          image:
-            imageFit === "cover"
-              ? imageBuilder.height(1500).fit("crop").auto("format").url()
-              : imageBuilder.auto("format").url(),
+          image: primaryImage,
+          images: [
+            { src: primaryImage, alt: entry.name },
+            ...galleryImages,
+          ],
           imageFit,
           badge: entry.badge,
           description: entry.description,

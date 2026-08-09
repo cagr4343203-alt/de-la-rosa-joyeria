@@ -1,5 +1,5 @@
 import { TagIcon } from "@sanity/icons/Tag";
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
 export const product = defineType({
   name: "product",
@@ -88,6 +88,34 @@ export const product = defineType({
           validation: (rule) => rule.required().max(120),
         }),
       ],
+    }),
+    defineField({
+      name: "gallery",
+      title: "Galería de fotos adicionales",
+      description:
+        "Subí fotos del mismo producto desde distintos ángulos. Podés arrastrarlas para cambiar el orden.",
+      type: "array",
+      of: [
+        defineArrayMember({
+          type: "image",
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: "alt",
+              title: "Descripción de la foto",
+              description:
+                "Ej.: Vista lateral del anillo. Ayuda a describir la imagen.",
+              type: "string",
+              validation: (rule) =>
+                rule
+                  .required()
+                  .max(120)
+                  .warning("Agregá una breve descripción de esta foto."),
+            }),
+          ],
+        }),
+      ],
+      validation: (rule) => rule.max(8),
     }),
     defineField({
       name: "referentialImage",

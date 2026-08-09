@@ -3964,20 +3964,38 @@ img {
     transition-duration: 0.01ms !important;
   }
 }
-/* Botón para ampliar la foto del producto */
+/* Galería deslizable de cada producto */
 
-.product-image-button {
+.product-gallery {
   position: absolute;
   inset: 0;
   z-index: 1;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  touch-action: pan-x pan-y;
+}
+
+.product-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.product-image-button {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
+  flex: 0 0 100%;
   padding: 0;
   overflow: hidden;
   border: 0;
   background: transparent;
   cursor: zoom-in;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .product-image-button img {
@@ -3989,10 +4007,87 @@ img {
   transform: scale(1.04);
 }
 
+.product-gallery-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  background: rgba(20, 16, 12, 0.56);
+  color: #ffffff;
+  cursor: pointer;
+  opacity: 0.88;
+  transform: translateY(-50%);
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.product-gallery-arrow.is-previous {
+  left: 9px;
+}
+
+.product-gallery-arrow.is-next {
+  right: 9px;
+}
+
+.product-gallery-arrow:hover:not(:disabled),
+.product-gallery-arrow:focus-visible {
+  background: rgba(20, 16, 12, 0.82);
+  opacity: 1;
+  transform: translateY(-50%) scale(1.06);
+}
+
+.product-gallery-arrow:disabled {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.product-gallery-dots {
+  position: absolute;
+  bottom: 58px;
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  max-width: calc(100% - 88px);
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(20, 16, 12, 0.46);
+  transform: translateX(-50%);
+}
+
+.product-gallery-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.58);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.product-gallery-dot.is-active {
+  background: #ffffff;
+  transform: scale(1.45);
+}
+
 .product-badge,
 .stock-badge {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   pointer-events: none;
 }
 
@@ -4001,8 +4096,7 @@ img {
   z-index: 3;
 }
 
-
-/* Visor de imagen ampliada */
+/* Visor ampliado con zoom y movimiento libre */
 
 .product-lightbox {
   position: fixed;
@@ -4011,7 +4105,7 @@ img {
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(10, 8, 6, 0.94);
+  background: rgba(10, 8, 6, 0.95);
   backdrop-filter: blur(8px);
   animation: productLightboxIn 0.2s ease;
 }
@@ -4020,7 +4114,7 @@ img {
   position: fixed;
   top: max(18px, env(safe-area-inset-top));
   right: 18px;
-  z-index: 3;
+  z-index: 5;
   display: grid;
   width: 46px;
   height: 46px;
@@ -4044,8 +4138,8 @@ img {
 
 .product-lightbox-content {
   display: flex;
-  width: min(94vw, 1000px);
-  max-height: 92vh;
+  width: min(96vw, 1100px);
+  max-height: 94vh;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -4054,43 +4148,129 @@ img {
   text-align: center;
 }
 
-.product-lightbox-image {
-  display: flex;
+.product-lightbox-image-stage {
+  position: relative;
   width: 100%;
-  height: min(76vh, 820px);
+  height: min(74vh, 820px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.025);
+  cursor: zoom-in;
+  outline: none;
+  overscroll-behavior: contain;
+  touch-action: none;
+  user-select: none;
+}
+
+.product-lightbox-image-stage:focus-visible {
+  border-color: rgba(220, 176, 91, 0.78);
+  box-shadow: 0 0 0 2px rgba(220, 176, 91, 0.24);
+}
+
+.product-lightbox-image-stage.is-zoomed {
+  cursor: grab;
+}
+
+.product-lightbox-image-stage.is-dragging {
+  cursor: grabbing;
+}
+
+.product-lightbox-image-transform {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(0, 0, 0) scale(1);
+  transform-origin: center;
+  transition: transform 0.2s ease;
+  will-change: transform;
+}
+
+.product-lightbox-image-stage.is-dragging .product-lightbox-image-transform {
+  transition: none;
+}
+
+.product-lightbox-image-transform img {
+  pointer-events: none;
+  user-select: none;
+}
+
+.product-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: 50%;
+  background: rgba(10, 8, 6, 0.62);
+  color: #ffffff;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.product-lightbox-nav.is-previous {
+  left: 16px;
+}
+
+.product-lightbox-nav.is-next {
+  right: 16px;
+}
+
+.product-lightbox-nav:hover:not(:disabled),
+.product-lightbox-nav:focus-visible {
+  background: rgba(10, 8, 6, 0.9);
+}
+
+.product-lightbox-nav:disabled {
+  pointer-events: none;
+  opacity: 0.18;
+}
+
+.product-lightbox-toolbar {
+  display: flex;
+  min-height: 42px;
   align-items: center;
   justify-content: center;
-  overflow: auto;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.product-lightbox-toolbar button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
   padding: 0;
   border: 0;
+  border-radius: 50%;
   background: transparent;
-  cursor: zoom-in;
-  scrollbar-width: thin;
-  touch-action: pan-x pan-y;
+  color: #ffffff;
+  cursor: pointer;
 }
 
-.product-lightbox-image img {
-  display: block;
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  max-height: 100%;
-  object-fit: contain;
-  transition:
-    width 0.25s ease,
-    max-width 0.25s ease;
+.product-lightbox-toolbar button:hover:not(:disabled),
+.product-lightbox-toolbar button:focus-visible {
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.product-lightbox-content.is-zoomed .product-lightbox-image {
-  display: block;
-  cursor: zoom-out;
+.product-lightbox-toolbar button:disabled {
+  cursor: default;
+  opacity: 0.28;
 }
 
-.product-lightbox-content.is-zoomed .product-lightbox-image img {
-  width: 160%;
-  max-width: none;
-  max-height: none;
-  margin: auto;
+.product-lightbox-toolbar span {
+  width: 52px;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.86;
 }
 
 .product-lightbox-content strong {
@@ -4099,9 +4279,21 @@ img {
   line-height: 1.3;
 }
 
-.product-lightbox-content span {
-  font-size: 0.82rem;
-  opacity: 0.75;
+.product-lightbox-content > span {
+  font-size: 0.78rem;
+  opacity: 0.76;
+}
+
+.product-lightbox-progress {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.product-lightbox-help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 @keyframes productLightboxIn {
@@ -4117,6 +4309,9 @@ img {
 @media (max-width: 600px) {
   .product-lightbox {
     padding: 12px;
+    padding-top: max(58px, env(safe-area-inset-top));
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    backdrop-filter: none;
   }
 
   .product-lightbox-close {
@@ -4131,11 +4326,38 @@ img {
     max-height: 94vh;
   }
 
-  .product-lightbox-image {
-    height: 72vh;
+  .product-lightbox-image-stage {
+    height: min(66svh, 700px);
   }
 
-  .product-lightbox-content.is-zoomed .product-lightbox-image img {
-    width: 190%;
+  .product-lightbox-nav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .product-lightbox-nav.is-previous {
+    left: 8px;
+  }
+
+  .product-lightbox-nav.is-next {
+    right: 8px;
+  }
+
+  .product-gallery-arrow {
+    width: 30px;
+    height: 30px;
+  }
+
+  .product-gallery-arrow.is-previous {
+    left: 6px;
+  }
+
+  .product-gallery-arrow.is-next {
+    right: 6px;
+  }
+
+  .product-gallery-dots {
+    bottom: 10px;
+    max-width: calc(100% - 68px);
   }
 }

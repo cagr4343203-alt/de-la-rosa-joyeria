@@ -2,10 +2,16 @@
 
 import Image from "next/image";
 import {
+  ChevronLeft,
+  ChevronRight,
   MessageCircle,
+  Move,
   Plus,
+  RotateCcw,
   ShoppingBag,
   X,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 import { createPortal } from "react-dom";
 import {
@@ -40,12 +46,33 @@ export function ProductCard({
 
   const outOfStock = product.status === "outOfStock";
   const imageFit = product.imageFit ?? "contain";
+  const galleryImages = product.images?.length
+    ? product.images
+    : [{ src: product.image, alt: product.name }];
 
   const cardRef = useRef<HTMLElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const lightboxTransformRef = useRef<HTMLDivElement>(null);
   const hasTrackedView = useRef(false);
+  const suppressLightboxClickRef = useRef(false);
+  const panRef = useRef({ x: 0, y: 0 });
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    originX: number;
+    originY: number;
+    moved: boolean;
+  } | null>(null);
 
   const [imageOpen, setImageOpen] = useState(false);
-  const [imageZoomed, setImageZoomed] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const activeImage =
+    galleryImages[activeImageIndex] ??
+    galleryImages[0] ?? { src: product.image, alt: product.name };
 
   const productImageUrl = new URL(
     product.image,
@@ -96,10 +123,69 @@ export function ProductCard({
 
     document.body.style.overflow = "hidden";
 
+    function applyKeyboardTransform(nextZoom: number) {
+      window.requestAnimationFrame(() => {
+        if (!lightboxTransformRef.current) return;
+
+        const { x, y } = panRef.current;
+        lightboxTransformRef.current.style.transform =
+          `translate3d(${x}px, ${y}px, 0) scale(${nextZoom})`;
+      });
+    }
+
+    function resetKeyboardView() {
+      panRef.current = { x: 0, y: 0 };
+      setZoom(1);
+      applyKeyboardTransform(1);
+    }
+
+    function changeKeyboardImage(difference: number) {
+      setActiveImageIndex((currentIndex) => {
+        const nextIndex = Math.min(
+          galleryImages.length - 1,
+          Math.max(0, currentIndex + difference),
+        );
+        const gallery = galleryRef.current;
+
+        if (gallery) {
+          gallery.scrollTo({
+            left: gallery.clientWidth * nextIndex,
+            behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+              ? "auto"
+              : "smooth",
+          });
+        }
+
+        return nextIndex;
+      });
+      resetKeyboardView();
+    }
+
+    function changeKeyboardZoom(difference: number) {
+      setZoom((currentZoom) => {
+        const nextZoom = Math.min(3, Math.max(1, currentZoom + difference));
+
+        if (nextZoom === 1) {
+          panRef.current = { x: 0, y: 0 };
+        }
+
+        applyKeyboardTransform(nextZoom);
+        return nextZoom;
+      });
+    }
+
     function closeWithKeyboard(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setImageOpen(false);
-        setImageZoomed(false);
+        resetKeyboardView();
+      } else if (event.key === "ArrowLeft") {
+        changeKeyboardImage(-1);
+      } else if (event.key === "ArrowRight") {
+        changeKeyboardImage(1);
+      } else if (event.key === "+" || event.key === "=") {
+        changeKeyboardZoom(0.25);
+      } else if (event.key === "-") {
+        changeKeyboardZoom(-0.25);
       }
     }
 
@@ -109,7 +195,7 @@ export function ProductCard({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeWithKeyboard);
     };
-  }, [imageOpen]);
+  }, [imageOpen, galleryImages.length]);
 
   const motionStyle =
     motionIndex === undefined
@@ -119,8 +205,60 @@ export function ProductCard({
           "--product-drift-delay": `${motionIndex * -1.15}s`,
         } as CSSProperties);
 
-  function openImage() {
-    setImageZoomed(false);
+  function applyImageTransform(nextZoom = zoom) {
+    if (!lightboxTransformRef.current) return;
+
+    const { x, y } = panRef.current;
+    lightboxTransformRef.current.style.transform =
+      `translate3d(${x}px, ${y}px, 0) scale(${nextZoom})`;
+  }
+
+  function resetImageView() {
+    panRef.current = { x: 0, y: 0 };
+    setZoom(1);
+    applyImageTransform(1);
+  }
+
+  function changeZoom(difference: number) {
+    const nextZoom = Math.min(3, Math.max(1, zoom + difference));
+
+    if (nextZoom === 1) {
+      panRef.current = { x: 0, y: 0 };
+    }
+
+    setZoom(nextZoom);
+    window.requestAnimationFrame(() => applyImageTransform(nextZoom));
+  }
+
+  function selectImage(index: number, scrollCard = true) {
+    const nextIndex = Math.min(
+      galleryImages.length - 1,
+      Math.max(0, index),
+    );
+
+    setActiveImageIndex(nextIndex);
+    resetImageView();
+
+    if (scrollCard) {
+      const gallery = galleryRef.current;
+      if (gallery) {
+        const reducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        gallery.scrollTo({
+          left: gallery.clientWidth * nextIndex,
+          behavior: reducedMotion ? "auto" : "smooth",
+        });
+      }
+    }
+  }
+
+  function changeImage(difference: number) {
+    selectImage(activeImageIndex + difference);
+  }
+
+  function openImage(index = activeImageIndex) {
+    selectImage(index, false);
     setImageOpen(true);
 
     if (!hasTrackedView.current) {
@@ -138,7 +276,87 @@ export function ProductCard({
 
   function closeImage() {
     setImageOpen(false);
-    setImageZoomed(false);
+    resetImageView();
+  }
+
+  function handleGalleryScroll() {
+    const gallery = galleryRef.current;
+    if (!gallery?.clientWidth) return;
+
+    const nextIndex = Math.round(gallery.scrollLeft / gallery.clientWidth);
+    if (nextIndex !== activeImageIndex) {
+      setActiveImageIndex(nextIndex);
+    }
+  }
+
+  function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    suppressLightboxClickRef.current = false;
+    setIsDragging(zoom > 1);
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: panRef.current.x,
+      originY: panRef.current.y,
+      moved: false,
+    };
+  }
+
+  function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    drag.moved = drag.moved || Math.abs(deltaX) + Math.abs(deltaY) > 8;
+
+    if (drag.moved) {
+      suppressLightboxClickRef.current = true;
+    }
+
+    if (zoom <= 1) return;
+
+    panRef.current = {
+      x: drag.originX + deltaX,
+      y: drag.originY + deltaY,
+    };
+    applyImageTransform();
+  }
+
+  function handlePointerUp(event: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    const moved = drag.moved;
+    dragRef.current = null;
+    setIsDragging(false);
+
+    if (
+      zoom === 1 &&
+      Math.abs(deltaX) > 50 &&
+      Math.abs(deltaX) > Math.abs(deltaY)
+    ) {
+      changeImage(deltaX < 0 ? 1 : -1);
+    }
+
+    if (moved) {
+      window.setTimeout(() => {
+        suppressLightboxClickRef.current = false;
+      }, 0);
+    }
+  }
+
+  function handlePointerCancel() {
+    dragRef.current = null;
+    setIsDragging(false);
+  }
+
+  function handleLightboxClick() {
+    if (suppressLightboxClickRef.current) return;
+    changeZoom(zoom > 1 ? 1 - zoom : 1);
   }
 
   function handleAddToCart() {
@@ -173,25 +391,79 @@ export function ProductCard({
         style={motionStyle}
       >
         <div className="product-media">
-          <button
-            className="product-image-button"
-            type="button"
-            onClick={openImage}
-            aria-label={`Ver imagen ampliada de ${product.name}`}
-            title="Ver imagen ampliada"
+          <div
+            ref={galleryRef}
+            className="product-gallery"
+            onScroll={handleGalleryScroll}
+            role="region"
+            aria-label={`Galería de fotos de ${product.name}`}
           >
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              loading={eager ? "eager" : "lazy"}
-              sizes="(max-width: 560px) 48vw, (max-width: 900px) 46vw, (max-width: 1200px) 30vw, 22vw"
-              style={{
-                objectFit: imageFit,
-                objectPosition: product.imagePosition ?? "center",
-              }}
-            />
-          </button>
+            {galleryImages.map((image, index) => (
+              <button
+                className="product-image-button"
+                type="button"
+                key={`${image.src}-${index}`}
+                onClick={() => openImage(index)}
+                aria-label={`Ampliar foto ${index + 1} de ${galleryImages.length} de ${product.name}`}
+                title="Ver imagen ampliada"
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  loading={eager && index === 0 ? "eager" : "lazy"}
+                  sizes="(max-width: 560px) 48vw, (max-width: 900px) 46vw, (max-width: 1200px) 30vw, 22vw"
+                  style={{
+                    objectFit: imageFit,
+                    objectPosition: product.imagePosition ?? "center",
+                  }}
+                />
+              </button>
+            ))}
+          </div>
+
+          {galleryImages.length > 1 && (
+            <>
+              <button
+                className="product-gallery-arrow is-previous"
+                type="button"
+                onClick={() => changeImage(-1)}
+                disabled={activeImageIndex === 0}
+                aria-label="Ver foto anterior"
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <button
+                className="product-gallery-arrow is-next"
+                type="button"
+                onClick={() => changeImage(1)}
+                disabled={activeImageIndex === galleryImages.length - 1}
+                aria-label="Ver foto siguiente"
+              >
+                <ChevronRight size={18} />
+              </button>
+
+              <div
+                className="product-gallery-dots"
+                role="group"
+                aria-label="Fotos del producto"
+              >
+                {galleryImages.map((image, index) => (
+                  <button
+                    type="button"
+                    key={`dot-${image.src}-${index}`}
+                    className={`product-gallery-dot ${
+                      index === activeImageIndex ? "is-active" : ""
+                    }`}
+                    onClick={() => selectImage(index)}
+                    aria-label={`Ver foto ${index + 1}`}
+                    aria-current={index === activeImageIndex ? "true" : undefined}
+                  />
+                ))}
+              </div>
+            </>
+          )}
 
           {product.badge && (
             <span className="product-badge">
@@ -286,45 +558,132 @@ export function ProductCard({
             </button>
 
             <div
-              className={`product-lightbox-content ${
-                imageZoomed ? "is-zoomed" : ""
-              }`}
+              className="product-lightbox-content"
               onClick={(event) => event.stopPropagation()}
             >
-              <button
-                className="product-lightbox-image"
-                type="button"
-                onClick={() =>
-                  setImageZoomed(
-                    (currentValue) => !currentValue,
-                  )
-                }
+              <div
+                className={`product-lightbox-image-stage ${
+                  zoom > 1 ? "is-zoomed" : ""
+                } ${isDragging ? "is-dragging" : ""}`}
+                onClick={handleLightboxClick}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerCancel}
+                onWheel={(event) => {
+                  event.preventDefault();
+                  changeZoom(event.deltaY < 0 ? 0.25 : -0.25);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    handleLightboxClick();
+                  }
+                }}
+                role="group"
+                tabIndex={0}
                 aria-label={
-                  imageZoomed
-                    ? "Reducir imagen"
-                    : "Ampliar más la imagen"
+                  zoom > 1
+                    ? "Mover la imagen ampliada libremente"
+                    : "Ampliar y mover la imagen"
                 }
               >
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={1600}
-                  height={1600}
-                  sizes="95vw"
-                  style={{
-                    objectFit: "contain",
-                    objectPosition:
-                      product.imagePosition ?? "center",
-                  }}
-                />
-              </button>
+                <div
+                  ref={lightboxTransformRef}
+                  className="product-lightbox-image-transform"
+                >
+                  <Image
+                    src={activeImage.src}
+                    alt={activeImage.alt}
+                    fill
+                    sizes="95vw"
+                    draggable={false}
+                    style={{
+                      objectFit: "contain",
+                      objectPosition: product.imagePosition ?? "center",
+                    }}
+                  />
+                </div>
+
+                {galleryImages.length > 1 && (
+                  <>
+                    <button
+                      className="product-lightbox-nav is-previous"
+                      type="button"
+                      onPointerDown={(event) => event.stopPropagation()}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        changeImage(-1);
+                      }}
+                      disabled={activeImageIndex === 0}
+                      aria-label="Ver foto anterior"
+                    >
+                      <ChevronLeft size={24} />
+                    </button>
+
+                    <button
+                      className="product-lightbox-nav is-next"
+                      type="button"
+                      onPointerDown={(event) => event.stopPropagation()}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        changeImage(1);
+                      }}
+                      disabled={activeImageIndex === galleryImages.length - 1}
+                      aria-label="Ver foto siguiente"
+                    >
+                      <ChevronRight size={24} />
+                    </button>
+                  </>
+                )}
+              </div>
+
+              <div className="product-lightbox-toolbar" aria-label="Controles de la imagen">
+                <button
+                  type="button"
+                  onClick={() => changeZoom(-0.25)}
+                  disabled={zoom <= 1}
+                  aria-label="Reducir imagen"
+                >
+                  <ZoomOut size={18} />
+                </button>
+
+                <span>{Math.round(zoom * 100)}%</span>
+
+                <button
+                  type="button"
+                  onClick={() => changeZoom(0.25)}
+                  disabled={zoom >= 3}
+                  aria-label="Ampliar imagen"
+                >
+                  <ZoomIn size={18} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={resetImageView}
+                  disabled={zoom === 1}
+                  aria-label="Restablecer imagen"
+                >
+                  <RotateCcw size={17} />
+                </button>
+              </div>
 
               <strong>{product.name}</strong>
 
-              <span>
-                {imageZoomed
-                  ? "Tocá la imagen para reducir"
-                  : "Tocá la imagen para ampliar"}
+              {galleryImages.length > 1 && (
+                <span className="product-lightbox-progress">
+                  Foto {activeImageIndex + 1} de {galleryImages.length}
+                </span>
+              )}
+
+              <span className="product-lightbox-help">
+                <Move size={14} />
+                {zoom > 1
+                  ? "Arrastrá la imagen para moverla libremente"
+                  : galleryImages.length > 1
+                    ? "Deslizá para cambiar de foto · tocá para ampliar"
+                    : "Tocá para ampliar y después arrastrá libremente"}
               </span>
             </div>
           </div>,

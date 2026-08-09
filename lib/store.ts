@@ -9,12 +9,18 @@ export type Product = {
   material: string;
   price: number;
   image: string;
+  images?: ProductImage[];
   badge?: string;
   description: string;
   imageFit?: "cover" | "contain";
   imagePosition?: string;
   referentialImage?: boolean;
   status?: "available" | "outOfStock";
+};
+
+export type ProductImage = {
+  src: string;
+  alt: string;
 };
 
 export type CartLine = Product & { quantity: number };
