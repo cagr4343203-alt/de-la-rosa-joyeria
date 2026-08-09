@@ -4,7 +4,6 @@ const apiVersion = "2026-08-03";
 const allowedCategories = new Set([
   "Anillos",
   "Aros",
-  "Argollas de plata",
   "Cadenas",
   "Pulseras",
   "Sets",
@@ -48,8 +47,37 @@ const { result: products } = await response.json();
 const issues = [];
 const sourceKeys = new Set();
 const imageRefs = new Map();
+const categoryOverrides = new Map([
+  ["client-20260805-set-trebol-negro", "Cadenas"],
+  ["client-20260805-set-nacar-floral", "Cadenas"],
+  ["set-serena", "Anillos"],
+  ["client-20260805-set-corazon-nacar", "Cadenas"],
+  ["client-20260805-set-corazon-verde", "Cadenas"],
+  ["client-20260805-set-rectangular-verde", "Cadenas"],
+  ["client-20260805-set-mariposas-perlas", "Pulseras"],
+  ["client-20260805-set-aros-anillo-elegante", "Aros"],
+  ["ga-20260731-003", "Cadenas"],
+  ["ga-20260731-004", "Sets"],
+  ["ga-20260731-010", "Cadenas"],
+  ["ga-20260731-012", "Cadenas"],
+  ["ga-20260731-017", "Sets"],
+  ["ga-20260731-018", "Anillos"],
+  ["ga-20260731-023", "Pulseras"],
+  ["ga-20260731-032", "Pulseras"],
+  ["ga-20260731-034", "Cadenas"],
+  ["ga-20260731-035", "Cadenas"],
+  ["ga-20260731-036", "Pulseras"],
+  ["ga-20260731-037", "Cadenas"],
+  ["ga-20260731-040", "Cadenas"],
+  ["ga-20260731-041", "Cadenas"],
+  ["ga-20260731-080", "Pulseras"],
+  ["ga-20260731-090", "Cadenas"],
+]);
 
 function expectedCategory(product) {
+  const override = categoryOverrides.get(product.sourceKey);
+  if (override) return override;
+
   const normalized = product.name
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -59,7 +87,7 @@ function expectedCategory(product) {
     product.sourceKey?.startsWith("argolla-plata-") ||
     (normalized.startsWith("argolla") && product.material === "Plata 925")
   ) {
-    return "Argollas de plata";
+    return "Aros";
   }
 
   if (normalized.startsWith("reloj dama")) return "Reloj dama";

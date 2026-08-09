@@ -158,6 +158,38 @@ function normalizeSearchText(value: string) {
     .trim();
 }
 
+function matchesMaterial(productMaterial: string, selectedMaterial: string) {
+  if (selectedMaterial === "Todos") return true;
+
+  const normalizedProductMaterial = normalizeSearchText(productMaterial);
+
+  if (selectedMaterial === "Oro") {
+    return ["oro", "gold", "dorado", "dorada"].some((term) =>
+      normalizedProductMaterial.includes(term),
+    );
+  }
+
+  if (selectedMaterial === "Plata") {
+    return ["plata", "silver", "plateado", "plateada"].some((term) =>
+      normalizedProductMaterial.includes(term),
+    );
+  }
+
+  if (selectedMaterial === "Acero") {
+    return normalizedProductMaterial.includes("acero");
+  }
+
+  if (selectedMaterial === "Enchapado") {
+    return ["enchapado", "enchapada", "banado", "banada"].some((term) =>
+      normalizedProductMaterial.includes(term),
+    );
+  }
+
+  return normalizedProductMaterial.includes(
+    normalizeSearchText(selectedMaterial),
+  );
+}
+
 function getSearchWords(value: string) {
   return normalizeSearchText(value)
     .split(/\s+/)
@@ -212,12 +244,7 @@ export function ProductCatalog({
     const result = products.filter((product) => {
       const categoryMatch = matchesCategory(product.category, category);
 
-      const normalizedProductMaterial = normalizeSearchText(product.material);
-      const normalizedSelectedMaterial = normalizeSearchText(material);
-
-      const materialMatch =
-        material === "Todos" ||
-        normalizedProductMaterial.includes(normalizedSelectedMaterial);
+      const materialMatch = matchesMaterial(product.material, material);
 
       const searchableText = [
         product.name,

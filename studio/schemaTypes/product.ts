@@ -44,7 +44,6 @@ export const product = defineType({
         list: [
           "Anillos",
           "Aros",
-          "Argollas de plata",
           "Cadenas",
           "Pulseras",
           "Sets",

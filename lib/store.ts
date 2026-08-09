@@ -153,7 +153,6 @@ export const categories = [
   "Todo",
   "Anillos",
   "Aros",
-  "Argollas de plata",
   "Cadenas",
   "Pulseras",
   "Sets",
@@ -170,9 +169,8 @@ export const categories = [
 
 export const materials = [
   "Todos",
-  "Oro 18K",
-  "Plata 925",
-  "Plata Gold",
+  "Oro",
+  "Plata",
   "Acero",
   "Enchapado",
 ];

@@ -189,9 +189,9 @@ img {
   border: 1px solid rgba(207, 172, 104, 0.32);
   border-radius: 50%;
   box-shadow: 0 5px 18px rgba(23, 18, 15, 0.1);
-  height: 58px;
+  height: 64px;
   object-fit: cover;
-  width: 58px;
+  width: 64px;
 }
 
 .header-brand > span {
@@ -280,6 +280,10 @@ img {
 
 .whatsapp {
   background: #087744;
+}
+
+.tiktok {
+  background: #050505;
 }
 
 .reserve-header,
@@ -572,7 +576,7 @@ img {
 .mobile-drawer-footer > div {
   display: grid;
   gap: 8px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .mobile-drawer-contact {
@@ -604,6 +608,10 @@ img {
 
 .mobile-drawer-contact.is-instagram {
   background: linear-gradient(135deg, #6a36d9, #e03b76 48%, #f6a337);
+}
+
+.mobile-drawer-contact.is-tiktok {
+  background: #050505;
 }
 
 .menu-overlay,

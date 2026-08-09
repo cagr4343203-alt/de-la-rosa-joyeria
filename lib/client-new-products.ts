@@ -35,11 +35,15 @@ function productDescription(product: (typeof clientCatalog)[number]) {
   return "Aros de plata 925. Consultá disponibilidad y detalles por WhatsApp.";
 }
 
+function productCategory(category: string) {
+  return category === "Argollas de plata" ? "Aros" : category;
+}
+
 export const clientNewProducts: Product[] = clientCatalog.map(
   (product) => ({
     id: product.sourceKey,
     name: product.name,
-    category: product.category,
+    category: productCategory(product.category),
     material: product.material,
     price: 0,
     image: `/products/client/${product.file}`,

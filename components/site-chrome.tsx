@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   INSTAGRAM_URL,
   MAPS_URL,
+  TIKTOK_URL,
   whatsappHref,
 } from "@/lib/store";
 import { CartDrawer, useStore } from "./store-context";
@@ -296,16 +297,12 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       <header className="site-header">
         <Link className="header-brand" href="/" aria-label="Dela Rosa, inicio">
           <Image
-            src="/logo-delarosa-negro.jpg"
-            alt=""
-            width={58}
-            height={58}
+            src="/logo.png"
+            alt="Dela Rosa Joyería y Relojería"
+            width={64}
+            height={64}
             priority
           />
-          <span>
-            <strong>DELA ROSA</strong>
-            <small>Joyería · Relojería</small>
-          </span>
         </Link>
 
         <nav className="desktop-nav" aria-label="Navegación principal">
@@ -333,6 +330,15 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               aria-label="Instagram de Dela Rosa"
             >
               <Image src="/instagram.svg" alt="" width={18} height={18} />
+            </a>
+            <a
+              className="brand-bubble tiktok"
+              href={TIKTOK_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="TikTok de Dela Rosa"
+            >
+              <Image src="/tiktok.svg" alt="" width={18} height={18} />
             </a>
             <a
               className="brand-bubble whatsapp"
@@ -392,15 +398,11 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             onClick={() => setMenuOpen(false)}
           >
             <Image
-              src="/logo-delarosa-negro.jpg"
-              alt=""
+              src="/logo.png"
+              alt="Dela Rosa Joyería y Relojería"
               width={58}
               height={58}
             />
-            <span>
-              <strong>DELA ROSA</strong>
-              <small>Joyería · Relojería</small>
-            </span>
           </Link>
           <button
             type="button"
@@ -470,6 +472,15 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               >
                 <Image src="/instagram.svg" alt="" width={17} height={17} />
                 Instagram
+              </a>
+              <a
+                className="mobile-drawer-contact is-tiktok"
+                href={TIKTOK_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Image src="/tiktok.svg" alt="" width={17} height={17} />
+                TikTok
               </a>
             </div>
           </div>

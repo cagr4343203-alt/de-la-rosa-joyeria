@@ -21,6 +21,10 @@ const products = JSON.parse(
   ),
 );
 
+function productCategory(category) {
+  return category === "Argollas de plata" ? "Aros" : category;
+}
+
 async function importProduct(product, index) {
   const existing = await client.fetch(
     `*[_type == "product" && sourceKey == $sourceKey][0]{_id, image}`,
@@ -47,7 +51,7 @@ async function importProduct(product, index) {
     name: product.name,
     slug: { _type: "slug", current: product.sourceKey },
     status: "available",
-    category: product.category,
+    category: productCategory(product.category),
     material: product.material,
     price: 0,
     image: {
