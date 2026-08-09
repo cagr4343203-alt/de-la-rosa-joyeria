@@ -164,15 +164,15 @@ function matchesMaterial(productMaterial: string, selectedMaterial: string) {
   const normalizedProductMaterial = normalizeSearchText(productMaterial);
 
   if (selectedMaterial === "Oro") {
-    return ["oro", "gold", "dorado", "dorada"].some((term) =>
-      normalizedProductMaterial.includes(term),
+    return (
+      normalizedProductMaterial.includes("oro") &&
+      !normalizedProductMaterial.includes("plata") &&
+      !normalizedProductMaterial.includes("acero")
     );
   }
 
   if (selectedMaterial === "Plata") {
-    return ["plata", "silver", "plateado", "plateada"].some((term) =>
-      normalizedProductMaterial.includes(term),
-    );
+    return normalizedProductMaterial.includes("plata");
   }
 
   if (selectedMaterial === "Acero") {
