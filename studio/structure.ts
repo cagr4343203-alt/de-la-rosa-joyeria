@@ -1,4 +1,10 @@
 import { BasketIcon } from "@sanity/icons/Basket";
+import { CalendarIcon } from "@sanity/icons/Calendar";
+import { HomeIcon } from "@sanity/icons/Home";
+import { ImageIcon } from "@sanity/icons/Image";
+import { InfoOutlineIcon } from "@sanity/icons/InfoOutline";
+import { PinIcon } from "@sanity/icons/Pin";
+import { StarIcon } from "@sanity/icons/Star";
 import { TagIcon } from "@sanity/icons/Tag";
 import type { StructureResolver } from "sanity/structure";
 
@@ -95,6 +101,89 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title("Catálogo Dela Rosa")
     .items([
+      S.listItem()
+        .id("homepage")
+        .title("Página de inicio")
+        .icon(HomeIcon)
+        .child(
+          S.list()
+            .title("Página de inicio")
+            .items([
+              S.listItem()
+                .id("home-hero")
+                .title("Portada principal")
+                .icon(HomeIcon)
+                .child(
+                  S.document()
+                    .schemaType("homeHero")
+                    .documentId("homeHero")
+                    .title("Portada principal"),
+                ),
+              S.listItem()
+                .id("home-services")
+                .title("Servicios destacados")
+                .icon(InfoOutlineIcon)
+                .child(
+                  S.document()
+                    .schemaType("homeServices")
+                    .documentId("homeServices")
+                    .title("Servicios destacados"),
+                ),
+              S.listItem()
+                .id("home-categories")
+                .title("Categorías e imágenes")
+                .icon(ImageIcon)
+                .child(
+                  S.document()
+                    .schemaType("homeCategories")
+                    .documentId("homeCategories")
+                    .title("Categorías e imágenes"),
+                ),
+              S.listItem()
+                .id("home-featured")
+                .title("Productos destacados")
+                .icon(StarIcon)
+                .child(
+                  S.document()
+                    .schemaType("homeFeatured")
+                    .documentId("homeFeatured")
+                    .title("Productos destacados"),
+                ),
+              S.listItem()
+                .id("home-piercing")
+                .title("Reserva de perforación")
+                .icon(CalendarIcon)
+                .child(
+                  S.document()
+                    .schemaType("homePiercing")
+                    .documentId("homePiercing")
+                    .title("Reserva de perforación"),
+                ),
+              S.listItem()
+                .id("home-history")
+                .title("Nuestra historia")
+                .icon(ImageIcon)
+                .child(
+                  S.document()
+                    .schemaType("homeHistory")
+                    .documentId("homeHistory")
+                    .title("Nuestra historia"),
+                ),
+              S.listItem()
+                .id("home-location")
+                .title("Ubicación y contacto")
+                .icon(PinIcon)
+                .child(
+                  S.document()
+                    .schemaType("homeLocation")
+                    .documentId("homeLocation")
+                    .title("Ubicación y contacto"),
+                ),
+            ]),
+        ),
+
+      S.divider(),
+
       S.listItem()
         .id("products")
         .title("Productos")

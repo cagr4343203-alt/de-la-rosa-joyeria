@@ -12,36 +12,32 @@ import {
 } from "lucide-react";
 import { MotionReveal } from "@/components/motion-reveal";
 import { ProductCard } from "@/components/product-card";
-import { MAPS_URL, STORE_ADDRESS, whatsappHref } from "@/lib/store";
+import { MAPS_URL, whatsappHref } from "@/lib/store";
 import { LOCAL_BUSINESS_JSON_LD } from "@/lib/seo";
+import {
+  getHomePage,
+  type HomeServiceIcon,
+} from "@/sanity/lib/homepage";
 import { getProducts } from "@/sanity/lib/products";
 
-const categoryCards = [
-  {
-    title: "Anillos",
-    eyebrow: "Momentos únicos",
-    image: "/products/06-joya.jpg",
-  },
-  {
-    title: "Aros",
-    eyebrow: "Brillo cotidiano",
-    image: "/products/04-aros.jpg",
-  },
-  {
-    title: "Bombillas",
-    eyebrow: "Detalles para regalar",
-    image: "/products/gifts/bombilla-04.jpg",
-  },
-  {
-    title: "Pulseras",
-    eyebrow: "Plata 925 bañada en oro",
-    image: "/products/client/pulsera-tennis-gold.jpeg",
-  },
-];
+const serviceIcons = {
+  gem: Gem,
+  watch: Watch,
+  gift: Gift,
+  calendar: CalendarDays,
+} satisfies Record<HomeServiceIcon, typeof Gem>;
 
 export default async function Home() {
-  const products = await getProducts();
-  const featured = products.slice(0, 4);
+  const [products, home] = await Promise.all([getProducts(), getHomePage()]);
+  const productsById = new Map(
+    products.map((product) => [String(product.id), product]),
+  );
+  const selectedFeatured = home.featured.productIds
+    .map((id) => productsById.get(id))
+    .filter((product) => product !== undefined);
+  const featured = selectedFeatured.length
+    ? selectedFeatured.slice(0, 4)
+    : products.slice(0, 4);
 
   return (
     <>
@@ -59,32 +55,29 @@ export default async function Home() {
       >
         <div className="hero-copy">
           <span className="kicker kicker-light">
-            Dela Rosa Joyería · Encarnación · Desde 2003
+            {home.hero.kicker}
           </span>
           <h1>
-            El detalle exclusivo
-            <em>para ese momento especial.</em>
+            {home.hero.title}
+            <em>{home.hero.emphasis}</em>
           </h1>
-          <p>
-            Joyas, relojes y regalos seleccionados para acompañar historias que
-            merecen ser recordadas.
-          </p>
+          <p>{home.hero.description}</p>
           <div className="hero-actions">
             <Link className="button button-gold" href="/productos">
-              Ver productos <ArrowUpRight size={17} />
+              {home.hero.primaryActionLabel} <ArrowUpRight size={17} />
             </Link>
             <Link className="button button-outline-light" href="/reservas">
-              <CalendarDays size={17} /> Reservar perforación
+              <CalendarDays size={17} /> {home.hero.secondaryActionLabel}
             </Link>
           </div>
           <div className="hero-trust">
             <span>
               <Gem size={17} />
-              Oro, plata y relojería
+              {home.hero.trustFirst}
             </span>
             <span>
               <ShieldCheck size={17} />
-              Atención personalizada
+              {home.hero.trustSecond}
             </span>
           </div>
         </div>
@@ -93,8 +86,8 @@ export default async function Home() {
           <div className="hero-halo" />
           <figure className="hero-photo hero-photo-main">
             <Image
-              src="/products/06-joya.jpg"
-              alt="Anillos de Dela Rosa"
+              src={home.hero.mainImage.src}
+              alt={home.hero.mainImage.alt}
               fill
               priority
               sizes="(max-width: 900px) 76vw, 36vw"
@@ -102,16 +95,16 @@ export default async function Home() {
           </figure>
           <figure className="hero-photo hero-photo-small">
             <Image
-              src="/products/05-pulsera.jpg"
-              alt="Pulsera de Dela Rosa"
+              src={home.hero.secondaryImage.src}
+              alt={home.hero.secondaryImage.alt}
               fill
               priority
               sizes="(max-width: 900px) 45vw, 20vw"
             />
           </figure>
           <Link className="hero-reserve-card" href="/reservas">
-            <span>Agenda disponible</span>
-            <strong>Reservá tu perforación</strong>
+            <span>{home.hero.reserveEyebrow}</span>
+            <strong>{home.hero.reserveTitle}</strong>
             <ArrowUpRight size={18} />
           </Link>
         </div>
@@ -123,64 +116,45 @@ export default async function Home() {
         aria-label="Servicios destacados"
         distance={22}
       >
-        <article>
-          <Gem size={24} />
-          <div>
-            <strong>Joyas seleccionadas</strong>
-            <span>Oro 18K, plata y enchapados</span>
-          </div>
-        </article>
-
-        <article>
-          <Watch size={24} />
-          <div>
-            <strong>Relojes</strong>
-            <span>Modelos clásicos y contemporáneos</span>
-          </div>
-        </article>
-
-        <article>
-          <Gift size={24} />
-          <div>
-            <strong>Regalos especiales</strong>
-            <span>Bombillas, bolígrafos y más detalles</span>
-          </div>
-        </article>
-
-        <article>
-          <CalendarDays size={24} />
-          <div>
-            <strong>Perforación de oreja</strong>
-            <span>Reservá fecha y horario por WhatsApp</span>
-          </div>
-        </article>
+        {home.services.items.map((service) => {
+          const Icon = serviceIcons[service.icon] ?? Gem;
+          return (
+            <article key={service._key}>
+              <Icon size={24} />
+              <div>
+                <strong>{service.title}</strong>
+                <span>{service.description}</span>
+              </div>
+            </article>
+          );
+        })}
       </MotionReveal>
 
       <section className="home-section category-section">
         <MotionReveal className="section-heading" distance={24}>
           <div>
-            <span className="kicker">Comprar por categoría</span>
-            <h2>Encontrá ese detalle especial</h2>
+            <span className="kicker">{home.categories.kicker}</span>
+            <h2>{home.categories.title}</h2>
           </div>
           <Link className="text-link" href="/productos">
-            Ver todo el catálogo <ArrowUpRight size={16} />
+            {home.categories.linkLabel} <ArrowUpRight size={16} />
           </Link>
         </MotionReveal>
         <div className="category-grid">
-          {categoryCards.map((card, index) => (
+          {home.categories.cards.map((card, index) => (
             <MotionReveal
-              key={card.title}
+              key={card._key}
               className="category-card-motion"
               delay={index * 60}
               distance={26}
             >
               <Link
                 className="category-card"
-                href={`/productos?categoria=${encodeURIComponent(card.title)}`}
+                href={`/productos?categoria=${encodeURIComponent(card.category)}`}
               >
                 <Image
-                  src={card.image}
-                  alt=""
+                  src={card.image.src}
+                  alt={card.image.alt}
                   fill
                   loading="lazy"
                   quality={70}
@@ -200,13 +174,10 @@ export default async function Home() {
       <section className="home-section featured-section">
         <MotionReveal className="section-heading" distance={24}>
           <div>
-            <span className="kicker">Selección Dela Rosa</span>
-            <h2>Productos destacados</h2>
+            <span className="kicker">{home.featured.kicker}</span>
+            <h2>{home.featured.title}</h2>
           </div>
-          <p>
-            Agregá tus favoritos al carrito o consultá la disponibilidad
-            directamente por WhatsApp.
-          </p>
+          <p>{home.featured.description}</p>
         </MotionReveal>
         <div className="featured-grid">
           {featured.map((product, index) => (
@@ -225,22 +196,19 @@ export default async function Home() {
           direction="left"
           distance={34}
         >
-          <span className="kicker kicker-light">Reserva de perforación</span>
-          <h2>Tu nuevo brillo, con atención personalizada.</h2>
-          <p>
-            Elegí fecha, horario y cantidad de perforaciones. Preparamos tu
-            solicitud y la confirmamos contigo por WhatsApp.
-          </p>
+          <span className="kicker kicker-light">{home.piercing.kicker}</span>
+          <h2>{home.piercing.title}</h2>
+          <p>{home.piercing.description}</p>
           <div className="piercing-points">
             <span>
-              <Clock3 size={18} /> Reserva rápida
+              <Clock3 size={18} /> {home.piercing.firstPoint}
             </span>
             <span>
-              <ShieldCheck size={18} /> Cuidado y orientación
+              <ShieldCheck size={18} /> {home.piercing.secondPoint}
             </span>
           </div>
           <Link className="button button-gold" href="/reservas">
-            Reservar ahora <ArrowUpRight size={17} />
+            {home.piercing.buttonLabel} <ArrowUpRight size={17} />
           </Link>
         </MotionReveal>
         <MotionReveal
@@ -251,14 +219,14 @@ export default async function Home() {
           distance={20}
         >
           <Image
-            src="/products/piercing-reference-client.png"
-            alt="Perforación de oreja realizada con aros plateados"
+            src={home.piercing.image.src}
+            alt={home.piercing.image.alt}
             fill
             sizes="(max-width: 900px) 82vw, 32vw"
           />
           <figcaption>
-            <span>Servicio con reserva</span>
-            <strong>Inspiración para tu próximo estilo</strong>
+            <span>{home.piercing.captionEyebrow}</span>
+            <strong>{home.piercing.captionTitle}</strong>
           </figcaption>
         </MotionReveal>
       </section>
@@ -270,8 +238,8 @@ export default async function Home() {
           distance={34}
         >
           <Image
-            src="/logo-delarosa-blanco.jpg"
-            alt="Logo de Dela Rosa"
+            src={home.history.image.src}
+            alt={home.history.image.alt}
             fill
             loading="lazy"
             quality={70}
@@ -284,14 +252,11 @@ export default async function Home() {
           delay={100}
           distance={34}
         >
-          <span className="kicker">Nuestra historia</span>
-          <h2>Desde el 2003 formando parte de tus momentos.</h2>
-          <p>
-            Gracias por elegirnos para celebrar aniversarios, logros, regalos y
-            recuerdos que duran para siempre.
-          </p>
+          <span className="kicker">{home.history.kicker}</span>
+          <h2>{home.history.title}</h2>
+          <p>{home.history.description}</p>
           <Link className="text-link" href="/nosotros">
-            Conocé Dela Rosa <ArrowUpRight size={16} />
+            {home.history.linkLabel} <ArrowUpRight size={16} />
           </Link>
         </MotionReveal>
       </section>
@@ -302,9 +267,9 @@ export default async function Home() {
         distance={24}
       >
         <div>
-          <span className="kicker kicker-light">Nuestra casa</span>
-          <h2>Te esperamos en Encarnación.</h2>
-          <p>{STORE_ADDRESS}.</p>
+          <span className="kicker kicker-light">{home.location.kicker}</span>
+          <h2>{home.location.title}</h2>
+          <p>{home.location.description}</p>
         </div>
         <a
           className="button button-outline-light"
@@ -312,7 +277,7 @@ export default async function Home() {
           target="_blank"
           rel="noreferrer"
         >
-          <MapPin size={17} /> Cómo llegar
+          <MapPin size={17} /> {home.location.mapLabel}
         </a>
         <a
           className="button button-gold"
@@ -322,7 +287,7 @@ export default async function Home() {
           target="_blank"
           rel="noreferrer"
         >
-          Consultar horario <ArrowUpRight size={17} />
+          {home.location.whatsappLabel} <ArrowUpRight size={17} />
         </a>
       </MotionReveal>
     </>

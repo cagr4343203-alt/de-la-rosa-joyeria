@@ -12,7 +12,8 @@
     "import:client-new": "sanity exec scripts/import-client-new-products.mjs --with-user-token",
     "import:client-evening": "sanity exec scripts/import-2026-08-05-evening.mjs --with-user-token",
     "prices:consult": "sanity exec scripts/set-consult-price.mjs --with-user-token",
-    "normalize:catalog": "sanity exec scripts/normalize-product-catalog.mjs --with-user-token"
+    "normalize:catalog": "sanity exec scripts/normalize-product-catalog.mjs --with-user-token",
+    "seed:homepage": "sanity exec scripts/seed-homepage.mjs --with-user-token"
   },
   "dependencies": {
     "@sanity/icons": "^5.2.1",
