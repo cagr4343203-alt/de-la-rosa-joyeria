@@ -200,9 +200,12 @@ img {
 }
 
 .header-brand strong {
-  font-family: var(--serif);
-  font-size: 1rem;
-  letter-spacing: 0.19em;
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .header-brand small {
@@ -576,7 +579,7 @@ img {
 .mobile-drawer-footer > div {
   display: grid;
   gap: 8px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .mobile-drawer-contact {
@@ -612,6 +615,10 @@ img {
 
 .mobile-drawer-contact.is-tiktok {
   background: #050505;
+}
+
+.mobile-drawer-contact.is-facebook {
+  background: #1877f2;
 }
 
 .menu-overlay,
@@ -1133,6 +1140,97 @@ img {
   background: var(--cream);
 }
 
+.promotions-section {
+  background: #f1e9dc;
+  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+}
+
+.promotions-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.promotion-card {
+  background: var(--paper);
+  border: 1px solid rgba(48, 35, 25, 0.14);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.promotion-card > a {
+  color: inherit;
+  display: block;
+  height: 100%;
+  text-decoration: none;
+}
+
+.promotion-card-inner {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.88fr) minmax(0, 1.12fr);
+  height: 100%;
+}
+
+.promotion-card figure {
+  background: #e8e0d6;
+  min-height: 330px;
+  overflow: hidden;
+  position: relative;
+}
+
+.promotion-card figure img {
+  object-fit: contain;
+  padding: 8px;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.promotion-card-inner > div {
+  align-content: center;
+  display: grid;
+  padding: clamp(26px, 4vw, 52px);
+}
+
+.promotion-card-inner > div > span {
+  color: var(--gold-dark);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.promotion-card h3 {
+  font-family: var(--serif);
+  font-size: clamp(1.7rem, 2.3vw, 2.6rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  margin: 12px 0 16px;
+}
+
+.promotion-card p {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.promotion-card small {
+  color: rgba(48, 35, 25, 0.55);
+  font-size: 0.62rem;
+  line-height: 1.5;
+  margin-top: 18px;
+}
+
+.promotion-card strong {
+  align-items: center;
+  display: flex;
+  font-size: 0.68rem;
+  gap: 7px;
+  margin-top: 20px;
+  text-transform: uppercase;
+}
+
 .featured-grid,
 .catalog-grid {
   display: grid;
@@ -1549,7 +1647,11 @@ img {
   display: grid;
   gap: clamp(30px, 4vw, 62px);
   grid-template-columns: 180px minmax(0, 1fr);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1760px;
   padding: 42px clamp(20px, 5vw, 74px) 110px;
+  width: 100%;
 }
 
 .catalog-filters {
@@ -1633,6 +1735,18 @@ img {
 
 .catalog-results {
   min-width: 0;
+  width: 100%;
+}
+
+.catalog-grid {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+.catalog-grid .product-info h3,
+.catalog-grid .product-info > span {
+  overflow-wrap: anywhere;
 }
 
 .results-head {
@@ -3110,7 +3224,8 @@ img {
   }
 
   .header-brand strong {
-    font-size: 0.82rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
   }
 
   .header-brand small,
@@ -3546,10 +3661,19 @@ img {
   }
 
   .mobile-drawer-contact {
-    font-size: 0.52rem;
+    font-size: 0.56rem;
     gap: 5px;
     letter-spacing: 0.02em;
     min-height: 44px;
+  }
+
+  .site-header > .header-brand strong {
+    font-size: 0.68rem;
+    letter-spacing: 0.13em;
+  }
+
+  .site-header > .header-brand small {
+    display: none;
   }
 
   .announcement {
@@ -3985,6 +4109,33 @@ img {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   touch-action: pan-x pan-y;
+}
+
+.location-details > address {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.76rem;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  line-height: 1.55;
+  margin: -14px 0 30px;
+}
+
+@media (max-width: 760px) {
+  .promotions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .promotion-card-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .promotion-card figure {
+    min-height: 360px;
+  }
+
+  .promotion-card-inner > div {
+    padding: 28px 22px 32px;
+  }
 }
 
 .product-gallery::-webkit-scrollbar {

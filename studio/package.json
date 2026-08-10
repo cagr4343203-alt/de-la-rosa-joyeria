@@ -14,7 +14,10 @@
     "prices:consult": "sanity exec scripts/set-consult-price.mjs --with-user-token",
     "normalize:catalog": "sanity exec scripts/normalize-product-catalog.mjs --with-user-token",
     "seed:homepage": "sanity exec scripts/seed-homepage.mjs --with-user-token",
-    "fix:client-notes": "sanity exec scripts/apply-2026-08-09-client-changes.mjs --with-user-token"
+    "fix:client-notes": "sanity exec scripts/apply-2026-08-09-client-changes.mjs --with-user-token",
+    "polish:descriptions": "sanity exec scripts/polish-product-descriptions.mjs --with-user-token",
+    "seed:site-content": "sanity exec scripts/seed-site-content.mjs --with-user-token",
+    "seed:promotions": "sanity exec scripts/seed-promotions.mjs --with-user-token"
   },
   "dependencies": {
     "@sanity/icons": "^5.2.1",

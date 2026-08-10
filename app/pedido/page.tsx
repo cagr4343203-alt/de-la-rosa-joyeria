@@ -10,6 +10,10 @@ export const metadata = {
   title: "Resumen del pedido",
   description:
     "Resumen de productos seleccionados del catálogo de Dela Rosa.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 type RequestedItem = {
@@ -68,10 +72,43 @@ function parseRequestedItems(value?: string): RequestedItem[] {
   }
 }
 
+function parseCompactRequestedItems(value?: string): RequestedItem[] {
+  if (!value) return [];
+
+  return value
+    .split(",")
+    .map((entry) => {
+      const separatorIndex = entry.lastIndexOf("~");
+      const encodedId =
+        separatorIndex >= 0
+          ? entry.slice(0, separatorIndex)
+          : entry;
+      const quantityValue =
+        separatorIndex >= 0
+          ? entry.slice(separatorIndex + 1)
+          : "1";
+
+      try {
+        const id = decodeURIComponent(encodedId).trim();
+        const quantity = Math.max(
+          1,
+          Math.min(99, Number(quantityValue) || 1),
+        );
+
+        return id ? { id, quantity } : null;
+      } catch {
+        return null;
+      }
+    })
+    .filter((item): item is RequestedItem => item !== null)
+    .slice(0, 50);
+}
+
 export default async function OrderPage({
   searchParams,
 }: {
   searchParams: Promise<{
+    p?: string;
     items?: string;
   }>;
 }) {
@@ -80,9 +117,10 @@ export default async function OrderPage({
     searchParams,
   ]);
 
-  const requestedItems = parseRequestedItems(
-    params.items,
-  );
+  const compactItems = parseCompactRequestedItems(params.p);
+  const requestedItems = compactItems.length
+    ? compactItems
+    : parseRequestedItems(params.items);
 
   const orderLines = requestedItems.flatMap(
     (requestedItem) => {

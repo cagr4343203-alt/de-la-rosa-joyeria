@@ -34,7 +34,22 @@ test("renders the Dela Rosa storefront", async () => {
   assert.match(html, /Productos destacados/);
   assert.match(html, /application\/ld\+json/);
   assert.match(html, /https:\/\/delarosajoyeria\.com/);
+  assert.match(html, /Promociones para elegir tu detalle/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
+});
+
+test("renders professional catalog descriptions and compact order links", async () => {
+  const [catalogResponse, orderResponse] = await Promise.all([
+    render("/productos"),
+    render("/pedido?p=1~2,2"),
+  ]);
+
+  assert.equal(catalogResponse.status, 200);
+  const catalog = await catalogResponse.text();
+  assert.doesNotMatch(catalog, /Foto real (?:enviada por|de) Dela Rosa/i);
+
+  assert.equal(orderResponse.status, 200);
+  assert.match(await orderResponse.text(), /Resumen del pedido|Tu pedido/i);
 });
 
 test("publishes SEO discovery files for the canonical domain", async () => {

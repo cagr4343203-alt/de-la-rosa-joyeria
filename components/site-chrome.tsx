@@ -16,12 +16,8 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  INSTAGRAM_URL,
-  MAPS_URL,
-  TIKTOK_URL,
-  whatsappHref,
-} from "@/lib/store";
+import { whatsappHref } from "@/lib/store";
+import type { SiteSettings } from "@/sanity/lib/site-content";
 import { CartDrawer, useStore } from "./store-context";
 
 const navItems = [
@@ -46,7 +42,13 @@ function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-export function SiteChrome({ children }: { children: React.ReactNode }) {
+export function SiteChrome({
+  children,
+  settings,
+}: {
+  children: React.ReactNode;
+  settings: SiteSettings;
+}) {
   const pathname = usePathname();
   const { itemCount, setCartOpen } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -303,6 +305,10 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             height={64}
             priority
           />
+          <span>
+            <strong>{settings.brandName}</strong>
+            <small>{settings.brandTagline}</small>
+          </span>
         </Link>
 
         <nav className="desktop-nav" aria-label="Navegación principal">
@@ -324,7 +330,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           <div className="header-socials">
             <a
               className="brand-bubble instagram"
-              href={INSTAGRAM_URL}
+              href={settings.instagramUrl}
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram de Dela Rosa"
@@ -333,7 +339,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             </a>
             <a
               className="brand-bubble tiktok"
-              href={TIKTOK_URL}
+              href={settings.tiktokUrl}
               target="_blank"
               rel="noreferrer"
               aria-label="TikTok de Dela Rosa"
@@ -344,6 +350,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               className="brand-bubble whatsapp"
               href={whatsappHref(
                 "Hola Dela Rosa, quiero consultar sobre sus productos.",
+                settings.whatsappNumber,
               )}
               target="_blank"
               rel="noreferrer"
@@ -403,6 +410,10 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               width={58}
               height={58}
             />
+            <span>
+              <strong>{settings.brandName}</strong>
+              <small>{settings.brandTagline}</small>
+            </span>
           </Link>
           <button
             type="button"
@@ -457,6 +468,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
                 className="mobile-drawer-contact is-whatsapp"
                 href={whatsappHref(
                   "Hola Dela Rosa, quiero consultar sobre sus productos.",
+                  settings.whatsappNumber,
                 )}
                 target="_blank"
                 rel="noreferrer"
@@ -466,7 +478,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               </a>
               <a
                 className="mobile-drawer-contact is-instagram"
-                href={INSTAGRAM_URL}
+                href={settings.instagramUrl}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -475,12 +487,21 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               </a>
               <a
                 className="mobile-drawer-contact is-tiktok"
-                href={TIKTOK_URL}
+                href={settings.tiktokUrl}
                 target="_blank"
                 rel="noreferrer"
               >
                 <Image src="/tiktok.svg" alt="" width={17} height={17} />
                 TikTok
+              </a>
+              <a
+                className="mobile-drawer-contact is-facebook"
+                href={settings.facebookUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Image src="/facebook.svg" alt="" width={17} height={17} />
+                Facebook
               </a>
             </div>
           </div>
@@ -505,7 +526,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             height={94}
           />
           <div>
-            <strong>DELA ROSA</strong>
+            <strong>{settings.brandName}</strong>
             <p>El detalle exclusivo para ese momento especial.</p>
           </div>
         </div>
@@ -518,18 +539,21 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         </div>
         <div className="footer-links">
           <strong>Contacto</strong>
-          <a href={MAPS_URL} target="_blank" rel="noreferrer">
-            Mariscal José Félix Estigarribia
+          <a href={settings.mapsUrl} target="_blank" rel="noreferrer">
+            {settings.address}
           </a>
-          <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
-            @dela_rosajoyeria
+          <a href={settings.instagramUrl} target="_blank" rel="noreferrer">
+            {settings.instagramLabel}
           </a>
           <a
-            href={whatsappHref("Hola Dela Rosa, quiero hacer una consulta.")}
+            href={whatsappHref(
+              "Hola Dela Rosa, quiero hacer una consulta.",
+              settings.whatsappNumber,
+            )}
             target="_blank"
             rel="noreferrer"
           >
-            +595 985 720031
+            {settings.phone}
           </a>
         </div>
         <p className="footer-copy">
@@ -554,7 +578,10 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       >
         <a
           className="social-pill whatsapp"
-          href={whatsappHref("Hola Dela Rosa, quiero hacer una consulta.")}
+          href={whatsappHref(
+            "Hola Dela Rosa, quiero hacer una consulta.",
+            settings.whatsappNumber,
+          )}
           target="_blank"
           rel="noreferrer"
           aria-label="Consultar por WhatsApp"
@@ -564,7 +591,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         </a>
         <a
           className="social-pill instagram"
-          href={INSTAGRAM_URL}
+          href={settings.instagramUrl}
           target="_blank"
           rel="noreferrer"
           aria-label="Abrir Instagram"

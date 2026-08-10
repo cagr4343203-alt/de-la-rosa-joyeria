@@ -179,6 +179,9 @@ export function money(value: number) {
   return `Gs. ${new Intl.NumberFormat("es-PY").format(value)}`;
 }
 
-export function whatsappHref(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+export function whatsappHref(
+  message: string,
+  number = WHATSAPP_NUMBER,
+) {
+  return `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
 }

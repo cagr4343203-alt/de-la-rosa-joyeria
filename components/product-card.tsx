@@ -42,7 +42,7 @@ export function ProductCard({
   eager?: boolean;
   motionIndex?: number;
 }) {
-  const { addToCart } = useStore();
+  const { addToCart, whatsappNumber } = useStore();
 
   const outOfStock = product.status === "outOfStock";
   const imageFit = product.imageFit ?? "contain";
@@ -524,7 +524,7 @@ export function ProductCard({
           </button>
 
           <a
-            href={whatsappHref(consultationMessage)}
+            href={whatsappHref(consultationMessage, whatsappNumber)}
             target="_blank"
             rel="noreferrer"
             onClick={handleProductConsultation}

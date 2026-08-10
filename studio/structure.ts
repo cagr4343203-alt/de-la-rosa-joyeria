@@ -1,5 +1,6 @@
 import { BasketIcon } from "@sanity/icons/Basket";
 import { CalendarIcon } from "@sanity/icons/Calendar";
+import { CogIcon } from "@sanity/icons/Cog";
 import { HomeIcon } from "@sanity/icons/Home";
 import { ImageIcon } from "@sanity/icons/Image";
 import { InfoOutlineIcon } from "@sanity/icons/InfoOutline";
@@ -96,6 +97,17 @@ export const structure: StructureResolver = (S) =>
     .title("Catálogo Dela Rosa")
     .items([
       S.listItem()
+        .id("site-settings")
+        .title("Datos generales y redes")
+        .icon(CogIcon)
+        .child(
+          S.document()
+            .schemaType("siteSettings")
+            .documentId("siteSettings")
+            .title("Datos generales y redes"),
+        ),
+
+      S.listItem()
         .id("homepage")
         .title("Página de inicio")
         .icon(HomeIcon)
@@ -144,6 +156,17 @@ export const structure: StructureResolver = (S) =>
                     .title("Productos destacados"),
                 ),
               S.listItem()
+                .id("promotions")
+                .title("Promociones y descuentos")
+                .icon(StarIcon)
+                .child(
+                  S.documentTypeList("promotion")
+                    .title("Promociones y descuentos")
+                    .defaultOrdering([
+                      { field: "order", direction: "asc" },
+                    ]),
+                ),
+              S.listItem()
                 .id("home-piercing")
                 .title("Reserva de perforación")
                 .icon(CalendarIcon)
@@ -174,6 +197,39 @@ export const structure: StructureResolver = (S) =>
                     .title("Ubicación y contacto"),
                 ),
             ]),
+        ),
+
+      S.listItem()
+        .id("reservation-page")
+        .title("Reserva y perforación")
+        .icon(CalendarIcon)
+        .child(
+          S.document()
+            .schemaType("reservationPage")
+            .documentId("reservationPage")
+            .title("Reserva y perforación"),
+        ),
+
+      S.listItem()
+        .id("about-page")
+        .title("Nosotros")
+        .icon(InfoOutlineIcon)
+        .child(
+          S.document()
+            .schemaType("aboutPage")
+            .documentId("aboutPage")
+            .title("Nosotros"),
+        ),
+
+      S.listItem()
+        .id("location-page")
+        .title("Ubicación")
+        .icon(PinIcon)
+        .child(
+          S.document()
+            .schemaType("locationPage")
+            .documentId("locationPage")
+            .title("Ubicación"),
         ),
 
       S.divider(),

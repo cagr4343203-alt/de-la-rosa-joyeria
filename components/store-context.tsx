@@ -23,6 +23,7 @@ type StoreContextValue = {
   cartOpen: boolean;
   itemCount: number;
   total: number;
+  whatsappNumber: string;
   addToCart: (product: Product) => void;
   changeQuantity: (
     id: Product["id"],
@@ -37,25 +38,25 @@ const StoreContext =
   createContext<StoreContextValue | null>(null);
 
 function createOrderSummaryUrl(cart: CartLine[]) {
-  const selectedItems = cart.map((item) => ({
-    id: String(item.id),
-    quantity: item.quantity,
-  }));
+  const selectedItems = cart
+    .map((item) => {
+      const id = encodeURIComponent(String(item.id));
+      return item.quantity > 1 ? `${id}~${item.quantity}` : id;
+    })
+    .join(",");
 
   const orderUrl = new URL("/pedido", SITE_URL);
-
-  orderUrl.searchParams.set(
-    "items",
-    JSON.stringify(selectedItems),
-  );
+  orderUrl.search = `?p=${selectedItems}`;
 
   return orderUrl.toString();
 }
 
 export function StoreProvider({
   children,
+  whatsappNumber,
 }: {
   children: React.ReactNode;
+  whatsappNumber: string;
 }) {
   const [cart, setCart] = useState<CartLine[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -125,6 +126,7 @@ export function StoreProvider({
       cartOpen,
       itemCount,
       total,
+      whatsappNumber,
       setCartOpen,
 
       addToCart(product) {
@@ -188,7 +190,7 @@ export function StoreProvider({
         setCart([]);
       },
     };
-  }, [cart, cartOpen]);
+  }, [cart, cartOpen, whatsappNumber]);
 
   return (
     <StoreContext.Provider value={value}>
@@ -218,6 +220,7 @@ export function CartDrawer() {
     clearCart,
     removeFromCart,
     setCartOpen,
+    whatsappNumber,
   } = useStore();
 
   const hasUnpricedProducts = cart.some(
@@ -430,7 +433,7 @@ export function CartDrawer() {
             }`}
             href={
               cart.length > 0
-                ? whatsappHref(orderMessage)
+                ? whatsappHref(orderMessage, whatsappNumber)
                 : undefined
             }
             target="_blank"

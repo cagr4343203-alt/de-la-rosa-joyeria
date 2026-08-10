@@ -12,13 +12,15 @@ import {
 } from "lucide-react";
 import { MotionReveal } from "@/components/motion-reveal";
 import { ProductCard } from "@/components/product-card";
-import { MAPS_URL, whatsappHref } from "@/lib/store";
-import { LOCAL_BUSINESS_JSON_LD } from "@/lib/seo";
+import { whatsappHref } from "@/lib/store";
+import { LOCAL_BUSINESS_JSON_LD, WEBSITE_JSON_LD } from "@/lib/seo";
 import {
   getHomePage,
   type HomeServiceIcon,
 } from "@/sanity/lib/homepage";
 import { getProducts } from "@/sanity/lib/products";
+import { getPromotions } from "@/sanity/lib/promotions";
+import { getSiteSettings } from "@/sanity/lib/site-content";
 
 const serviceIcons = {
   gem: Gem,
@@ -28,7 +30,12 @@ const serviceIcons = {
 } satisfies Record<HomeServiceIcon, typeof Gem>;
 
 export default async function Home() {
-  const [products, home] = await Promise.all([getProducts(), getHomePage()]);
+  const [products, home, settings, promotions] = await Promise.all([
+    getProducts(),
+    getHomePage(),
+    getSiteSettings(),
+    getPromotions(),
+  ]);
   const productsById = new Map(
     products.map((product) => [String(product.id), product]),
   );
@@ -45,6 +52,12 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(LOCAL_BUSINESS_JSON_LD).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(WEBSITE_JSON_LD).replace(/</g, "\\u003c"),
         }}
       />
       <MotionReveal
@@ -190,6 +203,66 @@ export default async function Home() {
         </div>
       </section>
 
+      {promotions.length > 0 && (
+        <section className="home-section promotions-section">
+          <MotionReveal className="section-heading" distance={24}>
+            <div>
+              <span className="kicker">{settings.promotionsKicker}</span>
+              <h2>{settings.promotionsTitle}</h2>
+            </div>
+            <p>{settings.promotionsDescription}</p>
+          </MotionReveal>
+          <div className="promotions-grid">
+            {promotions.map((promotion, index) => {
+              const card = (
+                <div className="promotion-card-inner">
+                  <figure>
+                    <Image
+                      src={promotion.image.src}
+                      alt={promotion.image.alt}
+                      fill
+                      sizes="(max-width: 760px) 88vw, 42vw"
+                      style={{
+                        transform: `rotate(${promotion.imageRotation}deg)`,
+                      }}
+                    />
+                  </figure>
+                  <div>
+                    <span>{promotion.badge}</span>
+                    <h3>{promotion.title}</h3>
+                    <p>{promotion.description}</p>
+                    {promotion.terms && <small>{promotion.terms}</small>}
+                    {promotion.linkUrl && promotion.linkLabel && (
+                      <strong>
+                        {promotion.linkLabel} <ArrowUpRight size={16} />
+                      </strong>
+                    )}
+                  </div>
+                </div>
+              );
+
+              return (
+                <MotionReveal
+                  as="article"
+                  className="promotion-card"
+                  key={promotion.id}
+                  delay={index * 80}
+                  distance={22}
+                >
+                  {promotion.linkUrl ? (
+                    <a href={promotion.linkUrl} target="_blank" rel="noreferrer">
+                      {card}
+                    </a>
+                  ) : (
+                    card
+                  )}
+                </MotionReveal>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <section className="piercing-cta">
         <MotionReveal
           className="piercing-copy"
@@ -273,7 +346,7 @@ export default async function Home() {
         </div>
         <a
           className="button button-outline-light"
-          href={MAPS_URL}
+          href={settings.mapsUrl}
           target="_blank"
           rel="noreferrer"
         >
@@ -283,6 +356,7 @@ export default async function Home() {
           className="button button-gold"
           href={whatsappHref(
             "Hola Dela Rosa, quiero consultar el horario del local.",
+            settings.whatsappNumber,
           )}
           target="_blank"
           rel="noreferrer"

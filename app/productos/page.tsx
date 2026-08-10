@@ -2,9 +2,9 @@ import { ProductCatalog } from "@/components/product-catalog";
 import { getProducts } from "@/sanity/lib/products";
 
 export const metadata = {
-  title: "Productos",
+  title: "Catálogo de joyas y relojes en Encarnación",
   description:
-    "Catálogo de joyas, relojes, pulseras, aros, bombillas y regalos de Dela Rosa en Encarnación, Paraguay.",
+    "Explorá el catálogo de Dela Rosa: joyas de oro 18K, plata 925, anillos, aros, cadenas, pulseras, relojes y regalos en Encarnación, Paraguay.",
   alternates: {
     canonical: "/productos",
   },

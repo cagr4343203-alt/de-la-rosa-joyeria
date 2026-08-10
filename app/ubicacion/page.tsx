@@ -1,26 +1,32 @@
 import { ArrowUpRight, Clock3, MapPin, MessageCircle } from "lucide-react";
+import { whatsappHref } from "@/lib/store";
 import {
-  MAPS_URL,
-  STORE_ADDRESS,
-  STORE_HOURS,
-  whatsappHref,
-} from "@/lib/store";
+  getLocationContent,
+  getSiteSettings,
+} from "@/sanity/lib/site-content";
 
 export const metadata = {
-  title: "Ubicación",
-  description: `Visitá Dela Rosa Joyería en ${STORE_ADDRESS}. Consultá horarios, ubicación y contacto.`,
+  title: "Ubicación y horarios en Encarnación",
+  description:
+    "Visitá Dela Rosa Joyería en Encarnación. Consultá horarios, ubicación y contacto.",
   alternates: {
     canonical: "/ubicacion",
   },
 };
 
-export default function LocationPage() {
+export default async function LocationPage() {
+  const [content, settings] = await Promise.all([
+    getLocationContent(),
+    getSiteSettings(),
+  ]);
+
   return (
     <section className="location-page">
       <div className="location-details">
-        <span className="kicker kicker-light">El local</span>
-        <h1>Vení a conocernos</h1>
-        <p>{STORE_ADDRESS}</p>
+        <span className="kicker kicker-light">{content.kicker}</span>
+        <h1>{content.title}</h1>
+        <p>{content.description}</p>
+        <address>{settings.address}</address>
         <div className="location-data">
           <span>
             <MapPin size={18} />
@@ -28,13 +34,13 @@ export default function LocationPage() {
           </span>
           <span>
             <Clock3 size={18} />
-            Horarios actualizados
+            {content.hoursFeature}
           </span>
         </div>
         <div className="location-hours">
-          <strong>Horario de atención</strong>
-          {STORE_HOURS.map((schedule) => (
-            <div key={schedule.days}>
+          <strong>{content.hoursTitle}</strong>
+          {settings.hours.map((schedule) => (
+            <div key={schedule._key}>
               <span>{schedule.days}</span>
               <p>
                 {schedule.times.map((time) => (
@@ -47,27 +53,28 @@ export default function LocationPage() {
         <div className="location-buttons">
           <a
             className="button button-gold"
-            href={MAPS_URL}
+            href={settings.mapsUrl}
             target="_blank"
             rel="noreferrer"
           >
-            Abrir Google Maps <ArrowUpRight size={17} />
+            {content.mapsButtonLabel} <ArrowUpRight size={17} />
           </a>
           <a
             className="button button-outline-light"
             href={whatsappHref(
-              "Hola Dela Rosa, quiero consultar el horario para visitar el local.",
+              content.whatsappMessage,
+              settings.whatsappNumber,
             )}
             target="_blank"
             rel="noreferrer"
           >
-            <MessageCircle size={17} /> Consultar horario
+            <MessageCircle size={17} /> {content.whatsappButtonLabel}
           </a>
         </div>
       </div>
       <a
         className="location-map"
-        href={MAPS_URL}
+        href={settings.mapsUrl}
         target="_blank"
         rel="noreferrer"
         aria-label="Abrir la ubicación de Dela Rosa en Google Maps"
@@ -78,11 +85,11 @@ export default function LocationPage() {
         <span className="map-road map-road-three" />
         <div className="map-marker">
           <MapPin size={30} />
-          <strong>DELA ROSA</strong>
-          <small>Mariscal José Félix Estigarribia</small>
+          <strong>{content.mapTitle}</strong>
+          <small>{content.mapSubtitle}</small>
         </div>
         <p>
-          Abrir ubicación <ArrowUpRight size={16} />
+          {content.mapFooterLabel} <ArrowUpRight size={16} />
         </p>
       </a>
     </section>

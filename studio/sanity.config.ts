@@ -72,6 +72,20 @@ const productCategoryTemplates = [
   },
 ] as const;
 
+const singletonTypes = new Set([
+  "siteSettings",
+  "reservationPage",
+  "aboutPage",
+  "locationPage",
+  "homeHero",
+  "homeServices",
+  "homeCategories",
+  "homeFeatured",
+  "homePiercing",
+  "homeHistory",
+  "homeLocation",
+]);
+
 export default defineConfig({
   name: "default",
   title: "Dela Rosa · Catálogo",
@@ -84,7 +98,9 @@ export default defineConfig({
     types: schemaTypes,
 
     templates: (templates) => [
-      ...templates,
+      ...templates.filter(
+        (template) => !singletonTypes.has(template.schemaType),
+      ),
 
       ...productCategoryTemplates.map((template) => ({
         id: template.id,

@@ -10,6 +10,13 @@ import {
   homeServiceItem,
   homeServices,
 } from "./homepage";
+import {
+  aboutPage,
+  locationPage,
+  promotion,
+  reservationPage,
+  siteSettings,
+} from "./siteContent";
 
 export const schemaTypes = [
   product,
@@ -22,4 +29,9 @@ export const schemaTypes = [
   homePiercing,
   homeHistory,
   homeLocation,
+  siteSettings,
+  reservationPage,
+  aboutPage,
+  locationPage,
+  promotion,
 ];
