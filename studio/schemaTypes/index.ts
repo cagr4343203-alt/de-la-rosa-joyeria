@@ -1,4 +1,5 @@
 import { product } from "./product";
+import { productMaterial } from "./productMaterial";
 import {
   homeCategories,
   homeCategoryCard,
@@ -20,6 +21,7 @@ import {
 
 export const schemaTypes = [
   product,
+  productMaterial,
   homeServiceItem,
   homeCategoryCard,
   homeHero,

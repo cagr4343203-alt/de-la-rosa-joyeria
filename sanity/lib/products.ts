@@ -13,7 +13,7 @@ const PRODUCTS_QUERY = defineQuery(`
     _id,
     name,
     category,
-    material,
+    "material": coalesce(materialRef->name, material),
     price,
     image,
     gallery[]{_key, asset, crop, hotspot, alt},
@@ -29,7 +29,7 @@ type SanityProduct = {
   _id: string;
   name: string;
   category: string;
-  material: string;
+  material?: string;
   price: number;
   image?: SanityImageSource;
   gallery?: Array<
@@ -77,7 +77,7 @@ export async function getProducts(): Promise<Product[]> {
           id: entry._id,
           name: entry.name,
           category: entry.category,
-          material: entry.material,
+          material: entry.material?.trim() || "Material a confirmar",
           price: entry.price,
           image: primaryImage,
           images: [

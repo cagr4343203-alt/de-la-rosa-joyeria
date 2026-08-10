@@ -1239,6 +1239,9 @@ img {
 }
 
 .product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   min-width: 0;
 }
 
@@ -1357,6 +1360,7 @@ img {
 
 .product-info {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   padding: 17px 2px 0;
 }
@@ -1401,7 +1405,8 @@ img {
   display: none;
   gap: 6px;
   grid-template-columns: 1fr 1fr;
-  margin-top: 13px;
+  margin-top: auto;
+  padding-top: 13px;
 }
 
 .product-actions button,
@@ -1415,8 +1420,11 @@ img {
   font-weight: 800;
   gap: 6px;
   justify-content: center;
+  line-height: 1.1;
   min-height: 41px;
+  text-align: center;
   text-transform: uppercase;
+  width: 100%;
 }
 
 .product-actions a {
@@ -4002,19 +4010,44 @@ img {
   }
 
   .site-footer {
+    gap: 18px;
     grid-template-columns: 1fr;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 24px 18px 20px;
   }
 
   .footer-copy {
     align-items: flex-start;
     flex-direction: column;
-    gap: 9px;
+    font-size: 0.5rem;
+    gap: 5px;
+    margin: 0;
+    padding-top: 14px;
   }
 
   .footer-brand {
     grid-column: auto;
+    gap: 12px;
+    max-width: none;
+  }
+
+  .footer-brand img {
+    height: 58px;
+    width: 58px;
+  }
+
+  .footer-brand strong {
+    font-size: 0.9rem;
+    letter-spacing: 0.14em;
+  }
+
+  .footer-brand p {
+    font-size: 0.62rem;
+    line-height: 1.35;
+    margin-top: 4px;
+  }
+
+  .site-footer .footer-links {
+    display: none;
   }
 
   .cart-drawer {
@@ -4121,20 +4154,91 @@ img {
 }
 
 @media (max-width: 760px) {
+  .promotions-section {
+    padding-bottom: 46px;
+    padding-top: 46px;
+  }
+
+  .promotions-section .section-heading {
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .promotions-section .section-heading h2 {
+    font-size: clamp(2rem, 10vw, 2.7rem);
+  }
+
+  .promotions-section .section-heading > p {
+    font-size: 0.7rem;
+    line-height: 1.45;
+  }
+
   .promotions-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    gap: 10px;
+    grid-template-columns: none;
+    margin-right: -14px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding-right: 14px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .promotions-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .promotion-card {
+    flex: 0 0 min(86vw, 400px);
+    scroll-snap-align: start;
   }
 
   .promotion-card-inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(105px, 0.42fr) minmax(0, 0.58fr);
+    min-height: 218px;
   }
 
   .promotion-card figure {
-    min-height: 360px;
+    min-height: 0;
   }
 
   .promotion-card-inner > div {
-    padding: 28px 22px 32px;
+    align-content: center;
+    padding: 16px 13px 17px;
+  }
+
+  .promotion-card-inner > div > span {
+    font-size: 0.5rem;
+    letter-spacing: 0.12em;
+  }
+
+  .promotion-card h3 {
+    font-size: 1.18rem;
+    line-height: 1.02;
+    margin: 7px 0 9px;
+  }
+
+  .promotion-card p {
+    display: -webkit-box;
+    font-size: 0.66rem;
+    line-height: 1.35;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .promotion-card small {
+    font-size: 0.5rem;
+    line-height: 1.35;
+    margin-top: 7px;
+  }
+
+  .promotion-card strong {
+    font-size: 0.52rem;
+    gap: 4px;
+    margin-top: 9px;
   }
 }
 

@@ -255,6 +255,23 @@ export const structure: StructureResolver = (S) =>
                     ),
                 ),
 
+              S.listItem()
+                .id("generic-product-names")
+                .title("Nombres pendientes de mejorar")
+                .icon(TagIcon)
+                .child(
+                  S.documentTypeList("product")
+                    .title("Nombres pendientes de mejorar")
+                    .apiVersion(apiVersion)
+                    .filter(
+                      '_type == "product" && status != "hidden" && name match "*modelo*"',
+                    )
+                    .defaultOrdering([
+                      { field: "category", direction: "asc" },
+                      { field: "name", direction: "asc" },
+                    ]),
+                ),
+
               S.divider(),
 
               ...productCategories.map((category) =>
@@ -295,6 +312,66 @@ export const structure: StructureResolver = (S) =>
             )
             .initialValueTemplates([
               S.initialValueTemplateItem("combo-product"),
+            ]),
+        ),
+
+      S.listItem()
+        .id("materials")
+        .title("Materiales")
+        .icon(TagIcon)
+        .child(
+          S.list()
+            .title("Materiales")
+            .items([
+              S.listItem()
+                .id("manage-materials")
+                .title("Administrar materiales")
+                .icon(TagIcon)
+                .child(
+                  S.documentTypeList("productMaterial")
+                    .title("Administrar materiales")
+                    .defaultOrdering([
+                      { field: "order", direction: "asc" },
+                      { field: "name", direction: "asc" },
+                    ]),
+                ),
+
+              S.divider(),
+
+              S.listItem()
+                .id("materials-linked-products")
+                .title("Productos con material confirmado")
+                .icon(TagIcon)
+                .child(
+                  S.documentTypeList("product")
+                    .title("Productos con material confirmado")
+                    .apiVersion(apiVersion)
+                    .filter(
+                      '_type == "product" && defined(materialRef) && materialRef->slug.current != "material-a-confirmar"',
+                    )
+                    .defaultOrdering([
+                      { field: "category", direction: "asc" },
+                      { field: "name", direction: "asc" },
+                    ]),
+                ),
+
+              S.listItem()
+                .id("materials-pending-products")
+                .title("Material pendiente de confirmar")
+                .icon(TagIcon)
+                .child(
+                  S.documentTypeList("product")
+                    .title("Material pendiente de confirmar")
+                    .apiVersion(apiVersion)
+                    .filter(
+                      '_type == "product" && (!defined(materialRef) || materialRef->slug.current == "material-a-confirmar")',
+                    )
+                    .defaultOrdering([
+                      { field: "material", direction: "asc" },
+                      { field: "category", direction: "asc" },
+                      { field: "name", direction: "asc" },
+                    ]),
+                ),
             ]),
         ),
     ]);

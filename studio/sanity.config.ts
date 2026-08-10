@@ -125,7 +125,6 @@ export default defineConfig({
         value: {
           category: "Combos",
           status: "available",
-          material: "Varios",
           price: 0,
           featured: false,
           order: 100,

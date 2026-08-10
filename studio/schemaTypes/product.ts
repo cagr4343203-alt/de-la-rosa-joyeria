@@ -11,7 +11,18 @@ export const product = defineType({
       name: "name",
       title: "Nombre",
       type: "string",
-      validation: (rule) => rule.required().min(2).max(90),
+      description:
+        "Escribí el nombre real de la pieza que se ve en la foto: tipo, diseño y detalle principal.",
+      validation: (rule) => [
+        rule.required().min(2).max(90),
+        rule
+          .custom((value) =>
+            /\bmodelo\s+\d+\b/iu.test(value ?? "")
+              ? "Este nombre todavía es genérico. Reemplazalo por el diseño real o una referencia confirmada."
+              : true,
+          )
+          .warning(),
+      ],
     }),
     defineField({
       name: "slug",
@@ -61,11 +72,33 @@ export const product = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "material",
+      name: "materialRef",
       title: "Material",
+      type: "reference",
+      to: [{ type: "productMaterial" }],
+      description:
+        "Elegí el material exacto desde la lista administrada en Materiales.",
+      options: {
+        filter: "active == true",
+      },
+      validation: (rule) =>
+        rule
+          .required()
+          .error("Elegí un material antes de publicar el producto."),
+    }),
+    defineField({
+      name: "material",
+      title: "Material anterior",
+      description:
+        "Dato conservado temporalmente. Usá el nuevo campo Material de arriba.",
       type: "string",
-      description: "Ej.: Oro 18K, Plata 925, acero o enchapado.",
-      validation: (rule) => rule.required().max(60),
+      deprecated: {
+        reason:
+          "Este texto fue reemplazado por la referencia administrable Material.",
+      },
+      readOnly: true,
+      hidden: ({ value }) => value === undefined,
+      initialValue: undefined,
     }),
     defineField({
       name: "price",
@@ -194,11 +227,20 @@ export const product = defineType({
   preview: {
     select: {
       title: "name",
-      subtitle: "category",
+      category: "category",
+      materialName: "materialRef.name",
+      legacyMaterial: "material",
       media: "image",
       status: "status",
     },
-    prepare({ title, subtitle, media, status }) {
+    prepare({
+      title,
+      category,
+      materialName,
+      legacyMaterial,
+      media,
+      status,
+    }) {
       const statusLabel =
         status === "outOfStock"
           ? "Agotado"
@@ -207,7 +249,7 @@ export const product = defineType({
             : "Disponible";
       return {
         title,
-        subtitle: `${subtitle ?? "Sin categoría"} · ${statusLabel}`,
+        subtitle: `${category ?? "Sin categoría"} · ${materialName ?? legacyMaterial ?? "Sin material"} · ${statusLabel}`,
         media,
       };
     },
