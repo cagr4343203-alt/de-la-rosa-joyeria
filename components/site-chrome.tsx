@@ -38,6 +38,12 @@ const mobileItems = [
   { href: "/ubicacion", label: "Ubicación", Icon: MapPin },
 ];
 
+const announcementItems = [
+  "Desde 2003 formando parte de tus momentos",
+  "Oro 18K · Plata 925 · Relojería",
+  "Perforación de oreja con reserva",
+];
+
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
@@ -279,20 +285,19 @@ export function SiteChrome({
       <div
         className="announcement"
         role="region"
-        aria-label="Información destacada"
+        aria-label={announcementItems.join(". ")}
       >
-        <div>
-          <span>Desde 2003 formando parte de tus momentos</span>
-          <i>✦</i>
-          <span>Oro 18K · Plata 925 · Relojería</span>
-          <i>✦</i>
-          <span>Perforación de oreja con reserva</span>
-          <i>✦</i>
-          <span>Desde 2003 formando parte de tus momentos</span>
-          <i>✦</i>
-          <span>Oro 18K · Plata 925 · Relojería</span>
-          <i>✦</i>
-          <span>Perforación de oreja con reserva</span>
+        <div className="announcement-track" aria-hidden="true">
+          {[0, 1].map((groupIndex) => (
+            <div className="announcement-group" key={groupIndex}>
+              {announcementItems.map((item) => (
+                <span className="announcement-item" key={item}>
+                  <span>{item}</span>
+                  <i>✦</i>
+                </span>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
 

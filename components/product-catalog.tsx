@@ -1,11 +1,13 @@
 "use client";
 
-import { Filter, Search, SlidersHorizontal, X } from "lucide-react";
+import { Filter, Gem, Search, SlidersHorizontal, Watch, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { categories, materials, type Product } from "@/lib/store";
+import { categories, type Product } from "@/lib/store";
 import { ProductCard } from "./product-card";
 
 type SortMode = "featured" | "price-asc" | "price-desc" | "name";
+type MaterialFilter = "Todos" | "Oro" | "Plata";
+type WatchSubtype = "Todos" | "Dama" | "Caballero" | "Infantil";
 
 const watchCategories = new Set([
   "Relojes",
@@ -14,11 +16,72 @@ const watchCategories = new Set([
   "Reloj infantil",
 ]);
 
-function matchesCategory(productCategory: string, selectedCategory: string) {
-  if (selectedCategory === "Todo") return true;
-  if (selectedCategory === "Relojes") {
-    return watchCategories.has(productCategory);
+const watchSubtypeCategories: Record<
+  Exclude<WatchSubtype, "Todos">,
+  string
+> = {
+  Dama: "Reloj dama",
+  Caballero: "Reloj caballero",
+  Infantil: "Reloj infantil",
+};
+
+const watchSubtypeOptions: WatchSubtype[] = [
+  "Todos",
+  "Dama",
+  "Caballero",
+  "Infantil",
+];
+
+const materialOptions: MaterialFilter[] = ["Todos", "Oro", "Plata"];
+
+const categoriesWithoutWatchSubtypes = categories.filter(
+  (item) =>
+    !Object.values(watchSubtypeCategories).includes(item),
+);
+
+const categoriesWithoutMaterialFilter = new Set([
+  "Sets",
+  "Relojes",
+  "Reloj dama",
+  "Reloj caballero",
+  "Reloj infantil",
+  "Bombillas",
+  "Bolígrafos",
+  "Combos",
+]);
+
+function getInitialWatchSubtype(initialCategory: string): WatchSubtype {
+  const subtype = Object.entries(watchSubtypeCategories).find(
+    ([, productCategory]) => productCategory === initialCategory,
+  )?.[0];
+
+  return (subtype as WatchSubtype | undefined) ?? "Todos";
+}
+
+function getInitialCategory(initialCategory: string) {
+  if (getInitialWatchSubtype(initialCategory) !== "Todos") {
+    return "Relojes";
   }
+
+  return categories.includes(initialCategory) ? initialCategory : "Todo";
+}
+
+function matchesCategory(
+  productCategory: string,
+  selectedCategory: string,
+  selectedWatchSubtype: WatchSubtype,
+) {
+  if (selectedCategory === "Todo") return true;
+
+  if (selectedCategory === "Relojes") {
+    if (!watchCategories.has(productCategory)) return false;
+
+    return (
+      selectedWatchSubtype === "Todos" ||
+      productCategory === watchSubtypeCategories[selectedWatchSubtype]
+    );
+  }
+
   return productCategory === selectedCategory;
 }
 
@@ -158,7 +221,10 @@ function normalizeSearchText(value: string) {
     .trim();
 }
 
-function matchesMaterial(productMaterial: string, selectedMaterial: string) {
+function matchesMaterial(
+  productMaterial: string,
+  selectedMaterial: MaterialFilter,
+) {
   if (selectedMaterial === "Todos") return true;
 
   const normalizedProductMaterial = normalizeSearchText(productMaterial);
@@ -167,7 +233,9 @@ function matchesMaterial(productMaterial: string, selectedMaterial: string) {
     return (
       normalizedProductMaterial.includes("oro") &&
       !normalizedProductMaterial.includes("plata") &&
-      !normalizedProductMaterial.includes("acero")
+      !normalizedProductMaterial.includes("acero") &&
+      !normalizedProductMaterial.includes("enchapad") &&
+      !normalizedProductMaterial.includes("banad")
     );
   }
 
@@ -175,19 +243,7 @@ function matchesMaterial(productMaterial: string, selectedMaterial: string) {
     return normalizedProductMaterial.includes("plata");
   }
 
-  if (selectedMaterial === "Acero") {
-    return normalizedProductMaterial.includes("acero");
-  }
-
-  if (selectedMaterial === "Enchapado") {
-    return ["enchapado", "enchapada", "banado", "banada"].some((term) =>
-      normalizedProductMaterial.includes(term),
-    );
-  }
-
-  return normalizedProductMaterial.includes(
-    normalizeSearchText(selectedMaterial),
-  );
+  return false;
 }
 
 function getSearchWords(value: string) {
@@ -221,13 +277,18 @@ export function ProductCatalog({
   initialCategory?: string;
   title?: string;
 }) {
-  const [category, setCategory] = useState(
-    categories.includes(initialCategory) ? initialCategory : "Todo",
+  const [category, setCategory] = useState(() =>
+    getInitialCategory(initialCategory),
   );
-  const [material, setMaterial] = useState("Todos");
+  const [material, setMaterial] = useState<MaterialFilter>("Todos");
+  const [watchSubtype, setWatchSubtype] = useState<WatchSubtype>(() =>
+    getInitialWatchSubtype(initialCategory),
+  );
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("featured");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const showMaterialFilter = !categoriesWithoutMaterialFilter.has(category);
+  const showWatchSubtypeFilter = category === "Relojes";
 
   useEffect(() => {
     document.body.classList.toggle("filters-open", filtersOpen);
@@ -242,9 +303,14 @@ export function ProductCatalog({
     const searchIsActive = queryWords.length > 0;
 
     const result = products.filter((product) => {
-      const categoryMatch = matchesCategory(product.category, category);
+      const categoryMatch = matchesCategory(
+        product.category,
+        category,
+        watchSubtype,
+      );
 
-      const materialMatch = matchesMaterial(product.material, material);
+      const materialMatch =
+        !showMaterialFilter || matchesMaterial(product.material, material);
 
       const searchableText = [
         product.name,
@@ -284,7 +350,15 @@ export function ProductCatalog({
 
       return 0;
     });
-  }, [category, material, products, query, sort]);
+  }, [
+    category,
+    material,
+    products,
+    query,
+    showMaterialFilter,
+    sort,
+    watchSubtype,
+  ]);
 
   function handleSearchChange(value: string) {
     setQuery(value);
@@ -293,8 +367,23 @@ export function ProductCatalog({
   function clearFilters() {
     setCategory("Todo");
     setMaterial("Todos");
+    setWatchSubtype("Todos");
     setQuery("");
     setSort("featured");
+  }
+
+  function selectCategory(nextCategory: string) {
+    setCategory(nextCategory);
+    setMaterial("Todos");
+    setWatchSubtype("Todos");
+    setQuery("");
+    setFiltersOpen(false);
+  }
+
+  function selectWatchSubtype(nextSubtype: WatchSubtype) {
+    setWatchSubtype(nextSubtype);
+    setQuery("");
+    setFiltersOpen(false);
   }
 
   return (
@@ -363,12 +452,12 @@ export function ProductCatalog({
           <div className="filter-group">
             <h3>Categorías</h3>
 
-            {categories.map((item) => {
+            {categoriesWithoutWatchSubtypes.map((item) => {
               const count =
                 item === "Todo"
                   ? products.length
                   : products.filter((product) =>
-                      matchesCategory(product.category, item),
+                      matchesCategory(product.category, item, "Todos"),
                     )
                       .length;
 
@@ -381,11 +470,7 @@ export function ProductCatalog({
                   key={item}
                   type="button"
                   className={category === item ? "is-active" : ""}
-                  onClick={() => {
-                    setCategory(item);
-                    setQuery("");
-                    setFiltersOpen(false);
-                  }}
+                  onClick={() => selectCategory(item)}
                 >
                   <span>{item}</span>
                   <small>{count}</small>
@@ -394,24 +479,54 @@ export function ProductCatalog({
             })}
           </div>
 
-          <div className="filter-group">
-            <h3>Materiales</h3>
+          {showWatchSubtypeFilter ? (
+            <div className="filter-group">
+              <h3>Tipos de reloj</h3>
 
-            {materials.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={material === item ? "is-active" : ""}
-                onClick={() => {
-                  setMaterial(item);
-                  setQuery("");
-                  setFiltersOpen(false);
-                }}
-              >
-                <span>{item}</span>
-              </button>
-            ))}
-          </div>
+              {watchSubtypeOptions.map((item) => {
+                const count = products.filter((product) =>
+                  matchesCategory(product.category, "Relojes", item),
+                ).length;
+
+                return (
+                  <button
+                    key={item}
+                    type="button"
+                    className={watchSubtype === item ? "is-active" : ""}
+                    onClick={() => selectWatchSubtype(item)}
+                  >
+                    <span>
+                      {item === "Todos" ? "Todos los relojes" : item}
+                    </span>
+                    <small>{count}</small>
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+
+          {showMaterialFilter ? (
+            <div className="filter-group">
+              <h3>Materiales</h3>
+
+              {materialOptions.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={material === item ? "is-active" : ""}
+                  onClick={() => {
+                    setMaterial(item);
+                    setQuery("");
+                    setFiltersOpen(false);
+                  }}
+                >
+                  <span>
+                    {item === "Todos" ? "Todos los materiales" : item}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
         </aside>
 
         <div className="catalog-results">
@@ -426,13 +541,21 @@ export function ProductCatalog({
                   ? `Resultados para “${query.trim()}”`
                   : category === "Todo"
                     ? "Todos los productos"
+                    : category === "Relojes" && watchSubtype !== "Todos"
+                      ? `Relojes para ${watchSubtype.toLowerCase()}`
                     : category}
               </h2>
 
               <p>{filtered.length} artículos</p>
             </div>
 
-            <div className="results-controls">
+            <div
+              className={`results-controls ${
+                showMaterialFilter || showWatchSubtypeFilter
+                  ? "has-context-filter"
+                  : ""
+              }`}
+            >
               <button
                 className="mobile-filter-button"
                 type="button"
@@ -441,6 +564,46 @@ export function ProductCatalog({
                 <Filter size={15} />
                 Filtrar
               </button>
+
+              {showMaterialFilter ? (
+                <label className="sort-control context-filter-control material-filter-control">
+                  <Gem size={16} aria-hidden="true" />
+                  <span>Material</span>
+
+                  <select
+                    value={material}
+                    onChange={(event) => {
+                      setMaterial(event.target.value as MaterialFilter);
+                      setQuery("");
+                    }}
+                    aria-label="Filtrar por material"
+                  >
+                    <option value="Todos">Todos los materiales</option>
+                    <option value="Oro">Oro</option>
+                    <option value="Plata">Plata</option>
+                  </select>
+                </label>
+              ) : null}
+
+              {showWatchSubtypeFilter ? (
+                <label className="sort-control context-filter-control watch-filter-control">
+                  <Watch size={16} aria-hidden="true" />
+                  <span>Tipo de reloj</span>
+
+                  <select
+                    value={watchSubtype}
+                    onChange={(event) =>
+                      selectWatchSubtype(event.target.value as WatchSubtype)
+                    }
+                    aria-label="Filtrar por tipo de reloj"
+                  >
+                    <option value="Todos">Todos los relojes</option>
+                    <option value="Dama">Relojes dama</option>
+                    <option value="Caballero">Relojes caballero</option>
+                    <option value="Infantil">Relojes infantiles</option>
+                  </select>
+                </label>
+              ) : null}
 
               <label className="sort-control">
                 <SlidersHorizontal size={16} />
