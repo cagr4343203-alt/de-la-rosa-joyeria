@@ -19,7 +19,9 @@
     "seed:site-content": "sanity exec scripts/seed-site-content.mjs --with-user-token",
     "seed:promotions": "sanity exec scripts/seed-promotions.mjs --with-user-token",
     "migrate:materials:dry-run": "sanity exec scripts/migrate-product-material-references.mjs --with-user-token",
-    "migrate:materials:apply": "sanity exec scripts/migrate-product-material-references.mjs --with-user-token -- --apply"
+    "migrate:materials:apply": "sanity exec scripts/migrate-product-material-references.mjs --with-user-token -- --apply",
+    "import:2026-08-10:dry-run": "sanity exec scripts/import-2026-08-10-products.mjs --with-user-token",
+    "import:2026-08-10:apply": "sanity exec scripts/import-2026-08-10-products.mjs --with-user-token -- --apply"
   },
   "dependencies": {
     "@sanity/icons": "^5.2.1",
