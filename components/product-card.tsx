@@ -263,7 +263,7 @@ export function ProductCard({
 
     if (!hasTrackedView.current) {
       trackProductView({
-        id: String(product.id),
+        id: product.growthSlug || String(product.id),
         name: product.name,
         category: product.category,
         material: product.material,
@@ -385,6 +385,7 @@ export function ProductCard({
     <>
       <article
         ref={cardRef}
+        data-growth-product-slug={product.growthSlug || String(product.id)}
         className={`product-card ${
           motionIndex === undefined ? "" : "is-featured-motion"
         } ${imageFit === "contain" ? "has-contained-image" : ""}`}

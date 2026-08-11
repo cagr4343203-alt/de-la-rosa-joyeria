@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@/components/google-analytics";
+import { GrowthAgencyAnalytics } from "@/components/growth-agency-analytics";
 import { SiteChrome } from "@/components/site-chrome";
 import { StoreProvider } from "@/components/store-context";
 import { BRAND_ICON_URL, BRAND_PREVIEW_URL, SITE_URL } from "@/lib/seo";
@@ -81,6 +82,7 @@ export default async function RootLayout({
         <StoreProvider whatsappNumber={siteSettings.whatsappNumber}>
           <SiteChrome settings={siteSettings}>{children}</SiteChrome>
         </StoreProvider>
+        <GrowthAgencyAnalytics />
         <GoogleAnalytics />
       </body>
     </html>

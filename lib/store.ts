@@ -4,6 +4,7 @@ import { clientNewProducts } from "./client-new-products";
 
 export type Product = {
   id: string | number;
+  growthSlug?: string;
   name: string;
   category: string;
   material: string;

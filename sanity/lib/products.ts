@@ -11,6 +11,7 @@ const builder = createImageUrlBuilder(sanityClient);
 const PRODUCTS_QUERY = defineQuery(`
   *[_type == "product" && status != "hidden"] | order(featured desc, order asc, name asc) {
     _id,
+    "slug": slug.current,
     name,
     category,
     "material": coalesce(materialRef->name, material),
@@ -27,6 +28,7 @@ const PRODUCTS_QUERY = defineQuery(`
 
 type SanityProduct = {
   _id: string;
+  slug?: string;
   name: string;
   category: string;
   material?: string;
@@ -75,6 +77,7 @@ export async function getProducts(): Promise<Product[]> {
 
         return {
           id: entry._id,
+          growthSlug: entry.slug,
           name: entry.name,
           category: entry.category,
           material: entry.material?.trim() || "Material a confirmar",
