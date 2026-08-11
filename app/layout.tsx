@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { SiteChrome } from "@/components/site-chrome";
 import { StoreProvider } from "@/components/store-context";
-import { SITE_URL } from "@/lib/seo";
+import { BRAND_ICON_URL, BRAND_PREVIEW_URL, SITE_URL } from "@/lib/seo";
 import { getSiteSettings } from "@/sanity/lib/site-content";
 import "./globals.css";
 
@@ -16,11 +16,11 @@ export const metadata: Metadata = {
       "Joyería y relojería en Encarnación, Paraguay. Encontrá joyas de oro 18K, plata 925, relojes, regalos y perforación de oreja en Dela Rosa, desde 2003.",
     icons: {
       icon: [
+        { url: BRAND_ICON_URL, type: "image/png", sizes: "512x512" },
         { url: "/favicon.ico", type: "image/x-icon", sizes: "48x48" },
-        { url: "/favicon.png", type: "image/png", sizes: "512x512" },
       ],
-      shortcut: "/favicon.ico",
-      apple: [{ url: "/favicon.png", type: "image/png", sizes: "512x512" }],
+      shortcut: BRAND_ICON_URL,
+      apple: [{ url: BRAND_ICON_URL, type: "image/png", sizes: "512x512" }],
     },
     alternates: {
       canonical: "/",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
       locale: "es_PY",
       images: [
         {
-          url: "/og.png",
+          url: BRAND_PREVIEW_URL,
           width: 1734,
           height: 907,
           alt: "Dela Rosa — El detalle exclusivo para ese momento especial",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
       title: "Joyería en Encarnación | Dela Rosa Joyería y Relojería",
       description:
         "Joyas, relojes, regalos y perforación de oreja en Encarnación, Paraguay.",
-      images: ["/og.png"],
+      images: [BRAND_PREVIEW_URL],
     },
   };
 

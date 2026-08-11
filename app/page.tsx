@@ -13,7 +13,11 @@ import {
 import { MotionReveal } from "@/components/motion-reveal";
 import { ProductCard } from "@/components/product-card";
 import { whatsappHref } from "@/lib/store";
-import { LOCAL_BUSINESS_JSON_LD, WEBSITE_JSON_LD } from "@/lib/seo";
+import {
+  HOME_PAGE_JSON_LD,
+  LOCAL_BUSINESS_JSON_LD,
+  WEBSITE_JSON_LD,
+} from "@/lib/seo";
 import {
   getHomePage,
   type HomeServiceIcon,
@@ -58,6 +62,12 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(WEBSITE_JSON_LD).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(HOME_PAGE_JSON_LD).replace(/</g, "\\u003c"),
         }}
       />
       <MotionReveal

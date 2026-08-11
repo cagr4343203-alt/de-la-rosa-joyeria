@@ -10,6 +10,8 @@ import {
 
 export const SITE_URL = "https://delarosajoyeria.com";
 export const SITE_NAME = "Dela Rosa Joyería";
+export const BRAND_ICON_URL = `${SITE_URL}/dela-rosa-icon-512.png`;
+export const BRAND_PREVIEW_URL = `${SITE_URL}/dela-rosa-google-preview.png`;
 
 export const WEBSITE_JSON_LD = {
   "@context": "https://schema.org",
@@ -33,8 +35,24 @@ export const LOCAL_BUSINESS_JSON_LD = {
   description:
     "Joyería, relojería, regalos y perforación de oreja en Encarnación, Paraguay. Desde 2003 formando parte de tus momentos.",
   url: SITE_URL,
-  logo: `${SITE_URL}/logo-delarosa-negro.jpg`,
-  image: [`${SITE_URL}/favicon.png`, `${SITE_URL}/og.png`],
+  logo: {
+    "@type": "ImageObject",
+    "@id": `${SITE_URL}/#logo`,
+    url: BRAND_ICON_URL,
+    contentUrl: BRAND_ICON_URL,
+    width: 512,
+    height: 512,
+    caption: SITE_NAME,
+  },
+  image: {
+    "@type": "ImageObject",
+    "@id": `${SITE_URL}/#primaryimage`,
+    url: BRAND_PREVIEW_URL,
+    contentUrl: BRAND_PREVIEW_URL,
+    width: 1734,
+    height: 907,
+    caption: "Dela Rosa Joyería y Relojería en Encarnación",
+  },
   foundingDate: "2003",
   telephone: STORE_PHONE,
   address: {
@@ -90,6 +108,26 @@ export const LOCAL_BUSINESS_JSON_LD = {
     },
   ],
   sameAs: [INSTAGRAM_URL, FACEBOOK_URL, TIKTOK_URL],
+};
+
+export const HOME_PAGE_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${SITE_URL}/#webpage`,
+  url: SITE_URL,
+  name: "Joyería en Encarnación | Dela Rosa Joyería y Relojería",
+  description:
+    "Joyas de oro 18K y plata 925, relojes, regalos y perforación de oreja en Encarnación, Paraguay.",
+  inLanguage: "es-PY",
+  isPartOf: {
+    "@id": `${SITE_URL}/#website`,
+  },
+  about: {
+    "@id": `${SITE_URL}/#joyeria`,
+  },
+  primaryImageOfPage: {
+    "@id": `${SITE_URL}/#primaryimage`,
+  },
 };
 
 export const INDEXABLE_ROUTES = [
