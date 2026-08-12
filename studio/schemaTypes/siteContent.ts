@@ -51,6 +51,22 @@ export const siteSettings = defineType({
       validation: (rule) => rule.required().max(80),
     }),
     defineField({
+      name: "logo",
+      title: "Logo principal",
+      description: "Se usa en la cabecera, el menú y el pie de la tienda.",
+      type: "image",
+      group: "brand",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Descripción del logo",
+          type: "string",
+          validation: (rule) => rule.required(),
+        }),
+      ],
+    }),
+    defineField({
       name: "whatsappNumber",
       title: "Número de WhatsApp",
       description: "Solo números, con código de país. Ej.: 595985720031",

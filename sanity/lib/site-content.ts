@@ -20,6 +20,7 @@ const builder = createImageUrlBuilder(sanityClient);
 export type SiteSettings = {
   brandName: string;
   brandTagline: string;
+  logoUrl: string;
   whatsappNumber: string;
   phone: string;
   address: string;
@@ -114,6 +115,7 @@ export type LocationContent = {
 const FALLBACK_SETTINGS: SiteSettings = {
   brandName: "DELA ROSA",
   brandTagline: "Joyería · Relojería",
+  logoUrl: "/logo.png",
   whatsappNumber: WHATSAPP_NUMBER,
   phone: STORE_PHONE,
   address: STORE_ADDRESS,
@@ -253,6 +255,7 @@ const SITE_SETTINGS_QUERY = defineQuery(`
   *[_id == "siteSettings"][0]{
     brandName,
     brandTagline,
+    logo,
     whatsappNumber,
     phone,
     address,
@@ -390,6 +393,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     return {
       brandName: text(entry.brandName, FALLBACK_SETTINGS.brandName),
       brandTagline: text(entry.brandTagline, FALLBACK_SETTINGS.brandTagline),
+      logoUrl: image(
+        entry.logo as (SanityImageSource & { alt?: string }) | undefined,
+        { src: FALLBACK_SETTINGS.logoUrl, alt: "Logo de Dela Rosa" },
+      ).src,
       whatsappNumber: text(
         entry.whatsappNumber,
         FALLBACK_SETTINGS.whatsappNumber,

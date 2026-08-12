@@ -56,6 +56,7 @@ export function SiteChrome({
   settings: SiteSettings;
 }) {
   const pathname = usePathname();
+  const brandLogo = settings.logoUrl || "/logo.png";
   const { itemCount, setCartOpen } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -272,7 +273,7 @@ export function SiteChrome({
         role="status"
       >
         <Image
-          src="/logo-delarosa-negro.jpg"
+          src={brandLogo}
           alt="Dela Rosa Joyería y Relojería"
           width={220}
           height={220}
@@ -304,7 +305,7 @@ export function SiteChrome({
       <header className="site-header">
         <Link className="header-brand" href="/" aria-label="Dela Rosa, inicio">
           <Image
-            src="/logo.png"
+            src={brandLogo}
             alt="Dela Rosa Joyería y Relojería"
             width={64}
             height={64}
@@ -410,7 +411,7 @@ export function SiteChrome({
             onClick={() => setMenuOpen(false)}
           >
             <Image
-              src="/logo.png"
+              src={brandLogo}
               alt="Dela Rosa Joyería y Relojería"
               width={58}
               height={58}
@@ -525,7 +526,7 @@ export function SiteChrome({
       <footer className="site-footer">
         <div className="footer-brand">
           <Image
-            src="/logo-delarosa-negro.jpg"
+            src={brandLogo}
             alt="Dela Rosa Joyería y Relojería"
             width={94}
             height={94}

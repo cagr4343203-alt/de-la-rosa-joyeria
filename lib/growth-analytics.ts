@@ -1,9 +1,12 @@
 "use client";
 
-const GROWTH_API_URL = "https://ufgnmsxvkeqhjusjdwcb.supabase.co";
-const GROWTH_API_KEY = "sb_publishable_eqAdT_-7_59g4qKoX7DLMg_ERZyxRF4";
-const GROWTH_SITE_SLUG = "dela-rosa-joyeria";
-const VISITOR_STORAGE_KEY = "delaRosaGrowthVisitorId";
+import {
+  GROWTH_API_KEY,
+  GROWTH_API_URL,
+  GROWTH_SITE_SLUG,
+  getGrowthVisitorId,
+} from "@/lib/growth-api";
+
 const SESSION_STORAGE_KEY = "delaRosaGrowthSessionId";
 
 function anonymousId(storage: Storage, key: string) {
@@ -42,7 +45,7 @@ export function trackGrowthAgencyEvent(
     body: JSON.stringify({
       requested_site_slug: GROWTH_SITE_SLUG,
       requested_event_type: eventType,
-      requested_visitor_id: anonymousId(localStorage, VISITOR_STORAGE_KEY),
+      requested_visitor_id: getGrowthVisitorId(),
       requested_session_id: anonymousId(sessionStorage, SESSION_STORAGE_KEY),
       requested_page_path: `${window.location.pathname}${window.location.search}`.slice(0, 240),
       requested_source: String(source || "website").slice(0, 80),
