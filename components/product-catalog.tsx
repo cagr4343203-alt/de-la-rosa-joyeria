@@ -6,7 +6,7 @@ import { categories, type Product } from "@/lib/store";
 import { ProductCard } from "./product-card";
 
 type SortMode = "featured" | "price-asc" | "price-desc" | "name";
-type MaterialFilter = "Todos" | "Oro" | "Plata";
+type MaterialFilter = string;
 type WatchSubtype = "Todos" | "Dama" | "Caballero" | "Infantil";
 
 const watchCategories = new Set([
@@ -32,23 +32,10 @@ const watchSubtypeOptions: WatchSubtype[] = [
   "Infantil",
 ];
 
-const materialOptions: MaterialFilter[] = ["Todos", "Oro", "Plata"];
-
 const categoriesWithoutWatchSubtypes = categories.filter(
   (item) =>
     !Object.values(watchSubtypeCategories).includes(item),
 );
-
-const categoriesWithoutMaterialFilter = new Set([
-  "Sets",
-  "Relojes",
-  "Reloj dama",
-  "Reloj caballero",
-  "Reloj infantil",
-  "Bombillas",
-  "Bolígrafos",
-  "Combos",
-]);
 
 function getInitialWatchSubtype(initialCategory: string): WatchSubtype {
   const subtype = Object.entries(watchSubtypeCategories).find(
@@ -227,23 +214,44 @@ function matchesMaterial(
 ) {
   if (selectedMaterial === "Todos") return true;
 
-  const normalizedProductMaterial = normalizeSearchText(productMaterial);
+  return (
+    normalizeSearchText(productMaterial) === normalizeSearchText(selectedMaterial)
+  );
+}
 
-  if (selectedMaterial === "Oro") {
-    return (
-      normalizedProductMaterial.includes("oro") &&
-      !normalizedProductMaterial.includes("plata") &&
-      !normalizedProductMaterial.includes("acero") &&
-      !normalizedProductMaterial.includes("enchapad") &&
-      !normalizedProductMaterial.includes("banad")
-    );
-  }
+function availableMaterials(
+  products: Product[],
+  selectedCategory: string,
+  selectedWatchSubtype: WatchSubtype,
+) {
+  const uniqueMaterials = new Map<string, string>();
 
-  if (selectedMaterial === "Plata") {
-    return normalizedProductMaterial.includes("plata");
-  }
+  products.forEach((product) => {
+    if (
+      !matchesCategory(product.category, selectedCategory, selectedWatchSubtype)
+    ) {
+      return;
+    }
 
-  return false;
+    const materialName = product.material.trim() || "Material a confirmar";
+    const normalizedName = normalizeSearchText(materialName);
+    if (normalizedName && !uniqueMaterials.has(normalizedName)) {
+      uniqueMaterials.set(normalizedName, materialName);
+    }
+  });
+
+  return [
+    "Todos",
+    ...Array.from(uniqueMaterials.values()).sort((left, right) => {
+      const leftPending = normalizeSearchText(left).includes("confirmar");
+      const rightPending = normalizeSearchText(right).includes("confirmar");
+      if (leftPending !== rightPending) return leftPending ? 1 : -1;
+      return left.localeCompare(right, "es", {
+        numeric: true,
+        sensitivity: "base",
+      });
+    }),
+  ];
 }
 
 function getSearchWords(value: string) {
@@ -287,8 +295,12 @@ export function ProductCatalog({
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("featured");
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const showMaterialFilter = !categoriesWithoutMaterialFilter.has(category);
   const showWatchSubtypeFilter = category === "Relojes";
+  const materialOptions = useMemo(
+    () => availableMaterials(products, category, watchSubtype),
+    [category, products, watchSubtype],
+  );
+  const showMaterialFilter = materialOptions.length > 1;
 
   useEffect(() => {
     document.body.classList.toggle("filters-open", filtersOpen);
@@ -382,6 +394,7 @@ export function ProductCatalog({
 
   function selectWatchSubtype(nextSubtype: WatchSubtype) {
     setWatchSubtype(nextSubtype);
+    setMaterial("Todos");
     setQuery("");
     setFiltersOpen(false);
   }
@@ -509,22 +522,31 @@ export function ProductCatalog({
             <div className="filter-group">
               <h3>Materiales</h3>
 
-              {materialOptions.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={material === item ? "is-active" : ""}
-                  onClick={() => {
-                    setMaterial(item);
-                    setQuery("");
-                    setFiltersOpen(false);
-                  }}
-                >
-                  <span>
-                    {item === "Todos" ? "Todos los materiales" : item}
-                  </span>
-                </button>
-              ))}
+              {materialOptions.map((item) => {
+                const count = products.filter(
+                  (product) =>
+                    matchesCategory(product.category, category, watchSubtype) &&
+                    matchesMaterial(product.material, item),
+                ).length;
+
+                return (
+                  <button
+                    key={item}
+                    type="button"
+                    className={material === item ? "is-active" : ""}
+                    onClick={() => {
+                      setMaterial(item);
+                      setQuery("");
+                      setFiltersOpen(false);
+                    }}
+                  >
+                    <span>
+                      {item === "Todos" ? "Todos los materiales" : item}
+                    </span>
+                    <small>{count}</small>
+                  </button>
+                );
+              })}
             </div>
           ) : null}
         </aside>
@@ -578,9 +600,11 @@ export function ProductCatalog({
                     }}
                     aria-label="Filtrar por material"
                   >
-                    <option value="Todos">Todos los materiales</option>
-                    <option value="Oro">Oro</option>
-                    <option value="Plata">Plata</option>
+                    {materialOptions.map((item) => (
+                      <option key={item} value={item}>
+                        {item === "Todos" ? "Todos los materiales" : item}
+                      </option>
+                    ))}
                   </select>
                 </label>
               ) : null}
