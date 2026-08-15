@@ -44,6 +44,8 @@ const announcementItems = [
   "Perforación de oreja con reserva",
 ];
 
+const INITIAL_LOADER_DURATION_MS = 2000;
+
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
@@ -73,7 +75,6 @@ export function SiteChrome({
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const mobile = window.matchMedia("(max-width: 760px)").matches;
     let readyTimer: number | undefined;
     const timer = window.setTimeout(
       () => {
@@ -86,7 +87,7 @@ export function SiteChrome({
           reduced ? 20 : 300,
         );
       },
-      reduced ? 50 : mobile ? 320 : 620,
+      INITIAL_LOADER_DURATION_MS,
     );
     return () => {
       window.clearTimeout(timer);
