@@ -31,6 +31,12 @@ const productCategories = [
     templateId: "product-cadenas",
   },
   {
+    id: "cadena-caballero",
+    title: "Cadenas para caballero",
+    value: "Cadena caballero",
+    templateId: "product-cadena-caballero",
+  },
+  {
     id: "pulseras",
     title: "Pulseras",
     value: "Pulseras",

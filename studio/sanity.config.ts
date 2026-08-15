@@ -21,6 +21,11 @@ const productCategoryTemplates = [
     category: "Cadenas",
   },
   {
+    id: "product-cadena-caballero",
+    title: "Nueva cadena para caballero",
+    category: "Cadena caballero",
+  },
+  {
     id: "product-pulseras",
     title: "Nueva pulsera",
     category: "Pulseras",

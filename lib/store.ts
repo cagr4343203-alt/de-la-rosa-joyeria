@@ -155,6 +155,7 @@ export const categories = [
   "Anillos",
   "Aros",
   "Cadenas",
+  "Cadena caballero",
   "Pulseras",
   "Pulsera dama",
   "Pulsera caballero",
