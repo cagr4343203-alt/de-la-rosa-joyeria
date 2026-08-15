@@ -26,6 +26,9 @@ export async function POST(request: Request) {
   if (paths.some((path) => ["/", "/productos", "/combos"].includes(path))) {
     revalidateTag("products", { expire: 0 });
   }
+  if (paths.some((path) => ["/productos", "/combos"].includes(path))) {
+    revalidateTag("growth-materials", { expire: 0 });
+  }
   for (const path of paths) revalidatePath(path);
   revalidatePath("/", "layout");
   return Response.json({ ok: true, paths, revalidatedAt: new Date().toISOString() });

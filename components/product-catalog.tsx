@@ -252,15 +252,22 @@ function normalizeSearchText(value: string) {
     .trim();
 }
 
+const materialAliases: Record<string, string> = {
+  "plata 925 banada en oro": "plata banada en oro",
+};
+
+function canonicalMaterialName(value: string) {
+  const normalized = normalizeSearchText(value);
+  return materialAliases[normalized] ?? normalized;
+}
+
 function matchesMaterial(
   productMaterial: string,
   selectedMaterial: MaterialFilter,
 ) {
   if (selectedMaterial === "Todos") return true;
 
-  return (
-    normalizeSearchText(productMaterial) === normalizeSearchText(selectedMaterial)
-  );
+  return canonicalMaterialName(productMaterial) === canonicalMaterialName(selectedMaterial);
 }
 
 function availableMaterials(
@@ -268,8 +275,9 @@ function availableMaterials(
   selectedCategory: string,
   selectedWatchSubtype: WatchSubtype,
   selectedBraceletSubtype: BraceletSubtype,
+  managedMaterials: string[],
 ) {
-  const uniqueMaterials = new Map<string, string>();
+  const availableProductMaterials = new Set<string>();
 
   products.forEach((product) => {
     if (
@@ -283,23 +291,17 @@ function availableMaterials(
       return;
     }
 
-    const materialName = product.material.trim() || "Material a confirmar";
-    const normalizedName = normalizeSearchText(materialName);
-    if (normalizedName && !uniqueMaterials.has(normalizedName)) {
-      uniqueMaterials.set(normalizedName, materialName);
-    }
+    const materialName = product.material.trim();
+    if (materialName) availableProductMaterials.add(canonicalMaterialName(materialName));
   });
 
   return [
     "Todos",
-    ...Array.from(uniqueMaterials.values()).sort((left, right) => {
-      const leftPending = normalizeSearchText(left).includes("confirmar");
-      const rightPending = normalizeSearchText(right).includes("confirmar");
-      if (leftPending !== rightPending) return leftPending ? 1 : -1;
-      return left.localeCompare(right, "es", {
-        numeric: true,
-        sensitivity: "base",
-      });
+    ...managedMaterials.filter((materialName, index) => {
+      const canonicalName = canonicalMaterialName(materialName);
+      return canonicalName &&
+        availableProductMaterials.has(canonicalName) &&
+        managedMaterials.findIndex((candidate) => canonicalMaterialName(candidate) === canonicalName) === index;
     }),
   ];
 }
@@ -328,10 +330,12 @@ function wordsMatch(queryWord: string, productWord: string) {
 
 export function ProductCatalog({
   products,
+  managedMaterials,
   initialCategory = "Todo",
   title = "Todos los productos",
 }: {
   products: Product[];
+  managedMaterials: string[];
   initialCategory?: string;
   title?: string;
 }) {
@@ -357,8 +361,9 @@ export function ProductCatalog({
         category,
         watchSubtype,
         braceletSubtype,
+        managedMaterials,
       ),
-    [braceletSubtype, category, products, watchSubtype],
+    [braceletSubtype, category, managedMaterials, products, watchSubtype],
   );
   const showMaterialFilter = materialOptions.length > 1;
 
