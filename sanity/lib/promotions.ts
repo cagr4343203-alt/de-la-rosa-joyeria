@@ -22,7 +22,7 @@ const PROMOTIONS_QUERY = defineQuery(`
     active == true &&
     (!defined(startsAt) || startsAt <= now()) &&
     (!defined(endsAt) || endsAt >= now())
-  ] | order(order asc, _createdAt desc) {
+  ] | order(coalesce(order, 9999) asc, title asc, _createdAt asc) {
     _id,
     title,
     badge,

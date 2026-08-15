@@ -1186,19 +1186,20 @@ img {
 
 .promotion-card-inner {
   display: grid;
-  grid-template-columns: minmax(190px, 0.88fr) minmax(0, 1.12fr);
+  grid-template-columns: minmax(250px, 0.88fr) minmax(0, 1.12fr);
   height: 100%;
+  min-height: clamp(440px, 31vw, 560px);
 }
 
 .promotion-card figure {
-  background: #e8e0d6;
-  min-height: 330px;
+  background: #ffffff;
+  min-height: 100%;
   overflow: hidden;
   position: relative;
 }
 
 .promotion-card figure img {
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
