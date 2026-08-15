@@ -11,6 +11,8 @@ const categoryOptions = [
   "Aros",
   "Cadenas",
   "Pulseras",
+  "Pulsera dama",
+  "Pulsera caballero",
   "Sets",
   "Relojes",
   "Reloj dama",

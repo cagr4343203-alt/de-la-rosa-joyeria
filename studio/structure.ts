@@ -37,6 +37,18 @@ const productCategories = [
     templateId: "product-pulseras",
   },
   {
+    id: "pulsera-dama",
+    title: "Pulseras para dama",
+    value: "Pulsera dama",
+    templateId: "product-pulsera-dama",
+  },
+  {
+    id: "pulsera-caballero",
+    title: "Pulseras para caballero",
+    value: "Pulsera caballero",
+    templateId: "product-pulsera-caballero",
+  },
+  {
     id: "sets",
     title: "Sets",
     value: "Sets",

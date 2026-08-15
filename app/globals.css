@@ -4017,6 +4017,10 @@ img {
     grid-column: 1 / -1;
   }
 
+  .bracelet-filter-control {
+    grid-column: 1 / -1;
+  }
+
   .sort-control,
   .sort-control select {
     max-width: none;

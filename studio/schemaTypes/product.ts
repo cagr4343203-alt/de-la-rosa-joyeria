@@ -57,6 +57,8 @@ export const product = defineType({
           "Aros",
           "Cadenas",
           "Pulseras",
+          "Pulsera dama",
+          "Pulsera caballero",
           "Sets",
           "Relojes",
           "Reloj dama",

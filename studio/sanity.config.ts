@@ -26,6 +26,16 @@ const productCategoryTemplates = [
     category: "Pulseras",
   },
   {
+    id: "product-pulsera-dama",
+    title: "Nueva pulsera para dama",
+    category: "Pulsera dama",
+  },
+  {
+    id: "product-pulsera-caballero",
+    title: "Nueva pulsera para caballero",
+    category: "Pulsera caballero",
+  },
+  {
     id: "product-sets",
     title: "Nuevo set",
     category: "Sets",

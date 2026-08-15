@@ -8,6 +8,7 @@ import { ProductCard } from "./product-card";
 type SortMode = "featured" | "price-asc" | "price-desc" | "name";
 type MaterialFilter = string;
 type WatchSubtype = "Todos" | "Dama" | "Caballero" | "Infantil";
+type BraceletSubtype = "Todos" | "Dama" | "Caballero";
 
 const watchCategories = new Set([
   "Relojes",
@@ -32,9 +33,30 @@ const watchSubtypeOptions: WatchSubtype[] = [
   "Infantil",
 ];
 
-const categoriesWithoutWatchSubtypes = categories.filter(
+const braceletCategories = new Set([
+  "Pulseras",
+  "Pulsera dama",
+  "Pulsera caballero",
+]);
+
+const braceletSubtypeCategories: Record<
+  Exclude<BraceletSubtype, "Todos">,
+  string
+> = {
+  Dama: "Pulsera dama",
+  Caballero: "Pulsera caballero",
+};
+
+const braceletSubtypeOptions: BraceletSubtype[] = [
+  "Todos",
+  "Dama",
+  "Caballero",
+];
+
+const categoriesWithoutSubtypes = categories.filter(
   (item) =>
-    !Object.values(watchSubtypeCategories).includes(item),
+    !Object.values(watchSubtypeCategories).includes(item) &&
+    !Object.values(braceletSubtypeCategories).includes(item),
 );
 
 function getInitialWatchSubtype(initialCategory: string): WatchSubtype {
@@ -45,9 +67,21 @@ function getInitialWatchSubtype(initialCategory: string): WatchSubtype {
   return (subtype as WatchSubtype | undefined) ?? "Todos";
 }
 
+function getInitialBraceletSubtype(initialCategory: string): BraceletSubtype {
+  const subtype = Object.entries(braceletSubtypeCategories).find(
+    ([, productCategory]) => productCategory === initialCategory,
+  )?.[0];
+
+  return (subtype as BraceletSubtype | undefined) ?? "Todos";
+}
+
 function getInitialCategory(initialCategory: string) {
   if (getInitialWatchSubtype(initialCategory) !== "Todos") {
     return "Relojes";
+  }
+
+  if (getInitialBraceletSubtype(initialCategory) !== "Todos") {
+    return "Pulseras";
   }
 
   return categories.includes(initialCategory) ? initialCategory : "Todo";
@@ -57,6 +91,7 @@ function matchesCategory(
   productCategory: string,
   selectedCategory: string,
   selectedWatchSubtype: WatchSubtype,
+  selectedBraceletSubtype: BraceletSubtype,
 ) {
   if (selectedCategory === "Todo") return true;
 
@@ -66,6 +101,15 @@ function matchesCategory(
     return (
       selectedWatchSubtype === "Todos" ||
       productCategory === watchSubtypeCategories[selectedWatchSubtype]
+    );
+  }
+
+  if (selectedCategory === "Pulseras") {
+    if (!braceletCategories.has(productCategory)) return false;
+
+    return (
+      selectedBraceletSubtype === "Todos" ||
+      productCategory === braceletSubtypeCategories[selectedBraceletSubtype]
     );
   }
 
@@ -223,12 +267,18 @@ function availableMaterials(
   products: Product[],
   selectedCategory: string,
   selectedWatchSubtype: WatchSubtype,
+  selectedBraceletSubtype: BraceletSubtype,
 ) {
   const uniqueMaterials = new Map<string, string>();
 
   products.forEach((product) => {
     if (
-      !matchesCategory(product.category, selectedCategory, selectedWatchSubtype)
+      !matchesCategory(
+        product.category,
+        selectedCategory,
+        selectedWatchSubtype,
+        selectedBraceletSubtype,
+      )
     ) {
       return;
     }
@@ -292,13 +342,23 @@ export function ProductCatalog({
   const [watchSubtype, setWatchSubtype] = useState<WatchSubtype>(() =>
     getInitialWatchSubtype(initialCategory),
   );
+  const [braceletSubtype, setBraceletSubtype] = useState<BraceletSubtype>(() =>
+    getInitialBraceletSubtype(initialCategory),
+  );
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("featured");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const showWatchSubtypeFilter = category === "Relojes";
+  const showBraceletSubtypeFilter = category === "Pulseras";
   const materialOptions = useMemo(
-    () => availableMaterials(products, category, watchSubtype),
-    [category, products, watchSubtype],
+    () =>
+      availableMaterials(
+        products,
+        category,
+        watchSubtype,
+        braceletSubtype,
+      ),
+    [braceletSubtype, category, products, watchSubtype],
   );
   const showMaterialFilter = materialOptions.length > 1;
 
@@ -319,6 +379,7 @@ export function ProductCatalog({
         product.category,
         category,
         watchSubtype,
+        braceletSubtype,
       );
 
       const materialMatch =
@@ -363,6 +424,7 @@ export function ProductCatalog({
       return 0;
     });
   }, [
+    braceletSubtype,
     category,
     material,
     products,
@@ -380,6 +442,7 @@ export function ProductCatalog({
     setCategory("Todo");
     setMaterial("Todos");
     setWatchSubtype("Todos");
+    setBraceletSubtype("Todos");
     setQuery("");
     setSort("featured");
   }
@@ -388,12 +451,20 @@ export function ProductCatalog({
     setCategory(nextCategory);
     setMaterial("Todos");
     setWatchSubtype("Todos");
+    setBraceletSubtype("Todos");
     setQuery("");
     setFiltersOpen(false);
   }
 
   function selectWatchSubtype(nextSubtype: WatchSubtype) {
     setWatchSubtype(nextSubtype);
+    setMaterial("Todos");
+    setQuery("");
+    setFiltersOpen(false);
+  }
+
+  function selectBraceletSubtype(nextSubtype: BraceletSubtype) {
+    setBraceletSubtype(nextSubtype);
     setMaterial("Todos");
     setQuery("");
     setFiltersOpen(false);
@@ -465,12 +536,17 @@ export function ProductCatalog({
           <div className="filter-group">
             <h3>Categorías</h3>
 
-            {categoriesWithoutWatchSubtypes.map((item) => {
+            {categoriesWithoutSubtypes.map((item) => {
               const count =
                 item === "Todo"
                   ? products.length
                   : products.filter((product) =>
-                      matchesCategory(product.category, item, "Todos"),
+                      matchesCategory(
+                        product.category,
+                        item,
+                        "Todos",
+                        "Todos",
+                      ),
                     )
                       .length;
 
@@ -498,7 +574,7 @@ export function ProductCatalog({
 
               {watchSubtypeOptions.map((item) => {
                 const count = products.filter((product) =>
-                  matchesCategory(product.category, "Relojes", item),
+                  matchesCategory(product.category, "Relojes", item, "Todos"),
                 ).length;
 
                 return (
@@ -518,6 +594,39 @@ export function ProductCatalog({
             </div>
           ) : null}
 
+          {showBraceletSubtypeFilter ? (
+            <div className="filter-group">
+              <h3>Tipos de pulsera</h3>
+
+              {braceletSubtypeOptions.map((item) => {
+                const count = products.filter((product) =>
+                  matchesCategory(
+                    product.category,
+                    "Pulseras",
+                    "Todos",
+                    item,
+                  ),
+                ).length;
+
+                return (
+                  <button
+                    key={item}
+                    type="button"
+                    className={braceletSubtype === item ? "is-active" : ""}
+                    onClick={() => selectBraceletSubtype(item)}
+                  >
+                    <span>
+                      {item === "Todos"
+                        ? "Todas las pulseras"
+                        : `Pulseras para ${item.toLowerCase()}`}
+                    </span>
+                    <small>{count}</small>
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+
           {showMaterialFilter ? (
             <div className="filter-group">
               <h3>Materiales</h3>
@@ -525,7 +634,12 @@ export function ProductCatalog({
               {materialOptions.map((item) => {
                 const count = products.filter(
                   (product) =>
-                    matchesCategory(product.category, category, watchSubtype) &&
+                    matchesCategory(
+                      product.category,
+                      category,
+                      watchSubtype,
+                      braceletSubtype,
+                    ) &&
                     matchesMaterial(product.material, item),
                 ).length;
 
@@ -565,7 +679,10 @@ export function ProductCatalog({
                     ? "Todos los productos"
                     : category === "Relojes" && watchSubtype !== "Todos"
                       ? `Relojes para ${watchSubtype.toLowerCase()}`
-                    : category}
+                      : category === "Pulseras" &&
+                            braceletSubtype !== "Todos"
+                        ? `Pulseras para ${braceletSubtype.toLowerCase()}`
+                        : category}
               </h2>
 
               <p>{filtered.length} artículos</p>
@@ -573,7 +690,9 @@ export function ProductCatalog({
 
             <div
               className={`results-controls ${
-                showMaterialFilter || showWatchSubtypeFilter
+                showMaterialFilter ||
+                showWatchSubtypeFilter ||
+                showBraceletSubtypeFilter
                   ? "has-context-filter"
                   : ""
               }`}
@@ -629,6 +748,27 @@ export function ProductCatalog({
                 </label>
               ) : null}
 
+              {showBraceletSubtypeFilter ? (
+                <label className="sort-control context-filter-control bracelet-filter-control">
+                  <Gem size={16} aria-hidden="true" />
+                  <span>Tipo de pulsera</span>
+
+                  <select
+                    value={braceletSubtype}
+                    onChange={(event) =>
+                      selectBraceletSubtype(
+                        event.target.value as BraceletSubtype,
+                      )
+                    }
+                    aria-label="Filtrar por tipo de pulsera"
+                  >
+                    <option value="Todos">Todas las pulseras</option>
+                    <option value="Dama">Pulseras para dama</option>
+                    <option value="Caballero">Pulseras para caballero</option>
+                  </select>
+                </label>
+              ) : null}
+
               <label className="sort-control">
                 <SlidersHorizontal size={16} />
                 <span>Ordenar por</span>
@@ -664,12 +804,28 @@ export function ProductCatalog({
               <span>◇</span>
               <h3>No encontramos esa pieza</h3>
               <p>
-                Probá escribiendo el tipo de producto y su material, por ejemplo
-                “anillo de oro”.
+                {showBraceletSubtypeFilter && braceletSubtype !== "Todos"
+                  ? `Todavía no hay pulseras para ${braceletSubtype.toLowerCase()} publicadas en esta colección.`
+                  : "Probá escribiendo el tipo de producto y su material, por ejemplo “anillo de oro”."}
               </p>
 
-              <button type="button" onClick={clearFilters}>
-                Ver todo el catálogo
+              <button
+                type="button"
+                onClick={() => {
+                  if (
+                    showBraceletSubtypeFilter &&
+                    braceletSubtype !== "Todos"
+                  ) {
+                    selectBraceletSubtype("Todos");
+                    return;
+                  }
+
+                  clearFilters();
+                }}
+              >
+                {showBraceletSubtypeFilter && braceletSubtype !== "Todos"
+                  ? "Ver todas las pulseras"
+                  : "Ver todo el catálogo"}
               </button>
             </div>
           )}

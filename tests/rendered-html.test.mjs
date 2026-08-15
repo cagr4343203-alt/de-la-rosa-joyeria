@@ -52,6 +52,17 @@ test("renders professional catalog descriptions and compact order links", async 
   assert.match(await orderResponse.text(), /Resumen del pedido|Tu pedido/i);
 });
 
+test("renders bracelet filters for dama and caballero", async () => {
+  const response = await render("/productos?categoria=Pulseras");
+
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /Tipos de pulsera/);
+  assert.match(html, /Todas las pulseras/);
+  assert.match(html, /Pulseras para dama/);
+  assert.match(html, /Pulseras para caballero/);
+});
+
 test("publishes SEO discovery files for the canonical domain", async () => {
   const [robotsResponse, sitemapResponse] = await Promise.all([
     render("/robots.txt"),
