@@ -1685,8 +1685,16 @@ img {
 }
 
 .catalog-filters {
+  align-self: start;
   border-right: 1px solid var(--line);
+  max-height: calc(100dvh - 116px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding-right: 22px;
+  position: sticky;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  top: 96px;
 }
 
 .mobile-filter-head,
