@@ -4015,6 +4015,10 @@ img {
     width: 100%;
   }
 
+  .sort-control select {
+    grid-column: 1 / -1;
+  }
+
   .mobile-filter-button {
     padding-left: 8px;
     padding-right: 8px;
