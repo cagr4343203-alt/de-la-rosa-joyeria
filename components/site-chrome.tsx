@@ -44,7 +44,6 @@ const announcementItems = [
   "Perforación de oreja con reserva",
 ];
 
-const INITIAL_LOADER_DURATION_MS = 450;
 const NAVIGATION_LOADER_DURATION_MS = 650;
 
 function isActive(pathname: string, href: string) {
@@ -62,7 +61,7 @@ export function SiteChrome({
   const brandLogo = settings.logoUrl || "/logo.png";
   const { itemCount, setCartOpen } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -73,27 +72,8 @@ export function SiteChrome({
   const navigationFallbackTimerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    let readyTimer: number | undefined;
-    const timer = window.setTimeout(
-      () => {
-        setLoading(false);
-        readyTimer = window.setTimeout(
-          () => {
-            document.documentElement.dataset.siteReady = "true";
-            window.dispatchEvent(new Event("dela:site-ready"));
-          },
-          reduced ? 20 : 300,
-        );
-      },
-      reduced ? 80 : INITIAL_LOADER_DURATION_MS,
-    );
-    return () => {
-      window.clearTimeout(timer);
-      if (readyTimer !== undefined) window.clearTimeout(readyTimer);
-    };
+    document.documentElement.dataset.siteReady = "true";
+    window.dispatchEvent(new Event("dela:site-ready"));
   }, []);
 
   useEffect(() => {
