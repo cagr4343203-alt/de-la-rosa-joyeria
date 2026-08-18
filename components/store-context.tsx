@@ -424,26 +424,26 @@ export function CartDrawer() {
             confirman por WhatsApp.
           </p>
 
-          <a
-            className={`checkout-button ${
-              cart.length === 0
-                ? "is-disabled"
-                : ""
-            }`}
-            href={
-              cart.length > 0
-                ? whatsappHref(orderMessage, whatsappNumber)
-                : undefined
-            }
-            target="_blank"
-            rel="noreferrer"
-            aria-disabled={
-              cart.length === 0
-            }
-          >
-            Enviar pedido por WhatsApp
-            <span>↗</span>
-          </a>
+          {cart.length > 0 ? (
+            <a
+              className="checkout-button"
+              href={whatsappHref(orderMessage, whatsappNumber)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Enviar pedido por WhatsApp
+              <span>↗</span>
+            </a>
+          ) : (
+            <button
+              className="checkout-button is-disabled"
+              type="button"
+              disabled
+            >
+              Enviar pedido por WhatsApp
+              <span>↗</span>
+            </button>
+          )}
 
           {cart.length > 0 && (
             <button

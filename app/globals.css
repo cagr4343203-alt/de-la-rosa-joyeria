@@ -2991,14 +2991,17 @@ img {
 .checkout-button {
   align-items: center;
   background: #087744;
+  border: 0;
   color: white;
   display: flex;
+  font-family: inherit;
   font-size: 0.62rem;
   font-weight: 800;
   justify-content: space-between;
   min-height: 50px;
   padding: 0 17px;
   text-transform: uppercase;
+  width: 100%;
 }
 
 .checkout-button.is-disabled {
