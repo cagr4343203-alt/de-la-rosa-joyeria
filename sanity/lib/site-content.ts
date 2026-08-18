@@ -366,7 +366,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     const entry = await sanityClient.fetch<Record<string, unknown> | null>(
       SITE_SETTINGS_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["site-settings"] } },
+      { next: { revalidate: 300, tags: ["site-settings"] } },
     );
 
     if (!entry) return FALLBACK_SETTINGS;
@@ -440,7 +440,7 @@ export async function getReservationContent(): Promise<ReservationContent> {
     const entry = await sanityClient.fetch<Record<string, unknown> | null>(
       RESERVATION_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["reservation-page"] } },
+      { next: { revalidate: 300, tags: ["reservation-page"] } },
     );
 
     if (!entry) return FALLBACK_RESERVATION;
@@ -479,7 +479,7 @@ export async function getAboutContent(): Promise<AboutContent> {
     const entry = await sanityClient.fetch<Record<string, unknown> | null>(
       ABOUT_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["about-page"] } },
+      { next: { revalidate: 300, tags: ["about-page"] } },
     );
 
     if (!entry) return FALLBACK_ABOUT;
@@ -510,7 +510,7 @@ export async function getLocationContent(): Promise<LocationContent> {
     const entry = await sanityClient.fetch<Record<string, unknown> | null>(
       LOCATION_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["location-page"] } },
+      { next: { revalidate: 300, tags: ["location-page"] } },
     );
 
     if (!entry) return FALLBACK_LOCATION;

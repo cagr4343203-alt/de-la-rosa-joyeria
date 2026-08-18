@@ -40,7 +40,7 @@ export async function getPromotions(): Promise<Promotion[]> {
     const entries = await sanityClient.fetch<Array<Record<string, unknown>>>(
       PROMOTIONS_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["promotions"] } },
+      { next: { revalidate: 300, tags: ["promotions"] } },
     );
 
     return entries.flatMap((entry) => {
@@ -59,7 +59,12 @@ export async function getPromotions(): Promise<Promotion[]> {
           description: String(entry.description ?? ""),
           terms: typeof entry.terms === "string" ? entry.terms : undefined,
           image: {
-            src: builder.image(entry.image).width(1200).auto("format").url(),
+            src: builder
+              .image(entry.image)
+              .width(1200)
+              .quality(70)
+              .auto("format")
+              .url(),
             alt:
               typeof imageEntry.alt === "string" && imageEntry.alt.trim()
                 ? imageEntry.alt

@@ -44,7 +44,8 @@ const announcementItems = [
   "Perforación de oreja con reserva",
 ];
 
-const LOADER_DURATION_MS = 2000;
+const INITIAL_LOADER_DURATION_MS = 450;
+const NAVIGATION_LOADER_DURATION_MS = 650;
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -87,7 +88,7 @@ export function SiteChrome({
           reduced ? 20 : 300,
         );
       },
-      LOADER_DURATION_MS,
+      reduced ? 80 : INITIAL_LOADER_DURATION_MS,
     );
     return () => {
       window.clearTimeout(timer);
@@ -111,7 +112,7 @@ export function SiteChrome({
         document.documentElement.dataset.siteReady = "true";
         window.dispatchEvent(new Event("dela:site-ready"));
       },
-      LOADER_DURATION_MS,
+      NAVIGATION_LOADER_DURATION_MS,
     );
   }, [pathname]);
 
@@ -139,7 +140,7 @@ export function SiteChrome({
         nextUrl.pathname === window.location.pathname;
       navigationFallbackTimerRef.current = window.setTimeout(
         finishFallback,
-        samePage ? LOADER_DURATION_MS : 2500,
+        samePage ? NAVIGATION_LOADER_DURATION_MS : 1600,
       );
     };
 
@@ -273,7 +274,7 @@ export function SiteChrome({
           alt="Dela Rosa Joyería y Relojería"
           width={220}
           height={220}
-          priority
+          sizes="(max-width: 600px) 160px, 220px"
         />
         <span />
         <small>Preparando detalles exclusivos</small>

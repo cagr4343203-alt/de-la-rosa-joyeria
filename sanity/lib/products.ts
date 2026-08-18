@@ -52,7 +52,7 @@ export async function getProducts(): Promise<Product[]> {
     const entries = await sanityClient.fetch<SanityProduct[]>(
       PRODUCTS_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["products"] } },
+      { next: { revalidate: 300, tags: ["products"] } },
     );
 
     if (!entries.length) return fallbackProducts;
@@ -62,11 +62,12 @@ export async function getProducts(): Promise<Product[]> {
       .map((entry) => {
         const imageFit = entry.imageFit === "cover" ? "cover" : "contain";
         const imageUrl = (source: SanityImageSource) => {
-          const imageBuilder = builder.image(source).width(1200);
-
-          return imageFit === "cover"
-            ? imageBuilder.height(1500).fit("crop").auto("format").url()
-            : imageBuilder.auto("format").url();
+          return builder
+            .image(source)
+            .width(1200)
+            .quality(70)
+            .auto("format")
+            .url();
         };
 
         const primaryImage = imageUrl(entry.image!);
