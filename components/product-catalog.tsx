@@ -1,6 +1,14 @@
 "use client";
 
-import { Filter, Gem, Search, SlidersHorizontal, Watch, X } from "lucide-react";
+import {
+  Filter,
+  Gem,
+  Search,
+  SlidersHorizontal,
+  UserRound,
+  Watch,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { categories, type Product } from "@/lib/store";
 import { ProductCard } from "./product-card";
@@ -9,6 +17,7 @@ type SortMode = "featured" | "price-asc" | "price-desc" | "name";
 type MaterialFilter = string;
 type WatchSubtype = "Todos" | "Dama" | "Caballero" | "Infantil";
 type BraceletSubtype = "Todos" | "Dama" | "Caballero";
+type AudienceSubtype = "Todos" | "Dama" | "Caballero";
 
 const watchCategories = new Set([
   "Relojes",
@@ -53,14 +62,41 @@ const braceletSubtypeOptions: BraceletSubtype[] = [
   "Caballero",
 ];
 
-const chainCategories = new Set(["Cadenas", "Cadena caballero"]);
+const chainCategories = new Set([
+  "Cadenas",
+  "Cadena dama",
+  "Cadena caballero",
+]);
+const ringCategories = new Set([
+  "Anillos",
+  "Anillo dama",
+  "Anillo caballero",
+]);
+const audienceSubtypeOptions: AudienceSubtype[] = [
+  "Todos",
+  "Dama",
+  "Caballero",
+];
 
+const hiddenSubtypeCategories = new Set([
+  ...Object.values(watchSubtypeCategories),
+  ...Object.values(braceletSubtypeCategories),
+  "Cadena dama",
+  "Cadena caballero",
+  "Anillo dama",
+  "Anillo caballero",
+]);
 const categoriesWithoutSubtypes = categories.filter(
-  (item) =>
-    !Object.values(watchSubtypeCategories).includes(item) &&
-    !Object.values(braceletSubtypeCategories).includes(item) &&
-    item !== "Cadena caballero",
+  (item) => !hiddenSubtypeCategories.has(item),
 );
+
+function getInitialAudienceSubtype(initialCategory: string): AudienceSubtype {
+  const normalized = normalizeSearchText(initialCategory);
+
+  if (normalized.includes("caballero")) return "Caballero";
+  if (normalized.includes("dama")) return "Dama";
+  return "Todos";
+}
 
 function getInitialWatchSubtype(initialCategory: string): WatchSubtype {
   const subtype = Object.entries(watchSubtypeCategories).find(
@@ -89,6 +125,10 @@ function getInitialCategory(initialCategory: string) {
 
   if (chainCategories.has(initialCategory)) {
     return "Cadenas";
+  }
+
+  if (ringCategories.has(initialCategory)) {
+    return "Anillos";
   }
 
   return categories.includes(initialCategory) ? initialCategory : "Todo";
@@ -122,6 +162,10 @@ function matchesCategory(
 
   if (selectedCategory === "Cadenas") {
     return chainCategories.has(productCategory);
+  }
+
+  if (selectedCategory === "Anillos") {
+    return ringCategories.has(productCategory);
   }
 
   return productCategory === selectedCategory;
@@ -263,6 +307,28 @@ function normalizeSearchText(value: string) {
     .trim();
 }
 
+function matchesAudience(product: Product, selectedAudience: AudienceSubtype) {
+  if (selectedAudience === "Todos") return true;
+
+  const searchableAudience = normalizeSearchText(
+    [product.category, product.name, product.description ?? ""].join(" "),
+  );
+  const isInfant = /\b(infantil|nino|nina|nene|nena|kids)\b/.test(
+    searchableAudience,
+  );
+  const isCaballero =
+    /\b(caballero|hombre|masculino|varon|senor)\b/.test(searchableAudience);
+  const isDama = /\b(dama|mujer|femenino|senora)\b/.test(searchableAudience);
+
+  if (isInfant) return false;
+  if (isCaballero) return selectedAudience === "Caballero";
+  if (isDama) return selectedAudience === "Dama";
+
+  // Las categorías generales existentes corresponden al catálogo de dama.
+  // Las piezas para caballero se identifican por su categoría o descripción.
+  return selectedAudience === "Dama";
+}
+
 const materialAliases: Record<string, string> = {
   "plata 925 banada en oro": "plata banada en oro",
 };
@@ -286,6 +352,7 @@ function availableMaterials(
   selectedCategory: string,
   selectedWatchSubtype: WatchSubtype,
   selectedBraceletSubtype: BraceletSubtype,
+  selectedAudience: AudienceSubtype,
   managedMaterials: string[],
 ) {
   const availableProductMaterials = new Set<string>();
@@ -298,6 +365,7 @@ function availableMaterials(
         selectedWatchSubtype,
         selectedBraceletSubtype,
       )
+      || !matchesAudience(product, selectedAudience)
     ) {
       return;
     }
@@ -360,11 +428,17 @@ export function ProductCatalog({
   const [braceletSubtype, setBraceletSubtype] = useState<BraceletSubtype>(() =>
     getInitialBraceletSubtype(initialCategory),
   );
+  const [audienceSubtype, setAudienceSubtype] = useState<AudienceSubtype>(() =>
+    getInitialAudienceSubtype(initialCategory),
+  );
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("featured");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const showWatchSubtypeFilter = category === "Relojes";
   const showBraceletSubtypeFilter = category === "Pulseras";
+  const showAudienceSubtypeFilter = ["Todo", "Cadenas", "Anillos"].includes(
+    category,
+  );
   const materialOptions = useMemo(
     () =>
       availableMaterials(
@@ -372,9 +446,18 @@ export function ProductCatalog({
         category,
         watchSubtype,
         braceletSubtype,
+        showAudienceSubtypeFilter ? audienceSubtype : "Todos",
         managedMaterials,
       ),
-    [braceletSubtype, category, managedMaterials, products, watchSubtype],
+    [
+      audienceSubtype,
+      braceletSubtype,
+      category,
+      managedMaterials,
+      products,
+      showAudienceSubtypeFilter,
+      watchSubtype,
+    ],
   );
   const showMaterialFilter = materialOptions.length > 1;
 
@@ -400,6 +483,8 @@ export function ProductCatalog({
 
       const materialMatch =
         !showMaterialFilter || matchesMaterial(product.material, material);
+      const audienceMatch =
+        !showAudienceSubtypeFilter || matchesAudience(product, audienceSubtype);
 
       const searchableText = [
         product.name,
@@ -421,7 +506,7 @@ export function ProductCatalog({
           ),
         );
 
-      return categoryMatch && materialMatch && queryMatch;
+      return categoryMatch && materialMatch && audienceMatch && queryMatch;
     });
 
     return [...result].sort((a, b) => {
@@ -440,12 +525,14 @@ export function ProductCatalog({
       return 0;
     });
   }, [
+    audienceSubtype,
     braceletSubtype,
     category,
     material,
     products,
     query,
     showMaterialFilter,
+    showAudienceSubtypeFilter,
     sort,
     watchSubtype,
   ]);
@@ -459,6 +546,7 @@ export function ProductCatalog({
     setMaterial("Todos");
     setWatchSubtype("Todos");
     setBraceletSubtype("Todos");
+    setAudienceSubtype("Todos");
     setQuery("");
     setSort("featured");
   }
@@ -468,6 +556,7 @@ export function ProductCatalog({
     setMaterial("Todos");
     setWatchSubtype("Todos");
     setBraceletSubtype("Todos");
+    setAudienceSubtype("Todos");
     setQuery("");
     setFiltersOpen(false);
   }
@@ -481,6 +570,13 @@ export function ProductCatalog({
 
   function selectBraceletSubtype(nextSubtype: BraceletSubtype) {
     setBraceletSubtype(nextSubtype);
+    setMaterial("Todos");
+    setQuery("");
+    setFiltersOpen(false);
+  }
+
+  function selectAudienceSubtype(nextSubtype: AudienceSubtype) {
+    setAudienceSubtype(nextSubtype);
     setMaterial("Todos");
     setQuery("");
     setFiltersOpen(false);
@@ -584,6 +680,38 @@ export function ProductCatalog({
             })}
           </div>
 
+          {showAudienceSubtypeFilter ? (
+            <div className="filter-group">
+              <h3>Para quién</h3>
+
+              {audienceSubtypeOptions.map((item) => {
+                const count = products.filter(
+                  (product) =>
+                    matchesCategory(
+                      product.category,
+                      category,
+                      "Todos",
+                      "Todos",
+                    ) && matchesAudience(product, item),
+                ).length;
+
+                return (
+                  <button
+                    key={item}
+                    type="button"
+                    className={audienceSubtype === item ? "is-active" : ""}
+                    onClick={() => selectAudienceSubtype(item)}
+                  >
+                    <span>
+                      {item === "Todos" ? "Dama y caballero" : item}
+                    </span>
+                    <small>{count}</small>
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+
           {showWatchSubtypeFilter ? (
             <div className="filter-group">
               <h3>Tipos de reloj</h3>
@@ -661,6 +789,8 @@ export function ProductCatalog({
                       watchSubtype,
                       braceletSubtype,
                     ) &&
+                    (!showAudienceSubtypeFilter ||
+                      matchesAudience(product, audienceSubtype)) &&
                     matchesMaterial(product.material, item),
                 ).length;
 
@@ -697,12 +827,17 @@ export function ProductCatalog({
                 {query.trim()
                   ? `Resultados para “${query.trim()}”`
                   : category === "Todo"
-                    ? "Todos los productos"
+                    ? audienceSubtype === "Todos"
+                      ? "Todos los productos"
+                      : `Productos para ${audienceSubtype.toLowerCase()}`
                     : category === "Relojes" && watchSubtype !== "Todos"
                       ? `Relojes para ${watchSubtype.toLowerCase()}`
                       : category === "Pulseras" &&
                             braceletSubtype !== "Todos"
                         ? `Pulseras para ${braceletSubtype.toLowerCase()}`
+                        : showAudienceSubtypeFilter &&
+                              audienceSubtype !== "Todos"
+                          ? `${category} para ${audienceSubtype.toLowerCase()}`
                         : category}
               </h2>
 
@@ -712,6 +847,7 @@ export function ProductCatalog({
             <div
               className={`results-controls ${
                 showMaterialFilter ||
+                showAudienceSubtypeFilter ||
                 showWatchSubtypeFilter ||
                 showBraceletSubtypeFilter
                   ? "has-context-filter"
@@ -745,6 +881,27 @@ export function ProductCatalog({
                         {item === "Todos" ? "Todos los materiales" : item}
                       </option>
                     ))}
+                  </select>
+                </label>
+              ) : null}
+
+              {showAudienceSubtypeFilter ? (
+                <label className="sort-control context-filter-control audience-filter-control">
+                  <UserRound size={16} aria-hidden="true" />
+                  <span>Para quién</span>
+
+                  <select
+                    value={audienceSubtype}
+                    onChange={(event) =>
+                      selectAudienceSubtype(
+                        event.target.value as AudienceSubtype,
+                      )
+                    }
+                    aria-label="Filtrar productos para dama o caballero"
+                  >
+                    <option value="Todos">Dama y caballero</option>
+                    <option value="Dama">Para dama</option>
+                    <option value="Caballero">Para caballero</option>
                   </select>
                 </label>
               ) : null}
@@ -827,6 +984,8 @@ export function ProductCatalog({
               <p>
                 {showBraceletSubtypeFilter && braceletSubtype !== "Todos"
                   ? `Todavía no hay pulseras para ${braceletSubtype.toLowerCase()} publicadas en esta colección.`
+                  : showAudienceSubtypeFilter && audienceSubtype !== "Todos"
+                    ? `Todavía no hay productos para ${audienceSubtype.toLowerCase()} publicados en esta colección.`
                   : "Probá escribiendo el tipo de producto y su material, por ejemplo “anillo de oro”."}
               </p>
 
@@ -841,11 +1000,21 @@ export function ProductCatalog({
                     return;
                   }
 
+                  if (
+                    showAudienceSubtypeFilter &&
+                    audienceSubtype !== "Todos"
+                  ) {
+                    selectAudienceSubtype("Todos");
+                    return;
+                  }
+
                   clearFilters();
                 }}
               >
                 {showBraceletSubtypeFilter && braceletSubtype !== "Todos"
                   ? "Ver todas las pulseras"
+                  : showAudienceSubtypeFilter && audienceSubtype !== "Todos"
+                    ? "Ver dama y caballero"
                   : "Ver todo el catálogo"}
               </button>
             </div>

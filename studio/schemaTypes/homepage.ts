@@ -8,8 +8,11 @@ import { defineArrayMember, defineField, defineType } from "sanity";
 
 const categoryOptions = [
   "Anillos",
+  "Anillo dama",
+  "Anillo caballero",
   "Aros",
   "Cadenas",
+  "Cadena dama",
   "Cadena caballero",
   "Pulseras",
   "Pulsera dama",

@@ -3207,6 +3207,17 @@ img {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .results-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .results-controls {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
   .site-footer {
     grid-template-columns: 1fr 0.7fr 0.8fr;
   }
@@ -4029,7 +4040,8 @@ img {
   }
 
   .watch-filter-control,
-  .bracelet-filter-control {
+  .bracelet-filter-control,
+  .audience-filter-control {
     grid-column: 1 / -1;
   }
 

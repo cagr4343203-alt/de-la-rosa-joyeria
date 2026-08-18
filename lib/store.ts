@@ -153,8 +153,11 @@ export const products: Product[] = [
 export const categories = [
   "Todo",
   "Anillos",
+  "Anillo dama",
+  "Anillo caballero",
   "Aros",
   "Cadenas",
+  "Cadena dama",
   "Cadena caballero",
   "Pulseras",
   "Pulsera dama",

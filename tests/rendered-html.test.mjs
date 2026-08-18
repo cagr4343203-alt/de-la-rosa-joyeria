@@ -63,6 +63,23 @@ test("renders bracelet filters for dama and caballero", async () => {
   assert.match(html, /Pulseras para caballero/);
 });
 
+test("renders dama and caballero filters for all products, chains and rings", async () => {
+  const [allResponse, chainsResponse, ringsResponse] = await Promise.all([
+    render("/productos"),
+    render("/productos?categoria=Cadena%20dama"),
+    render("/productos?categoria=Anillo%20caballero"),
+  ]);
+
+  for (const response of [allResponse, chainsResponse, ringsResponse]) {
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, /Para quién/);
+    assert.match(html, /Dama y caballero/);
+    assert.match(html, /Para dama/);
+    assert.match(html, /Para caballero/);
+  }
+});
+
 test("publishes SEO discovery files for the canonical domain", async () => {
   const [robotsResponse, sitemapResponse] = await Promise.all([
     render("/robots.txt"),

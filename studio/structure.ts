@@ -19,6 +19,18 @@ const productCategories = [
     templateId: "product-anillos",
   },
   {
+    id: "anillo-dama",
+    title: "Anillos para dama",
+    value: "Anillo dama",
+    templateId: "product-anillo-dama",
+  },
+  {
+    id: "anillo-caballero",
+    title: "Anillos para caballero",
+    value: "Anillo caballero",
+    templateId: "product-anillo-caballero",
+  },
+  {
     id: "aros",
     title: "Aros",
     value: "Aros",
@@ -29,6 +41,12 @@ const productCategories = [
     title: "Cadenas",
     value: "Cadenas",
     templateId: "product-cadenas",
+  },
+  {
+    id: "cadena-dama",
+    title: "Cadenas para dama",
+    value: "Cadena dama",
+    templateId: "product-cadena-dama",
   },
   {
     id: "cadena-caballero",

@@ -54,8 +54,11 @@ export const product = defineType({
       options: {
         list: [
           "Anillos",
+          "Anillo dama",
+          "Anillo caballero",
           "Aros",
           "Cadenas",
+          "Cadena dama",
           "Cadena caballero",
           "Pulseras",
           "Pulsera dama",
