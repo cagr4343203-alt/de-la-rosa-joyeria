@@ -16,11 +16,8 @@ export const metadata: Metadata = {
     description:
       "Joyería y relojería en Encarnación, Paraguay. Encontrá joyas de oro 18K, plata 925, relojes, regalos y perforación de oreja en Dela Rosa, desde 2003.",
     icons: {
-      icon: [
-        { url: BRAND_ICON_URL, type: "image/png", sizes: "512x512" },
-        { url: "/favicon.ico", type: "image/x-icon", sizes: "48x48" },
-      ],
-      shortcut: BRAND_ICON_URL,
+      icon: [{ url: "/favicon.ico", type: "image/x-icon", sizes: "48x48" }],
+      shortcut: "/favicon.ico",
       apple: [{ url: BRAND_ICON_URL, type: "image/png", sizes: "512x512" }],
     },
     alternates: {
