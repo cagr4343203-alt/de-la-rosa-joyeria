@@ -20,6 +20,7 @@ const builder = createImageUrlBuilder(sanityClient);
 export type SiteSettings = {
   brandName: string;
   brandTagline: string;
+  logoUrl: string;
   whatsappNumber: string;
   phone: string;
   address: string;
@@ -114,6 +115,7 @@ export type LocationContent = {
 const FALLBACK_SETTINGS: SiteSettings = {
   brandName: "DELA ROSA",
   brandTagline: "Joyería · Relojería",
+  logoUrl: "/logo.png",
   whatsappNumber: WHATSAPP_NUMBER,
   phone: STORE_PHONE,
   address: STORE_ADDRESS,
@@ -253,6 +255,7 @@ const SITE_SETTINGS_QUERY = defineQuery(`
   *[_id == "siteSettings"][0]{
     brandName,
     brandTagline,
+    logo,
     whatsappNumber,
     phone,
     address,
@@ -363,7 +366,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     const entry = await sanityClient.fetch<Record<string, unknown> | null>(
       SITE_SETTINGS_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["site-settings"] } },
+      { next: { revalidate: 300, tags: ["site-settings"] } },
     );
 
     if (!entry) return FALLBACK_SETTINGS;
@@ -390,6 +393,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     return {
       brandName: text(entry.brandName, FALLBACK_SETTINGS.brandName),
       brandTagline: text(entry.brandTagline, FALLBACK_SETTINGS.brandTagline),
+      logoUrl: image(
+        entry.logo as (SanityImageSource & { alt?: string }) | undefined,
+        { src: FALLBACK_SETTINGS.logoUrl, alt: "Logo de Dela Rosa" },
+      ).src,
       whatsappNumber: text(
         entry.whatsappNumber,
         FALLBACK_SETTINGS.whatsappNumber,
@@ -433,7 +440,7 @@ export async function getReservationContent(): Promise<ReservationContent> {
     const entry = await sanityClient.fetch<Record<string, unknown> | null>(
       RESERVATION_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["reservation-page"] } },
+      { next: { revalidate: 300, tags: ["reservation-page"] } },
     );
 
     if (!entry) return FALLBACK_RESERVATION;
@@ -472,7 +479,7 @@ export async function getAboutContent(): Promise<AboutContent> {
     const entry = await sanityClient.fetch<Record<string, unknown> | null>(
       ABOUT_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["about-page"] } },
+      { next: { revalidate: 300, tags: ["about-page"] } },
     );
 
     if (!entry) return FALLBACK_ABOUT;
@@ -503,7 +510,7 @@ export async function getLocationContent(): Promise<LocationContent> {
     const entry = await sanityClient.fetch<Record<string, unknown> | null>(
       LOCATION_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["location-page"] } },
+      { next: { revalidate: 300, tags: ["location-page"] } },
     );
 
     if (!entry) return FALLBACK_LOCATION;

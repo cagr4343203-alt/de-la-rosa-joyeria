@@ -9,8 +9,9 @@ import { sanityClient } from "./client";
 const builder = createImageUrlBuilder(sanityClient);
 
 const PRODUCTS_QUERY = defineQuery(`
-  *[_type == "product" && status != "hidden"] | order(featured desc, order asc, name asc) {
+  *[_type == "product" && status != "hidden"] | order(featured desc, _createdAt desc, order asc, name asc) {
     _id,
+    "slug": slug.current,
     name,
     category,
     "material": coalesce(materialRef->name, material),
@@ -27,6 +28,7 @@ const PRODUCTS_QUERY = defineQuery(`
 
 type SanityProduct = {
   _id: string;
+  slug?: string;
   name: string;
   category: string;
   material?: string;
@@ -50,7 +52,7 @@ export async function getProducts(): Promise<Product[]> {
     const entries = await sanityClient.fetch<SanityProduct[]>(
       PRODUCTS_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["products"] } },
+      { next: { revalidate: 300, tags: ["products"] } },
     );
 
     if (!entries.length) return fallbackProducts;
@@ -60,11 +62,12 @@ export async function getProducts(): Promise<Product[]> {
       .map((entry) => {
         const imageFit = entry.imageFit === "cover" ? "cover" : "contain";
         const imageUrl = (source: SanityImageSource) => {
-          const imageBuilder = builder.image(source).width(1200);
-
-          return imageFit === "cover"
-            ? imageBuilder.height(1500).fit("crop").auto("format").url()
-            : imageBuilder.auto("format").url();
+          return builder
+            .image(source)
+            .width(1200)
+            .quality(70)
+            .auto("format")
+            .url();
         };
 
         const primaryImage = imageUrl(entry.image!);
@@ -75,6 +78,7 @@ export async function getProducts(): Promise<Product[]> {
 
         return {
           id: entry._id,
+          growthSlug: entry.slug,
           name: entry.name,
           category: entry.category,
           material: entry.material?.trim() || "Material a confirmar",

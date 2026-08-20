@@ -1,4 +1,5 @@
 import { ProductCatalog } from "@/components/product-catalog";
+import { getGrowthMaterials } from "@/lib/growth-api";
 import { getProducts } from "@/sanity/lib/products";
 
 export const metadata = {
@@ -15,11 +16,16 @@ export default async function ProductsPage({
 }: {
   searchParams: Promise<{ categoria?: string }>;
 }) {
-  const [products, params] = await Promise.all([getProducts(), searchParams]);
+  const [products, managedMaterials, params] = await Promise.all([
+    getProducts(),
+    getGrowthMaterials(),
+    searchParams,
+  ]);
 
   return (
     <ProductCatalog
       products={products}
+      managedMaterials={managedMaterials}
       initialCategory={params.categoria ?? "Todo"}
     />
   );

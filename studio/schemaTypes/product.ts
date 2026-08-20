@@ -54,9 +54,15 @@ export const product = defineType({
       options: {
         list: [
           "Anillos",
+          "Anillo dama",
+          "Anillo caballero",
           "Aros",
           "Cadenas",
+          "Cadena dama",
+          "Cadena caballero",
           "Pulseras",
+          "Pulsera dama",
+          "Pulsera caballero",
           "Sets",
           "Relojes",
           "Reloj dama",
@@ -105,6 +111,42 @@ export const product = defineType({
       title: "Precio referencial (guaraníes)",
       type: "number",
       validation: (rule) => rule.required().integer().min(0),
+    }),
+    defineField({
+      name: "oldPrice",
+      title: "Precio anterior",
+      description: "Opcional. Se usa para mostrar una oferta o descuento.",
+      type: "number",
+      validation: (rule) => rule.integer().min(0),
+    }),
+    defineField({
+      name: "brand",
+      title: "Marca",
+      type: "string",
+      initialValue: "Dela Rosa",
+      validation: (rule) => rule.max(80),
+    }),
+    defineField({
+      name: "stock",
+      title: "Stock disponible",
+      description: "Se sincroniza con el panel de Growth Agency.",
+      type: "number",
+      initialValue: 1,
+      validation: (rule) => rule.integer().min(0),
+    }),
+    defineField({
+      name: "comboProducts",
+      title: "Productos incluidos en el combo",
+      type: "array",
+      hidden: ({ parent }) => parent?.category !== "Combos",
+      of: [
+        defineArrayMember({
+          type: "reference",
+          to: [{ type: "product" }],
+          options: { filter: 'category != "Combos"' },
+        }),
+      ],
+      validation: (rule) => rule.unique(),
     }),
     defineField({
       name: "image",

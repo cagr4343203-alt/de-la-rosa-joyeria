@@ -74,10 +74,8 @@ export function ProductCard({
     galleryImages[activeImageIndex] ??
     galleryImages[0] ?? { src: product.image, alt: product.name };
 
-  const productImageUrl = new URL(
-    product.image,
-    SITE_URL,
-  ).toString();
+  const productAnchor = product.growthSlug || String(product.id);
+  const productPublicUrl = `${SITE_URL}/productos#producto-${encodeURIComponent(productAnchor)}`;
 
   const consultationMessage = [
     "Hola Dela Rosa, quiero consultar por este producto:",
@@ -92,8 +90,8 @@ export function ProductCard({
       ? `Detalle: ${product.description}`
       : "",
     "",
-    "Foto del producto:",
-    productImageUrl,
+    "Ver producto y todas sus fotos:",
+    productPublicUrl,
   ]
     .filter(Boolean)
     .join("\n");
@@ -263,7 +261,7 @@ export function ProductCard({
 
     if (!hasTrackedView.current) {
       trackProductView({
-        id: String(product.id),
+        id: product.growthSlug || String(product.id),
         name: product.name,
         category: product.category,
         material: product.material,
@@ -384,7 +382,9 @@ export function ProductCard({
   return (
     <>
       <article
+        id={`producto-${productAnchor}`}
         ref={cardRef}
+        data-growth-product-slug={product.growthSlug || String(product.id)}
         className={`product-card ${
           motionIndex === undefined ? "" : "is-featured-motion"
         } ${imageFit === "contain" ? "has-contained-image" : ""}`}

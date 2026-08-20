@@ -1,4 +1,5 @@
 import type { CartLine } from "@/lib/store";
+import { trackGrowthAgencyEvent } from "@/lib/growth-analytics";
 
 export type AnalyticsParameters = Record<string, unknown>;
 
@@ -38,6 +39,7 @@ export function trackProductView(product: {
   material: string;
   price: number;
 }) {
+  trackGrowthAgencyEvent("product_view", "product_gallery", String(product.id));
   trackEvent("view_item", {
     currency: "PYG",
     value: product.price,

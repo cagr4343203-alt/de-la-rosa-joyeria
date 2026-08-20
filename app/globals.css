@@ -1186,19 +1186,20 @@ img {
 
 .promotion-card-inner {
   display: grid;
-  grid-template-columns: minmax(190px, 0.88fr) minmax(0, 1.12fr);
+  grid-template-columns: minmax(250px, 0.88fr) minmax(0, 1.12fr);
   height: 100%;
+  min-height: clamp(440px, 31vw, 560px);
 }
 
 .promotion-card figure {
-  background: #e8e0d6;
-  min-height: 330px;
+  background: #ffffff;
+  min-height: 100%;
   overflow: hidden;
   position: relative;
 }
 
 .promotion-card figure img {
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1415,8 +1416,11 @@ img {
 }
 
 .product-info > strong {
-  font-size: 0.77rem;
-  margin-top: 13px;
+  display: block;
+  font-size: 0.86rem;
+  line-height: 1.15;
+  margin-top: auto;
+  padding-top: 13px;
 }
 
 .product-actions {
@@ -1681,8 +1685,16 @@ img {
 }
 
 .catalog-filters {
+  align-self: start;
   border-right: 1px solid var(--line);
+  max-height: calc(100dvh - 116px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding-right: 22px;
+  position: sticky;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  top: 96px;
 }
 
 .mobile-filter-head,
@@ -1820,6 +1832,14 @@ img {
   min-width: 190px;
   outline: 0;
   padding: 10px 12px;
+}
+
+.results-controls .sort-control {
+  position: relative;
+}
+
+.results-controls .sort-control > svg {
+  color: var(--gold-deep);
 }
 
 .catalog-empty {
@@ -2971,14 +2991,17 @@ img {
 .checkout-button {
   align-items: center;
   background: #087744;
+  border: 0;
   color: white;
   display: flex;
+  font-family: inherit;
   font-size: 0.62rem;
   font-weight: 800;
   justify-content: space-between;
   min-height: 50px;
   padding: 0 17px;
   text-transform: uppercase;
+  width: 100%;
 }
 
 .checkout-button.is-disabled {
@@ -3182,6 +3205,17 @@ img {
   .featured-grid,
   .catalog-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .results-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .results-controls {
+    flex-wrap: wrap;
+    width: 100%;
   }
 
   .site-footer {
@@ -3545,11 +3579,11 @@ img {
 
   .sort-control > svg,
   .sort-control > span {
-    display: none;
+    display: block;
   }
 
   .sort-control select {
-    grid-column: auto;
+    grid-column: 1 / -1;
     min-height: 42px;
   }
 
@@ -3824,8 +3858,8 @@ img {
   }
 
   .product-info h3 {
-    font-size: 0.82rem;
-    line-height: 1.2;
+    font-size: 0.92rem;
+    line-height: 1.25;
   }
 
   .product-info > span {
@@ -3833,7 +3867,8 @@ img {
   }
 
   .product-info > strong {
-    font-size: 0.64rem;
+    font-size: 0.88rem;
+    padding-top: 14px;
   }
 
   .product-info > p {
@@ -3979,7 +4014,7 @@ img {
   }
 
   .results-head {
-    align-items: start;
+    align-items: stretch;
     flex-direction: column;
     gap: 15px;
   }
@@ -3990,22 +4025,61 @@ img {
 
   .results-controls {
     display: grid;
-    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 8px;
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.45fr);
     width: 100%;
   }
 
   .results-controls.has-context-filter {
     gap: 8px;
-    grid-template-columns: 84px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.45fr);
   }
 
   .results-controls.has-context-filter > .sort-control:last-child {
     grid-column: 1 / -1;
   }
 
+  .watch-filter-control,
+  .bracelet-filter-control,
+  .audience-filter-control {
+    grid-column: 1 / -1;
+  }
+
+  .results-head {
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+  }
+
+  .catalog-grid .product-info > p,
+  .catalog-grid .product-info h3 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .catalog-grid .product-info > p {
+    min-height: 2.7em;
+  }
+
+  .catalog-grid .product-info h3 {
+    min-height: 2.5em;
+  }
+
   .sort-control,
   .sort-control select {
+    max-width: none;
     min-width: 0;
+    width: 100%;
+  }
+
+  .sort-control select {
+    grid-column: 1 / -1;
+  }
+
+  .mobile-filter-button {
+    padding-left: 8px;
+    padding-right: 8px;
     width: 100%;
   }
 

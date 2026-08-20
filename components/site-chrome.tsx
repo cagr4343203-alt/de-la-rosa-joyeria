@@ -44,6 +44,8 @@ const announcementItems = [
   "Perforación de oreja con reserva",
 ];
 
+const NAVIGATION_LOADER_DURATION_MS = 650;
+
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
@@ -56,9 +58,10 @@ export function SiteChrome({
   settings: SiteSettings;
 }) {
   const pathname = usePathname();
+  const brandLogo = settings.logoUrl || "/logo.png";
   const { itemCount, setCartOpen } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -69,28 +72,8 @@ export function SiteChrome({
   const navigationFallbackTimerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const mobile = window.matchMedia("(max-width: 760px)").matches;
-    let readyTimer: number | undefined;
-    const timer = window.setTimeout(
-      () => {
-        setLoading(false);
-        readyTimer = window.setTimeout(
-          () => {
-            document.documentElement.dataset.siteReady = "true";
-            window.dispatchEvent(new Event("dela:site-ready"));
-          },
-          reduced ? 20 : 300,
-        );
-      },
-      reduced ? 50 : mobile ? 320 : 620,
-    );
-    return () => {
-      window.clearTimeout(timer);
-      if (readyTimer !== undefined) window.clearTimeout(readyTimer);
-    };
+    document.documentElement.dataset.siteReady = "true";
+    window.dispatchEvent(new Event("dela:site-ready"));
   }, []);
 
   useEffect(() => {
@@ -102,11 +85,6 @@ export function SiteChrome({
     navigationPendingRef.current = false;
     window.clearTimeout(navigationFallbackTimerRef.current);
 
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const mobile = window.matchMedia("(max-width: 760px)").matches;
-
     navigationHideTimerRef.current = window.setTimeout(
       () => {
         setLoading(false);
@@ -114,7 +92,7 @@ export function SiteChrome({
         document.documentElement.dataset.siteReady = "true";
         window.dispatchEvent(new Event("dela:site-ready"));
       },
-      reduced ? 20 : mobile ? 260 : 380,
+      NAVIGATION_LOADER_DURATION_MS,
     );
   }, [pathname]);
 
@@ -142,7 +120,7 @@ export function SiteChrome({
         nextUrl.pathname === window.location.pathname;
       navigationFallbackTimerRef.current = window.setTimeout(
         finishFallback,
-        samePage ? 480 : 2500,
+        samePage ? NAVIGATION_LOADER_DURATION_MS : 1600,
       );
     };
 
@@ -272,11 +250,11 @@ export function SiteChrome({
         role="status"
       >
         <Image
-          src="/logo-delarosa-negro.jpg"
+          src={brandLogo}
           alt="Dela Rosa Joyería y Relojería"
           width={220}
           height={220}
-          priority
+          sizes="(max-width: 600px) 160px, 220px"
         />
         <span />
         <small>Preparando detalles exclusivos</small>
@@ -304,7 +282,7 @@ export function SiteChrome({
       <header className="site-header">
         <Link className="header-brand" href="/" aria-label="Dela Rosa, inicio">
           <Image
-            src="/logo.png"
+            src={brandLogo}
             alt="Dela Rosa Joyería y Relojería"
             width={64}
             height={64}
@@ -410,7 +388,7 @@ export function SiteChrome({
             onClick={() => setMenuOpen(false)}
           >
             <Image
-              src="/logo.png"
+              src={brandLogo}
               alt="Dela Rosa Joyería y Relojería"
               width={58}
               height={58}
@@ -525,7 +503,7 @@ export function SiteChrome({
       <footer className="site-footer">
         <div className="footer-brand">
           <Image
-            src="/logo-delarosa-negro.jpg"
+            src={brandLogo}
             alt="Dela Rosa Joyería y Relojería"
             width={94}
             height={94}

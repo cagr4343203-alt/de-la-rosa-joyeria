@@ -1,4 +1,5 @@
 import { ProductCatalog } from "@/components/product-catalog";
+import { getGrowthMaterials } from "@/lib/growth-api";
 import { getProducts } from "@/sanity/lib/products";
 
 export const metadata = {
@@ -11,11 +12,15 @@ export const metadata = {
 };
 
 export default async function CombosPage() {
-  const products = await getProducts();
+  const [products, managedMaterials] = await Promise.all([
+    getProducts(),
+    getGrowthMaterials(),
+  ]);
 
   return (
     <ProductCatalog
       products={products}
+      managedMaterials={managedMaterials}
       initialCategory="Combos"
       title="Combos"
     />

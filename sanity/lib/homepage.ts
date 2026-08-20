@@ -312,15 +312,11 @@ function imageFromSanity(
   image: EditableImage | undefined,
   fallback: HomeImage,
   width: number,
-  height?: number,
 ): HomeImage {
   if (!image) return fallback;
 
-  let imageBuilder = builder.image(image).width(width);
-  if (height) imageBuilder = imageBuilder.height(height).fit("crop");
-
   return {
-    src: imageBuilder.auto("format").url(),
+    src: builder.image(image).width(width).quality(70).auto("format").url(),
     alt: image.alt?.trim() || fallback.alt,
   };
 }
@@ -330,7 +326,7 @@ export async function getHomePage(): Promise<HomePageContent> {
     const entry = await sanityClient.fetch<RawHomePage>(
       HOMEPAGE_QUERY,
       {},
-      { next: { revalidate: 30, tags: ["homepage", "products"] } },
+      { next: { revalidate: 300, tags: ["homepage", "products"] } },
     );
 
     const hero = entry.hero;
@@ -346,13 +342,11 @@ export async function getHomePage(): Promise<HomePageContent> {
           hero?.mainImage,
           defaultHomePage.hero.mainImage,
           1200,
-          1500,
         ),
         secondaryImage: imageFromSanity(
           hero?.secondaryImage,
           defaultHomePage.hero.secondaryImage,
           900,
-          1100,
         ),
       },
       services: {
@@ -373,7 +367,6 @@ export async function getHomePage(): Promise<HomePageContent> {
                   index % defaultHomePage.categories.cards.length
                 ].image,
                 900,
-                1100,
               ),
             }))
           : defaultHomePage.categories.cards,
@@ -390,7 +383,6 @@ export async function getHomePage(): Promise<HomePageContent> {
           piercing?.image,
           defaultHomePage.piercing.image,
           1100,
-          1300,
         ),
       },
       history: {

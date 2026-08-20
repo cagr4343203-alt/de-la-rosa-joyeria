@@ -11,6 +11,16 @@ const productCategoryTemplates = [
     category: "Anillos",
   },
   {
+    id: "product-anillo-dama",
+    title: "Nuevo anillo para dama",
+    category: "Anillo dama",
+  },
+  {
+    id: "product-anillo-caballero",
+    title: "Nuevo anillo para caballero",
+    category: "Anillo caballero",
+  },
+  {
     id: "product-aros",
     title: "Nuevo aro",
     category: "Aros",
@@ -21,9 +31,29 @@ const productCategoryTemplates = [
     category: "Cadenas",
   },
   {
+    id: "product-cadena-dama",
+    title: "Nueva cadena para dama",
+    category: "Cadena dama",
+  },
+  {
+    id: "product-cadena-caballero",
+    title: "Nueva cadena para caballero",
+    category: "Cadena caballero",
+  },
+  {
     id: "product-pulseras",
     title: "Nueva pulsera",
     category: "Pulseras",
+  },
+  {
+    id: "product-pulsera-dama",
+    title: "Nueva pulsera para dama",
+    category: "Pulsera dama",
+  },
+  {
+    id: "product-pulsera-caballero",
+    title: "Nueva pulsera para caballero",
+    category: "Pulsera caballero",
   },
   {
     id: "product-sets",

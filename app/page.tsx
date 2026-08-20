@@ -121,7 +121,6 @@ export default async function Home() {
               src={home.hero.secondaryImage.src}
               alt={home.hero.secondaryImage.alt}
               fill
-              priority
               sizes="(max-width: 900px) 45vw, 20vw"
             />
           </figure>

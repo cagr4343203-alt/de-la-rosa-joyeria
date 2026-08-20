@@ -19,6 +19,18 @@ const productCategories = [
     templateId: "product-anillos",
   },
   {
+    id: "anillo-dama",
+    title: "Anillos para dama",
+    value: "Anillo dama",
+    templateId: "product-anillo-dama",
+  },
+  {
+    id: "anillo-caballero",
+    title: "Anillos para caballero",
+    value: "Anillo caballero",
+    templateId: "product-anillo-caballero",
+  },
+  {
     id: "aros",
     title: "Aros",
     value: "Aros",
@@ -31,10 +43,34 @@ const productCategories = [
     templateId: "product-cadenas",
   },
   {
+    id: "cadena-dama",
+    title: "Cadenas para dama",
+    value: "Cadena dama",
+    templateId: "product-cadena-dama",
+  },
+  {
+    id: "cadena-caballero",
+    title: "Cadenas para caballero",
+    value: "Cadena caballero",
+    templateId: "product-cadena-caballero",
+  },
+  {
     id: "pulseras",
     title: "Pulseras",
     value: "Pulseras",
     templateId: "product-pulseras",
+  },
+  {
+    id: "pulsera-dama",
+    title: "Pulseras para dama",
+    value: "Pulsera dama",
+    templateId: "product-pulsera-dama",
+  },
+  {
+    id: "pulsera-caballero",
+    title: "Pulseras para caballero",
+    value: "Pulsera caballero",
+    templateId: "product-pulsera-caballero",
   },
   {
     id: "sets",

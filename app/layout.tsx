@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@/components/google-analytics";
+import { GrowthAgencyAnalytics } from "@/components/growth-agency-analytics";
 import { SiteChrome } from "@/components/site-chrome";
 import { StoreProvider } from "@/components/store-context";
 import { BRAND_ICON_URL, BRAND_PREVIEW_URL, SITE_URL } from "@/lib/seo";
@@ -15,11 +16,8 @@ export const metadata: Metadata = {
     description:
       "Joyería y relojería en Encarnación, Paraguay. Encontrá joyas de oro 18K, plata 925, relojes, regalos y perforación de oreja en Dela Rosa, desde 2003.",
     icons: {
-      icon: [
-        { url: BRAND_ICON_URL, type: "image/png", sizes: "512x512" },
-        { url: "/favicon.ico", type: "image/x-icon", sizes: "48x48" },
-      ],
-      shortcut: BRAND_ICON_URL,
+      icon: [{ url: "/favicon.ico", type: "image/x-icon", sizes: "48x48" }],
+      shortcut: "/favicon.ico",
       apple: [{ url: BRAND_ICON_URL, type: "image/png", sizes: "512x512" }],
     },
     alternates: {
@@ -81,6 +79,7 @@ export default async function RootLayout({
         <StoreProvider whatsappNumber={siteSettings.whatsappNumber}>
           <SiteChrome settings={siteSettings}>{children}</SiteChrome>
         </StoreProvider>
+        <GrowthAgencyAnalytics />
         <GoogleAnalytics />
       </body>
     </html>

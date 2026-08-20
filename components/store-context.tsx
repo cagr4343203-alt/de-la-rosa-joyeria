@@ -15,8 +15,7 @@ import {
   money,
   whatsappHref,
 } from "@/lib/store";
-
-const SITE_URL = "https://delarosajoyeria.com";
+import { createLegacyOrderUrl, createShortOrderUrl } from "@/lib/order-links";
 
 type StoreContextValue = {
   cart: CartLine[];
@@ -36,20 +35,6 @@ type StoreContextValue = {
 
 const StoreContext =
   createContext<StoreContextValue | null>(null);
-
-function createOrderSummaryUrl(cart: CartLine[]) {
-  const selectedItems = cart
-    .map((item) => {
-      const id = encodeURIComponent(String(item.id));
-      return item.quantity > 1 ? `${id}~${item.quantity}` : id;
-    })
-    .join(",");
-
-  const orderUrl = new URL("/pedido", SITE_URL);
-  orderUrl.search = `?p=${selectedItems}`;
-
-  return orderUrl.toString();
-}
 
 export function StoreProvider({
   children,
@@ -222,6 +207,25 @@ export function CartDrawer() {
     setCartOpen,
     whatsappNumber,
   } = useStore();
+  const cartLinkKey = useMemo(
+    () => cart.map((item) => `${item.id}:${item.quantity}`).join("|"),
+    [cart],
+  );
+  const legacyOrderSummaryUrl = cart.length ? createLegacyOrderUrl(cart) : "";
+  const [shortOrderLink, setShortOrderLink] = useState<{ key: string; url: string } | null>(null);
+  const orderSummaryUrl = shortOrderLink?.key === cartLinkKey
+    ? shortOrderLink.url
+    : legacyOrderSummaryUrl;
+
+  useEffect(() => {
+    if (cart.length === 0) return;
+
+    let current = true;
+    void createShortOrderUrl(cart).then((url) => {
+      if (current) setShortOrderLink({ key: cartLinkKey, url });
+    });
+    return () => { current = false; };
+  }, [cart, cartLinkKey]);
 
   const hasUnpricedProducts = cart.some(
     (item) => item.price <= 0,
@@ -232,11 +236,6 @@ export function CartDrawer() {
       ? `${money(total)} + artículos a cotizar`
       : "A confirmar"
     : money(total);
-
-  const orderSummaryUrl =
-    cart.length > 0
-      ? createOrderSummaryUrl(cart)
-      : "";
 
   const orderMessage = [
     "Hola Dela Rosa ✨",
@@ -425,26 +424,26 @@ export function CartDrawer() {
             confirman por WhatsApp.
           </p>
 
-          <a
-            className={`checkout-button ${
-              cart.length === 0
-                ? "is-disabled"
-                : ""
-            }`}
-            href={
-              cart.length > 0
-                ? whatsappHref(orderMessage, whatsappNumber)
-                : undefined
-            }
-            target="_blank"
-            rel="noreferrer"
-            aria-disabled={
-              cart.length === 0
-            }
-          >
-            Enviar pedido por WhatsApp
-            <span>↗</span>
-          </a>
+          {cart.length > 0 ? (
+            <a
+              className="checkout-button"
+              href={whatsappHref(orderMessage, whatsappNumber)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Enviar pedido por WhatsApp
+              <span>↗</span>
+            </a>
+          ) : (
+            <button
+              className="checkout-button is-disabled"
+              type="button"
+              disabled
+            >
+              Enviar pedido por WhatsApp
+              <span>↗</span>
+            </button>
+          )}
 
           {cart.length > 0 && (
             <button
