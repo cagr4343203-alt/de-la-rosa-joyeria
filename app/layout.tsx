@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Titan_One } from "next/font/google";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { GrowthAgencyAnalytics } from "@/components/growth-agency-analytics";
 import { SiteChrome } from "@/components/site-chrome";
@@ -6,6 +7,13 @@ import { StoreProvider } from "@/components/store-context";
 import { BRAND_ICON_URL, BRAND_PREVIEW_URL, SITE_URL } from "@/lib/seo";
 import { getSiteSettings } from "@/sanity/lib/site-content";
 import "./globals.css";
+
+const brandFont = Titan_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-brand",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
@@ -74,7 +82,11 @@ export default async function RootLayout({
   const siteSettings = await getSiteSettings();
 
   return (
-    <html lang="es-PY" data-scroll-behavior="smooth">
+    <html
+      lang="es-PY"
+      className={brandFont.variable}
+      data-scroll-behavior="smooth"
+    >
       <body>
         <StoreProvider whatsappNumber={siteSettings.whatsappNumber}>
           <SiteChrome settings={siteSettings}>{children}</SiteChrome>
