@@ -12,7 +12,7 @@
   --line: rgba(23, 18, 15, 0.14);
   --serif: Georgia, "Times New Roman", serif;
   --sans: "Segoe UI", Arial, Helvetica, sans-serif;
-  --brand: var(--font-brand), "Arial Rounded MT Bold", sans-serif;
+  --brand: var(--font-brand), "Montserrat", "Segoe UI", sans-serif;
 }
 
 * {
@@ -220,8 +220,8 @@ img {
 .header-brand strong {
   font-family: var(--brand);
   font-size: 0.92rem;
-  font-weight: 400;
-  letter-spacing: 0.1em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -2725,8 +2725,8 @@ img {
 .footer-brand strong {
   font-family: var(--brand);
   font-size: 1.15rem;
-  font-weight: 400;
-  letter-spacing: 0.1em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
@@ -3300,7 +3300,7 @@ img {
 
   .header-brand strong {
     font-size: 0.72rem;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.15em;
   }
 
   .header-brand small,
@@ -3744,7 +3744,7 @@ img {
 
   .site-header > .header-brand strong {
     font-size: 0.68rem;
-    letter-spacing: 0.13em;
+    letter-spacing: 0.14em;
   }
 
   .site-header > .header-brand small {
@@ -4155,7 +4155,7 @@ img {
 
   .footer-brand strong {
     font-size: 0.9rem;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.15em;
   }
 
   .footer-brand p {

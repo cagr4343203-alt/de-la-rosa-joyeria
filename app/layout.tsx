@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Titan_One } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { GrowthAgencyAnalytics } from "@/components/growth-agency-analytics";
 import { SiteChrome } from "@/components/site-chrome";
@@ -8,9 +8,9 @@ import { BRAND_ICON_URL, BRAND_PREVIEW_URL, SITE_URL } from "@/lib/seo";
 import { getSiteSettings } from "@/sanity/lib/site-content";
 import "./globals.css";
 
-const brandFont = Titan_One({
+const brandFont = Montserrat({
   subsets: ["latin"],
-  weight: "400",
+  weight: "500",
   variable: "--font-brand",
   display: "swap",
 });
