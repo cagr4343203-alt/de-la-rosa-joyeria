@@ -11,13 +11,22 @@ import {
   MapPin,
   Menu,
   PackageSearch,
+  Search,
   ShoppingBag,
   UsersRound,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { whatsappHref } from "@/lib/store";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { money, type Product, whatsappHref } from "@/lib/store";
 import type { SiteSettings } from "@/sanity/lib/site-content";
+
+import searchStyles from "./site-search.module.css";
 import { CartDrawer, useStore } from "./store-context";
 
 const navItems = [
@@ -50,26 +59,165 @@ function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
+function normalizeSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("es")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function productSearchText(product: Product) {
+  return normalizeSearch(
+    [
+      product.name,
+      product.category,
+      product.material,
+      product.description,
+      product.badge ?? "",
+    ].join(" "),
+  );
+}
+
+function productHref(product: Product) {
+  const slug = product.growthSlug?.trim();
+
+  if (slug) {
+    return `/${encodeURIComponent(slug)}`;
+  }
+
+  return "/productos";
+}
+
 export function SiteChrome({
   children,
   settings,
+  products,
 }: {
   children: React.ReactNode;
   settings: SiteSettings;
+  products: Product[];
 }) {
   const pathname = usePathname();
   const brandLogo = settings.logoUrl || "/logo.png";
   const { itemCount, setCartOpen } = useStore();
+
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const drawerScrollRef = useRef<HTMLDivElement>(null);
   const previousPathnameRef = useRef(pathname);
   const navigationPendingRef = useRef(false);
   const navigationHideTimerRef = useRef<number | undefined>(undefined);
   const navigationFallbackTimerRef = useRef<number | undefined>(undefined);
+
+  const normalizedQuery = normalizeSearch(searchQuery);
+
+  const searchResults = useMemo(() => {
+    if (!normalizedQuery) {
+      return [];
+    }
+
+    const terms = normalizedQuery.split(" ").filter(Boolean);
+
+    return products
+      .map((product) => {
+        const haystack = productSearchText(product);
+
+        if (!terms.every((term) => haystack.includes(term))) {
+          return null;
+        }
+
+        const normalizedName = normalizeSearch(product.name);
+        const normalizedCategory = normalizeSearch(product.category);
+        const normalizedMaterial = normalizeSearch(product.material);
+
+        let score = 0;
+
+        if (normalizedName === normalizedQuery) score += 120;
+        if (normalizedName.startsWith(normalizedQuery)) score += 80;
+        if (normalizedName.includes(normalizedQuery)) score += 55;
+        if (normalizedCategory.includes(normalizedQuery)) score += 30;
+        if (normalizedMaterial.includes(normalizedQuery)) score += 25;
+
+        score += terms.filter((term) => normalizedName.includes(term)).length * 12;
+        score += terms.filter((term) => normalizedCategory.includes(term)).length * 6;
+        score += terms.filter((term) => normalizedMaterial.includes(term)).length * 5;
+
+        return { product, score };
+      })
+      .filter(
+        (
+          entry,
+        ): entry is {
+          product: Product;
+          score: number;
+        } => Boolean(entry),
+      )
+      .sort((left, right) => {
+        if (right.score !== left.score) {
+          return right.score - left.score;
+        }
+
+        return left.product.name.localeCompare(
+          right.product.name,
+          "es",
+        );
+      })
+      .slice(0, 10)
+      .map((entry) => entry.product);
+  }, [normalizedQuery, products]);
+
+  const suggestions = useMemo(() => {
+    if (!normalizedQuery) {
+      return [];
+    }
+
+    const candidates = new Map<string, string>();
+
+    for (const product of products) {
+      for (const value of [
+        product.name,
+        product.category,
+        product.material,
+      ]) {
+        const cleanValue = value?.replace(/\s+/g, " ").trim();
+
+        if (!cleanValue) continue;
+
+        const key = normalizeSearch(cleanValue);
+
+        if (!key || candidates.has(key)) continue;
+
+        if (key.includes(normalizedQuery)) {
+          candidates.set(key, cleanValue);
+        }
+      }
+    }
+
+    return Array.from(candidates.values())
+      .sort((left, right) => {
+        const leftValue = normalizeSearch(left);
+        const rightValue = normalizeSearch(right);
+        const leftStarts = leftValue.startsWith(normalizedQuery) ? 0 : 1;
+        const rightStarts = rightValue.startsWith(normalizedQuery) ? 0 : 1;
+
+        if (leftStarts !== rightStarts) {
+          return leftStarts - rightStarts;
+        }
+
+        return left.length - right.length;
+      })
+      .slice(0, 5);
+  }, [normalizedQuery, products]);
 
   useEffect(() => {
     document.documentElement.dataset.siteReady = "true";
@@ -80,6 +228,9 @@ export function SiteChrome({
     if (previousPathnameRef.current === pathname) return;
 
     previousPathnameRef.current = pathname;
+    setSearchOpen(false);
+    setSearchQuery("");
+
     if (!navigationPendingRef.current) return;
 
     navigationPendingRef.current = false;
@@ -113,11 +264,13 @@ export function SiteChrome({
       document.documentElement.dataset.siteReady = "false";
       document.body.classList.add("page-loading");
       setMenuOpen(false);
+      setSearchOpen(false);
       setLoading(true);
 
       const samePage =
         nextUrl &&
         nextUrl.pathname === window.location.pathname;
+
       navigationFallbackTimerRef.current = window.setTimeout(
         finishFallback,
         samePage ? NAVIGATION_LOADER_DURATION_MS : 1600,
@@ -140,6 +293,7 @@ export function SiteChrome({
       if (!(target instanceof Element)) return;
 
       const anchor = target.closest<HTMLAnchorElement>("a[href]");
+
       if (
         !anchor ||
         anchor.target === "_blank" ||
@@ -149,6 +303,7 @@ export function SiteChrome({
       }
 
       const nextUrl = new URL(anchor.href, window.location.href);
+
       if (nextUrl.origin !== window.location.origin) return;
 
       const currentUrl = new URL(window.location.href);
@@ -184,7 +339,10 @@ export function SiteChrome({
 
   useEffect(() => {
     document.body.classList.toggle("menu-open", menuOpen);
-    return () => document.body.classList.remove("menu-open");
+
+    return () => {
+      document.body.classList.remove("menu-open");
+    };
   }, [menuOpen]);
 
   useEffect(() => {
@@ -195,6 +353,7 @@ export function SiteChrome({
     const focusFrame = window.requestAnimationFrame(() => {
       closeButtonRef.current?.focus();
     });
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setMenuOpen(false);
@@ -205,6 +364,7 @@ export function SiteChrome({
       if (event.key !== "Tab") return;
 
       const drawer = drawerRef.current;
+
       if (!drawer) return;
 
       const focusable = Array.from(
@@ -214,6 +374,7 @@ export function SiteChrome({
       );
       const first = focusable[0];
       const last = focusable.at(-1);
+
       if (!first || !last) return;
 
       if (event.shiftKey && document.activeElement === first) {
@@ -230,15 +391,52 @@ export function SiteChrome({
     };
 
     window.addEventListener("keydown", handleKeyDown);
+
     return () => {
       window.cancelAnimationFrame(focusFrame);
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!searchOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+
+    const handleSearchKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSearchOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleSearchKeyDown);
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener("keydown", handleSearchKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [searchOpen]);
+
   const closeMenu = () => {
     setMenuOpen(false);
     window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+  };
+
+  const openSearch = () => {
+    setMenuOpen(false);
+    setCartOpen(false);
+    setSearchOpen(true);
+  };
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchQuery("");
   };
 
   return (
@@ -249,15 +447,28 @@ export function SiteChrome({
         aria-live="polite"
         role="status"
       >
-        <Image
-          src={brandLogo}
-          alt="Dela Rosa Joyería y Relojería"
-          width={220}
-          height={220}
-          sizes="(max-width: 600px) 160px, 220px"
-        />
-        <span />
-        <small>Preparando detalles exclusivos</small>
+        <div className="site-loader-mark">
+          <div className="site-loader-logo-shell">
+            <img
+              src={brandLogo}
+              alt="Dela Rosa Joyería y Relojería"
+              className="site-loader-logo-image"
+              onError={(event) => {
+                const image = event.currentTarget;
+
+                if (!image.src.endsWith("/logo.png")) {
+                  image.src = "/logo.png";
+                }
+              }}
+            />
+          </div>
+
+          <span className="site-loader-line" />
+
+          <small className="site-loader-copy">
+            Preparando detalles exclusivos
+          </small>
+        </div>
       </div>
 
       <div
@@ -310,6 +521,17 @@ export function SiteChrome({
         </nav>
 
         <div className="header-actions">
+          <button
+            className={searchStyles.headerSearch}
+            type="button"
+            onClick={openSearch}
+            aria-label="Buscar productos"
+            aria-haspopup="dialog"
+            aria-expanded={searchOpen}
+          >
+            <Search size={19} />
+          </button>
+
           <div className="header-socials">
             <a
               className="brand-bubble instagram"
@@ -342,10 +564,12 @@ export function SiteChrome({
               <Image src="/whatsapp.svg" alt="" width={18} height={18} />
             </a>
           </div>
+
           <Link className="reserve-header" href="/reservas">
             <CalendarDays size={17} />
             Reservar perforación
           </Link>
+
           <button
             className="header-cart"
             type="button"
@@ -356,6 +580,7 @@ export function SiteChrome({
             <span>Carrito</span>
             <b>{itemCount}</b>
           </button>
+
           <button
             className="menu-toggle"
             type="button"
@@ -369,6 +594,187 @@ export function SiteChrome({
           </button>
         </div>
       </header>
+
+      {searchOpen && (
+        <div
+          className={searchStyles.overlay}
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.currentTarget === event.target) {
+              closeSearch();
+            }
+          }}
+        >
+          <section
+            className={searchStyles.panel}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Buscar productos en Dela Rosa"
+          >
+            <div className={searchStyles.searchTop}>
+              <div className={searchStyles.searchField}>
+                <Search size={20} aria-hidden="true" />
+                <input
+                  ref={searchInputRef}
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Buscar productos"
+                  aria-label="Buscar productos"
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery("");
+                      searchInputRef.current?.focus();
+                    }}
+                    aria-label="Limpiar búsqueda"
+                  >
+                    <X size={17} />
+                  </button>
+                )}
+              </div>
+
+              <button
+                className={searchStyles.closeButton}
+                type="button"
+                onClick={closeSearch}
+                aria-label="Cerrar buscador"
+              >
+                <X size={21} />
+              </button>
+            </div>
+
+            {!normalizedQuery ? (
+              <div className={searchStyles.intro}>
+                <span>Buscador Dela Rosa</span>
+                <h2>Buscá por joya, reloj o categoría.</h2>
+                <p>
+                  Elegí un producto para entrar directamente a su ficha.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className={searchStyles.scrollArea}>
+                  <section className={searchStyles.section}>
+                    <div className={searchStyles.sectionTitle}>
+                      <span>Sugerencias</span>
+                    </div>
+
+                    <div className={searchStyles.suggestions}>
+                      {suggestions.length ? (
+                        suggestions.map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            type="button"
+                            onClick={() => {
+                              setSearchQuery(suggestion);
+                              searchInputRef.current?.focus();
+                            }}
+                          >
+                            <Search size={15} />
+                            <span>{suggestion}</span>
+                          </button>
+                        ))
+                      ) : (
+                        <p className={searchStyles.emptySuggestion}>
+                          No hay sugerencias para esta búsqueda.
+                        </p>
+                      )}
+                    </div>
+                  </section>
+
+                  <section className={searchStyles.section}>
+                    <div className={searchStyles.sectionTitle}>
+                      <span>Productos</span>
+                      <small>
+                        {searchResults.length}{" "}
+                        {searchResults.length === 1
+                          ? "resultado"
+                          : "resultados"}
+                      </small>
+                    </div>
+
+                    <div className={searchStyles.results}>
+                      {searchResults.length ? (
+                        searchResults.map((product) => (
+                          <Link
+                            key={String(product.id)}
+                            className={searchStyles.productResult}
+                            href={productHref(product)}
+                            onClick={() => {
+                              setSearchOpen(false);
+                              setSearchQuery("");
+                            }}
+                          >
+                            <div className={searchStyles.productImage}>
+                              <Image
+                                src={product.image}
+                                alt={product.name}
+                                fill
+                                sizes="76px"
+                                style={{
+                                  objectFit: product.imageFit ?? "contain",
+                                  objectPosition:
+                                    product.imagePosition ?? "center",
+                                }}
+                              />
+                            </div>
+
+                            <div className={searchStyles.productCopy}>
+                              <span>
+                                {product.category} · {product.material}
+                              </span>
+                              <strong>{product.name}</strong>
+                              <small>
+                                {product.status === "outOfStock"
+                                  ? "Agotado"
+                                  : product.price > 0
+                                    ? money(product.price)
+                                    : "Consultar precio"}
+                              </small>
+                            </div>
+
+                            <ArrowUpRight
+                              className={searchStyles.productArrow}
+                              size={18}
+                              aria-hidden="true"
+                            />
+                          </Link>
+                        ))
+                      ) : (
+                        <div className={searchStyles.emptyResults}>
+                          <Search size={24} />
+                          <strong>No encontramos productos</strong>
+                          <span>
+                            Probá con otro nombre, categoría o material.
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                </div>
+
+                <div className={searchStyles.footer}>
+                  <Link
+                    href="/productos"
+                    onClick={() => {
+                      setSearchOpen(false);
+                      setSearchQuery("");
+                    }}
+                  >
+                    Ver todos los productos
+                    <ArrowUpRight size={17} />
+                  </Link>
+                </div>
+              </>
+            )}
+          </section>
+        </div>
+      )}
 
       <div
         id="mobile-navigation"
@@ -398,6 +804,7 @@ export function SiteChrome({
               <small>{settings.brandTagline}</small>
             </span>
           </Link>
+
           <button
             type="button"
             onClick={closeMenu}
@@ -407,6 +814,7 @@ export function SiteChrome({
             <X size={20} />
           </button>
         </div>
+
         <div className="mobile-drawer-scroll" ref={drawerScrollRef}>
           <div className="mobile-drawer-intro">
             <span>Menú principal</span>
@@ -446,6 +854,7 @@ export function SiteChrome({
               <strong>¿Necesitás ayuda?</strong>
               Te asesoramos de forma personalizada.
             </p>
+
             <div>
               <a
                 className="mobile-drawer-contact is-whatsapp"
@@ -459,6 +868,7 @@ export function SiteChrome({
                 <Image src="/whatsapp.svg" alt="" width={17} height={17} />
                 WhatsApp
               </a>
+
               <a
                 className="mobile-drawer-contact is-instagram"
                 href={settings.instagramUrl}
@@ -468,6 +878,7 @@ export function SiteChrome({
                 <Image src="/instagram.svg" alt="" width={17} height={17} />
                 Instagram
               </a>
+
               <a
                 className="mobile-drawer-contact is-tiktok"
                 href={settings.tiktokUrl}
@@ -477,6 +888,7 @@ export function SiteChrome({
                 <Image src="/tiktok.svg" alt="" width={17} height={17} />
                 TikTok
               </a>
+
               <a
                 className="mobile-drawer-contact is-facebook"
                 href={settings.facebookUrl}
@@ -490,6 +902,7 @@ export function SiteChrome({
           </div>
         </div>
       </div>
+
       <button
         className={`menu-overlay ${menuOpen ? "is-visible" : ""}`}
         type="button"
@@ -513,6 +926,7 @@ export function SiteChrome({
             <p>El detalle exclusivo para ese momento especial.</p>
           </div>
         </div>
+
         <div className="footer-links">
           <strong>Tienda</strong>
           <Link href="/productos">Productos</Link>
@@ -520,14 +934,18 @@ export function SiteChrome({
           <Link href="/reservas">Reservar perforación</Link>
           <Link href="/nosotros">Nuestra historia</Link>
         </div>
+
         <div className="footer-links">
           <strong>Contacto</strong>
+
           <a href={settings.mapsUrl} target="_blank" rel="noreferrer">
             {settings.address}
           </a>
+
           <a href={settings.instagramUrl} target="_blank" rel="noreferrer">
             {settings.instagramLabel}
           </a>
+
           <a
             href={whatsappHref(
               "Hola Dela Rosa, quiero hacer una consulta.",
@@ -539,8 +957,11 @@ export function SiteChrome({
             {settings.phone}
           </a>
         </div>
+
         <p className="footer-copy">
-          <span>© {new Date().getFullYear()} Dela Rosa · Encarnación, Paraguay</span>
+          <span>
+            © {new Date().getFullYear()} Dela Rosa · Encarnación, Paraguay
+          </span>
           <span className="footer-credit">
             Desarrollado por{" "}
             <a
@@ -572,6 +993,7 @@ export function SiteChrome({
           <Image src="/whatsapp.svg" alt="" width={21} height={21} />
           <span>WhatsApp</span>
         </a>
+
         <a
           className="social-pill instagram"
           href={settings.instagramUrl}
