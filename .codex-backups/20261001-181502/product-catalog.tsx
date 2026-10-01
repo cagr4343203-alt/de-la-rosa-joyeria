@@ -1,9 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import {
-  ArrowRight,
   Filter,
   Gem,
   Search,
@@ -12,8 +9,8 @@ import {
   Watch,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { categories, money, type Product } from "@/lib/store";
+import { useEffect, useMemo, useState } from "react";
+import { categories, type Product } from "@/lib/store";
 import { ProductCard } from "./product-card";
 import styles from "./product-catalog.module.css";
 
@@ -440,9 +437,7 @@ export function ProductCatalog({
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("featured");
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_PRODUCTS);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
   const showWatchSubtypeFilter = category === "Relojes";
   const showBraceletSubtypeFilter = category === "Pulseras";
   const showAudienceSubtypeFilter = ["Todo", "Cadenas", "Anillos"].includes(
@@ -532,28 +527,6 @@ export function ProductCatalog({
     };
   }, [filtersOpen]);
 
-  useEffect(() => {
-    if (!suggestionsOpen) return;
-
-    function closeSuggestionsOnOutsideClick(event: PointerEvent) {
-      if (
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target as Node)
-      ) {
-        setSuggestionsOpen(false);
-      }
-    }
-
-    document.addEventListener("pointerdown", closeSuggestionsOnOutsideClick);
-
-    return () => {
-      document.removeEventListener(
-        "pointerdown",
-        closeSuggestionsOnOutsideClick,
-      );
-    };
-  }, [suggestionsOpen]);
-
   const filtered = useMemo(() => {
     const queryWords = getSearchWords(query);
     const searchIsActive = queryWords.length > 0;
@@ -622,24 +595,9 @@ export function ProductCatalog({
     watchSubtype,
   ]);
   const visibleProducts = filtered.slice(0, visibleCount);
-  const suggestedProducts = filtered.slice(0, 5);
-  const trimmedQuery = query.trim();
-  const showSuggestions =
-    suggestionsOpen &&
-    trimmedQuery.length >= 2 &&
-    suggestedProducts.length > 0;
 
   function handleSearchChange(value: string) {
     setQuery(value);
-    setSuggestionsOpen(value.trim().length >= 2);
-  }
-
-  function showAllSearchResults() {
-    setSuggestionsOpen(false);
-    document.querySelector(".catalog-layout")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
   }
 
   function clearFilters() {
@@ -695,88 +653,19 @@ export function ProductCatalog({
           finales se confirman por WhatsApp.
         </p>
 
-        <div className="catalog-search-shell" ref={searchContainerRef}>
-          <label className="catalog-search">
-            <Search size={18} />
+        <label className="catalog-search">
+          <Search size={18} />
 
-            <input
-              type="search"
-              placeholder="Ej.: anillo de oro, cadena de plata..."
-              value={query}
-              onChange={(event) => handleSearchChange(event.target.value)}
-              onFocus={() =>
-                setSuggestionsOpen(query.trim().length >= 2)
-              }
-              onKeyDown={(event) => {
-                if (event.key === "Escape") setSuggestionsOpen(false);
-              }}
-              aria-label="Buscar productos"
-              aria-autocomplete="list"
-              aria-controls="catalog-search-suggestions"
-            />
+          <input
+            type="search"
+            placeholder="Ej.: anillo de oro, cadena de plata..."
+            value={query}
+            onChange={(event) => handleSearchChange(event.target.value)}
+            aria-label="Buscar productos"
+          />
 
-            <span>Buscar</span>
-          </label>
-
-          {showSuggestions ? (
-            <div
-              className="catalog-search-suggestions"
-              id="catalog-search-suggestions"
-              aria-label="Productos sugeridos"
-            >
-              <div className="catalog-search-suggestion-list">
-                {suggestedProducts.map((product) => (
-                  <Link
-                    className="catalog-search-suggestion"
-                    href={
-                      product.growthSlug
-                        ? `/producto/${encodeURIComponent(product.growthSlug)}`
-                        : "/productos"
-                    }
-                    key={String(product.id)}
-                    onClick={() => setSuggestionsOpen(false)}
-                  >
-                    <span className="catalog-search-suggestion-image">
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        sizes="64px"
-                        style={{
-                          objectFit: "contain",
-                          objectPosition: "center",
-                        }}
-                      />
-                    </span>
-
-                    <span className="catalog-search-suggestion-copy">
-                      <span className="catalog-search-suggestion-meta">
-                        {product.category} · {product.material}
-                      </span>
-                      <strong>{product.name}</strong>
-                      <small>
-                        {product.price === 0
-                          ? "Consultar precio"
-                          : money(product.price)}
-                      </small>
-                    </span>
-
-                    <ArrowRight size={18} aria-hidden="true" />
-                  </Link>
-                ))}
-              </div>
-
-              <button
-                className="catalog-search-suggestion-all"
-                type="button"
-                onClick={showAllSearchResults}
-              >
-                Ver todos los resultados para “{trimmedQuery}”
-                <ArrowRight size={16} aria-hidden="true" />
-              </button>
-            </div>
-          ) : null}
-        </div>
+          <span>Buscar</span>
+        </label>
       </section>
 
       <section className="catalog-layout">
