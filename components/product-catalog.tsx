@@ -12,12 +12,15 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { categories, type Product } from "@/lib/store";
 import { ProductCard } from "./product-card";
+import styles from "./product-catalog.module.css";
 
 type SortMode = "featured" | "price-asc" | "price-desc" | "name";
 type MaterialFilter = string;
 type WatchSubtype = "Todos" | "Dama" | "Caballero" | "Infantil";
 type BraceletSubtype = "Todos" | "Dama" | "Caballero";
 type AudienceSubtype = "Todos" | "Dama" | "Caballero";
+
+const INITIAL_VISIBLE_PRODUCTS = 24;
 
 const watchCategories = new Set([
   "Relojes",
@@ -434,6 +437,7 @@ export function ProductCatalog({
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("featured");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_PRODUCTS);
   const showWatchSubtypeFilter = category === "Relojes";
   const showBraceletSubtypeFilter = category === "Pulseras";
   const showAudienceSubtypeFilter = ["Todo", "Cadenas", "Anillos"].includes(
@@ -477,6 +481,43 @@ export function ProductCatalog({
 
     return () => window.cancelAnimationFrame(applyCategoryFrame);
   }, []);
+
+  useEffect(() => {
+    if (!window.location.hash.startsWith("#producto-")) return;
+
+    let requestedAnchor = window.location.hash.slice("#producto-".length);
+
+    try {
+      requestedAnchor = decodeURIComponent(requestedAnchor);
+    } catch {
+      // Conservamos el valor original si el enlace trae una codificación vieja.
+    }
+
+    const productIndex = products.findIndex(
+      (product) =>
+        (product.growthSlug || String(product.id)) === requestedAnchor,
+    );
+
+    if (productIndex < 0) return;
+
+    const revealProductFrame = window.requestAnimationFrame(() => {
+      setVisibleCount(
+        Math.max(
+          INITIAL_VISIBLE_PRODUCTS,
+          Math.ceil((productIndex + 1) / INITIAL_VISIBLE_PRODUCTS) *
+            INITIAL_VISIBLE_PRODUCTS,
+        ),
+      );
+
+      window.requestAnimationFrame(() => {
+        document
+          .getElementById(`producto-${requestedAnchor}`)
+          ?.scrollIntoView({ block: "center" });
+      });
+    });
+
+    return () => window.cancelAnimationFrame(revealProductFrame);
+  }, [products]);
 
   useEffect(() => {
     document.body.classList.toggle("filters-open", filtersOpen);
@@ -553,6 +594,7 @@ export function ProductCatalog({
     sort,
     watchSubtype,
   ]);
+  const visibleProducts = filtered.slice(0, visibleCount);
 
   function handleSearchChange(value: string) {
     setQuery(value);
@@ -985,15 +1027,38 @@ export function ProductCatalog({
           </div>
 
           {filtered.length ? (
-            <div className="catalog-grid">
-              {filtered.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  eager={index < 4}
-                />
-              ))}
-            </div>
+            <>
+              <div className="catalog-grid">
+                {visibleProducts.map((product, index) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    eager={index < 4}
+                  />
+                ))}
+              </div>
+
+              {visibleProducts.length < filtered.length ? (
+                <div className={styles.loadMore}>
+                  <span>
+                    Mostrando {visibleProducts.length} de {filtered.length}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setVisibleCount((current) =>
+                        Math.min(
+                          current + INITIAL_VISIBLE_PRODUCTS,
+                          filtered.length,
+                        ),
+                      )
+                    }
+                  >
+                    Ver más productos
+                  </button>
+                </div>
+              ) : null}
+            </>
           ) : (
             <div className="catalog-empty">
               <span>◇</span>
