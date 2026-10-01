@@ -85,7 +85,7 @@ function productHref(product: Product) {
   const slug = product.growthSlug?.trim();
 
   if (slug) {
-    return `/${encodeURIComponent(slug)}`;
+    return `/producto/${encodeURIComponent(slug)}`;
   }
 
   return "/productos";
