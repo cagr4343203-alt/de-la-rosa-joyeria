@@ -53,7 +53,11 @@ const announcementItems = [
   "Perforación de oreja con reserva",
 ];
 
-const NAVIGATION_LOADER_DURATION_MS = 650;
+// Las rutas que Next.js ya tiene preparadas suelen cambiar casi al instante.
+// Esperamos un momento antes de mostrar el panel para evitar un destello y solo
+// dar feedback cuando una navegación realmente está demorando.
+const NAVIGATION_LOADER_SHOW_DELAY_MS = 180;
+const NAVIGATION_LOADER_FALLBACK_MS = 5000;
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -116,7 +120,7 @@ export function SiteChrome({
   const drawerScrollRef = useRef<HTMLDivElement>(null);
   const previousPathnameRef = useRef(pathname);
   const navigationPendingRef = useRef(false);
-  const navigationHideTimerRef = useRef<number | undefined>(undefined);
+  const navigationShowTimerRef = useRef<number | undefined>(undefined);
   const navigationFallbackTimerRef = useRef<number | undefined>(undefined);
 
   const normalizedQuery = normalizeSearch(searchQuery);
@@ -234,22 +238,18 @@ export function SiteChrome({
     if (!navigationPendingRef.current) return;
 
     navigationPendingRef.current = false;
+    window.clearTimeout(navigationShowTimerRef.current);
     window.clearTimeout(navigationFallbackTimerRef.current);
-
-    navigationHideTimerRef.current = window.setTimeout(
-      () => {
-        setLoading(false);
-        document.body.classList.remove("page-loading");
-        document.documentElement.dataset.siteReady = "true";
-        window.dispatchEvent(new Event("dela:site-ready"));
-      },
-      NAVIGATION_LOADER_DURATION_MS,
-    );
+    setLoading(false);
+    document.body.classList.remove("page-loading");
+    document.documentElement.dataset.siteReady = "true";
+    window.dispatchEvent(new Event("dela:site-ready"));
   }, [pathname]);
 
   useEffect(() => {
     const finishFallback = () => {
       navigationPendingRef.current = false;
+      window.clearTimeout(navigationShowTimerRef.current);
       setLoading(false);
       document.body.classList.remove("page-loading");
       document.documentElement.dataset.siteReady = "true";
@@ -257,23 +257,24 @@ export function SiteChrome({
     };
 
     const beginNavigation = (nextUrl?: URL) => {
-      window.clearTimeout(navigationHideTimerRef.current);
+      window.clearTimeout(navigationShowTimerRef.current);
       window.clearTimeout(navigationFallbackTimerRef.current);
 
       navigationPendingRef.current = true;
-      document.documentElement.dataset.siteReady = "false";
-      document.body.classList.add("page-loading");
       setMenuOpen(false);
       setSearchOpen(false);
-      setLoading(true);
 
-      const samePage =
-        nextUrl &&
-        nextUrl.pathname === window.location.pathname;
+      navigationShowTimerRef.current = window.setTimeout(() => {
+        if (!navigationPendingRef.current) return;
+
+        document.documentElement.dataset.siteReady = "false";
+        document.body.classList.add("page-loading");
+        setLoading(true);
+      }, NAVIGATION_LOADER_SHOW_DELAY_MS);
 
       navigationFallbackTimerRef.current = window.setTimeout(
         finishFallback,
-        samePage ? NAVIGATION_LOADER_DURATION_MS : 1600,
+        NAVIGATION_LOADER_FALLBACK_MS,
       );
     };
 
@@ -307,16 +308,9 @@ export function SiteChrome({
       if (nextUrl.origin !== window.location.origin) return;
 
       const currentUrl = new URL(window.location.href);
-      const isNavigationPanelLink = Boolean(
-        anchor.closest(
-          ".desktop-nav, .mobile-drawer nav, .mobile-bottom-nav",
-        ),
-      );
-      const isCurrentUrl =
-        nextUrl.pathname === currentUrl.pathname &&
-        nextUrl.search === currentUrl.search;
-
-      if (isCurrentUrl && !isNavigationPanelLink) {
+      // Los filtros, anclas y el enlace de la ruta actual no necesitan cubrir
+      // la pantalla: permanecen en la misma página.
+      if (nextUrl.pathname === currentUrl.pathname) {
         return;
       }
 
@@ -331,7 +325,7 @@ export function SiteChrome({
     return () => {
       document.removeEventListener("click", handleInternalLink, true);
       window.removeEventListener("popstate", handleHistoryNavigation);
-      window.clearTimeout(navigationHideTimerRef.current);
+      window.clearTimeout(navigationShowTimerRef.current);
       window.clearTimeout(navigationFallbackTimerRef.current);
       document.body.classList.remove("page-loading");
     };

@@ -3,6 +3,7 @@ import {
   type SanityImageSource,
 } from "@sanity/image-url";
 import { defineQuery } from "next-sanity";
+import { cache } from "react";
 import { products as fallbackProducts, type Product } from "@/lib/store";
 import { sanityClient } from "./client";
 
@@ -47,7 +48,7 @@ type SanityProduct = {
   status?: "available" | "outOfStock" | "hidden";
 };
 
-export async function getProducts(): Promise<Product[]> {
+export const getProducts = cache(async function getProducts(): Promise<Product[]> {
   try {
     const entries = await sanityClient.fetch<SanityProduct[]>(
       PRODUCTS_QUERY,
@@ -99,4 +100,4 @@ export async function getProducts(): Promise<Product[]> {
   } catch {
     return fallbackProducts;
   }
-}
+});

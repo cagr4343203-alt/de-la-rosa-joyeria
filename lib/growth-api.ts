@@ -29,7 +29,9 @@ export async function getGrowthMaterials() {
         "content-type": "application/json",
       },
       body: JSON.stringify({ requested_site_slug: GROWTH_SITE_SLUG }),
-      next: { revalidate: 60, tags: ["growth-materials"] },
+      // Los cambios del panel invalidan esta etiqueta inmediatamente. Entre
+      // cambios podemos reutilizar el resultado para no frenar el catálogo.
+      next: { revalidate: 300, tags: ["growth-materials"] },
     });
     if (!response.ok) return FALLBACK_GROWTH_MATERIALS;
 
