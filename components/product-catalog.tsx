@@ -462,6 +462,23 @@ export function ProductCatalog({
   const showMaterialFilter = materialOptions.length > 1;
 
   useEffect(() => {
+    const requestedCategory = new URLSearchParams(window.location.search).get(
+      "categoria",
+    );
+
+    if (!requestedCategory) return;
+
+    const applyCategoryFrame = window.requestAnimationFrame(() => {
+      setCategory(getInitialCategory(requestedCategory));
+      setWatchSubtype(getInitialWatchSubtype(requestedCategory));
+      setBraceletSubtype(getInitialBraceletSubtype(requestedCategory));
+      setAudienceSubtype(getInitialAudienceSubtype(requestedCategory));
+    });
+
+    return () => window.cancelAnimationFrame(applyCategoryFrame);
+  }, []);
+
+  useEffect(() => {
     document.body.classList.toggle("filters-open", filtersOpen);
 
     return () => {

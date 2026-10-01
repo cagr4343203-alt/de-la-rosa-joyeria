@@ -11,22 +11,16 @@ export const metadata = {
   },
 };
 
-export default async function ProductsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ categoria?: string }>;
-}) {
-  const [products, managedMaterials, params] = await Promise.all([
+export default async function ProductsPage() {
+  const [products, managedMaterials] = await Promise.all([
     getProducts(),
     getGrowthMaterials(),
-    searchParams,
   ]);
 
   return (
     <ProductCatalog
       products={products}
       managedMaterials={managedMaterials}
-      initialCategory={params.categoria ?? "Todo"}
     />
   );
 }

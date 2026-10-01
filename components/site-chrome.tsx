@@ -256,7 +256,7 @@ export function SiteChrome({
       window.dispatchEvent(new Event("dela:site-ready"));
     };
 
-    const beginNavigation = (nextUrl?: URL) => {
+    const beginNavigation = () => {
       window.clearTimeout(navigationShowTimerRef.current);
       window.clearTimeout(navigationFallbackTimerRef.current);
 
@@ -314,7 +314,7 @@ export function SiteChrome({
         return;
       }
 
-      beginNavigation(nextUrl);
+      beginNavigation();
     };
 
     const handleHistoryNavigation = () => beginNavigation();

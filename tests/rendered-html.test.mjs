@@ -52,15 +52,14 @@ test("renders professional catalog descriptions and compact order links", async 
   assert.match(await orderResponse.text(), /Resumen del pedido|Tu pedido/i);
 });
 
-test("renders bracelet filters for dama and caballero", async () => {
+test("renders bracelet categories for client-side filtering", async () => {
   const response = await render("/productos?categoria=Pulseras");
 
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /Tipos de pulsera/);
-  assert.match(html, /Todas las pulseras/);
-  assert.match(html, /Pulseras para dama/);
-  assert.match(html, /Pulseras para caballero/);
+  assert.match(html, /Pulseras/);
+  assert.match(html, /Para quién/);
+  assert.match(html, /Dama y caballero/);
 });
 
 test("renders dama and caballero filters for all products, chains and rings", async () => {
